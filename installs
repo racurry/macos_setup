@@ -13,6 +13,7 @@ brew tap homebrew/versions
 brew tap phinze/homebrew-cask
 
 # Install gui apps
+brew cask install 1password
 brew cask install adium
 brew cask install alfred
 brew cask install bitcasa
@@ -33,7 +34,9 @@ brew cask install witch
 
 # Install non-guis
 brew install mackup
+brew install git bash-completion
 npm install nvm
+
 
 # Install rvm
 ruby -e "$(curl -sSL https://get.rvm.io | bash)"
