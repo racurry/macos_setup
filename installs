@@ -4,7 +4,7 @@
 # > xcode-select --install
 
 # Install homebrew
-ruby -e "$(curl -fsSL https://raw.github.com/mxcl/homebrew/go)"
+ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 
 # Configure homebrew
 brew update
@@ -12,8 +12,9 @@ brew upgrade
 brew tap homebrew/versions
 brew tap phinze/homebrew-cask
 
+brew install brew-cask
+
 # Install gui apps
-brew cask install 1password
 brew cask install adium
 brew cask install alfred
 brew cask install bitcasa
@@ -21,10 +22,10 @@ brew cask install caffeine
 brew cask install dropbox
 brew cask install evernote
 brew cask install flash
-brew cask install gas-mask
 brew cask install google-chrome
 brew cask install iterm2
 brew cask install node
+brew cask install onepassword
 brew cask install silverlight
 brew cask install Skype
 brew cask install spectacle
@@ -35,8 +36,6 @@ brew cask install witch
 # Install non-guis
 brew install mackup
 brew install git bash-completion
-npm install nvm
-
 
 # Install rvm
 ruby -e "$(curl -sSL https://get.rvm.io | bash)"
