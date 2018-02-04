@@ -75,6 +75,11 @@
 	      "name": "nvAlt",
 	      "type": "homebrewcask",
 	      "package": "nvalt"
+	    },
+	    {
+	    	"name": "git completion",
+	    	"type": "homebrew",
+	    	"package": "bash-completion"
 	    }
 	]
 }
