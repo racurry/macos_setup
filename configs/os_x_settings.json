@@ -36,6 +36,10 @@
     {
       "description": "Show hidden files",
       "command": "defaults write com.apple.finder AppleShowAllFiles YES"
+    },
+    {
+      "description": "Set default Finder window view to column view",
+      "command": "defaults write com.apple.finder FXPreferredViewStyle -string \"Nlsv\""
     }
   ]
 }
