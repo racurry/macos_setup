@@ -32,6 +32,10 @@
     {
       "description": "Disable smart quotes",
       "command": "defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false"
+    },
+    {
+      "description": "Show hidden files",
+      "command": "defaults write com.apple.finder AppleShowAllFiles YES"
     }
   ]
 }
