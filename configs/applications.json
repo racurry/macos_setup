@@ -80,6 +80,12 @@
 	    	"name": "git completion",
 	    	"type": "homebrew",
 	    	"package": "bash-completion"
+	    },
+	    {
+        "name": "F.lux",
+        "type": "homebrewcask",
+        "package": "flux",
+        "open_after_install": true
 	    }
 	]
 }
