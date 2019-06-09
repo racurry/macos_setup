@@ -1,91 +1,96 @@
 {
 	"applications": [
-	    {
-	      "name": "XCode Command Line Tools",
-	      "type": "shell",
-	      "test": "gcc --help",
-	      "command": "xcode-select --install"
-	    },
-	    {
-	      "name": "Homebrew",
-	      "type": "shell",
-	      "command": "/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"",
-	      "test": "brew help"
-	    },
-	    {
-	      "name": "Homebrew Cask",
-	      "type": "shell",
-	      "command": "brew tap caskroom/cask",
-	      "test": "brew tap | grep caskroom/cask"
-	    },
-	    {
-	      "name": "rbenv",
-	      "type": "homebrew",
-	      "package": "rbenv"
-	    },
-	    {
-	      "name": "git",
-	      "type": "homebrew",
-	      "package": "git"
-	    },
-	    {
-	      "name": "Caffeine",
-	      "type": "homebrewcask",
-	      "package": "caffeine",
-	      "open_after_install": true
-	    },
-	    {
-	      "name": "Spectacle",
-	      "type": "homebrewcask",
-	      "package": "spectacle",
-	      "open_after_install": true
-	    },
-	    {
-	      "name": "Alfred",
-	      "type": "homebrewcask",
-	      "package": "alfred",
-	      "open_after_install": true
-	    },
-	    {
-	      "name": "Sublime Text",
-	      "type": "homebrewcask",
-	      "package": "sublime-text"
-	    },
-	    {
-	      "name": "Dropbox",
-	      "type": "homebrewcask",
-	      "package": "dropbox"
-	    },
-	    {
-	      "name": "iDrive",
-	      "type": "homebrewcask",
-	      "package": "idrive"
-	    },
-	    {
-	      "name": "Hazel",
-	      "type": "homebrewcask",
-	      "package": "hazel"
-	    },
-	    {
-	      "name": "Google Photos backup",
-	      "type": "homebrewcask",
-	      "package": "google-photos-backup-and-sync"
-	    },
-	    {
-	      "name": "nvAlt",
-	      "type": "homebrewcask",
-	      "package": "nvalt"
-	    },
-	    {
-	    	"name": "git completion",
-	    	"type": "homebrew",
-	    	"package": "bash-completion"
-	    },
-	    {
-        "name": "F.lux",
-        "type": "homebrewcask",
-        "package": "flux",
-        "open_after_install": true
-	    }
+    {
+      "name": "XCode Command Line Tools",
+      "type": "shell",
+      "test": "gcc --help",
+      "command": "xcode-select --install"
+    },
+    {
+      "name": "Homebrew",
+      "type": "shell",
+      "command": "/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"",
+      "test": "brew help"
+    },
+    {
+      "name": "Homebrew Cask",
+      "type": "shell",
+      "command": "brew tap caskroom/cask",
+      "test": "brew tap | grep caskroom/cask"
+    },
+    {
+      "name": "rbenv",
+      "type": "homebrew",
+      "package": "rbenv"
+    },
+    {
+      "name": "zsh",
+      "type": "homebrew",
+      "package": "zsh"
+    },
+    {
+      "name": "git",
+      "type": "homebrew",
+      "package": "git"
+    },
+    {
+      "name": "Caffeine",
+      "type": "homebrewcask",
+      "package": "caffeine",
+      "open_after_install": true
+    },
+    {
+      "name": "Spectacle",
+      "type": "homebrewcask",
+      "package": "spectacle",
+      "open_after_install": true
+    },
+    {
+      "name": "Alfred",
+      "type": "homebrewcask",
+      "package": "alfred",
+      "open_after_install": true
+    },
+    {
+      "name": "Sublime Text",
+      "type": "homebrewcask",
+      "package": "sublime-text"
+    },
+    {
+      "name": "Dropbox",
+      "type": "homebrewcask",
+      "package": "dropbox"
+    },
+    {
+      "name": "iDrive",
+      "type": "homebrewcask",
+      "package": "idrive"
+    },
+    {
+      "name": "Hazel",
+      "type": "homebrewcask",
+      "package": "hazel"
+    },
+    {
+      "name": "Google Photos backup",
+      "type": "homebrewcask",
+      "package": "google-photos-backup-and-sync"
+    },
+    {
+      "name": "nvAlt",
+      "type": "homebrewcask",
+      "package": "nvalt"
+    },
+    {
+      "name": "F.lux",
+      "type": "homebrewcask",
+      "package": "flux",
+      "open_after_install": true
+    },
+    {
+      "name": "Oh my ZSH",
+      "type": "shell",
+      "package": "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
+    }
 	]
 }
