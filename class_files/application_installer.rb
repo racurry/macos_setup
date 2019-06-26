@@ -23,7 +23,7 @@ class ApplicationInstaller
 
       case result
       when ALREADY
-        puts "🔸 #{application.name} is already installed.  Skipping"
+        puts "✅  #{application.name} is already installed.  Skipping"
       when SUCCESS
         puts "✅  #{application.name} successfully installed."
       when FAILURE
