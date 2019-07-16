@@ -7,3 +7,14 @@ Software to add:
 	- Bartender
 	- Itsycal
 	- Lastpass
+Do work/personal split
+	- Work only apps
+	- git config
+Share/sync configs
+	- Alfred
+	- Hazel
+	- Spectacle
+	- Bartender
+	- Itsycal
+App configuration
+	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up

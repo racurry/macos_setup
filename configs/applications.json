@@ -88,9 +88,16 @@
       "open_after_install": true
     },
     {
-      "name": "Oh my ZSH",
-      "type": "shell",
-      "package": "sh -c \"$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)\""
+      "name": "Bartender",
+      "type": "homebrewcask",
+      "package": "bartender",
+      "open_after_install": true
+    },
+    {
+      "name": "iTerm2",
+      "type": "homebrewcask",
+      "package": "iterm2",
+      "open_after_install": true
     }
 	]
 }
