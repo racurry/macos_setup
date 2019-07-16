@@ -63,6 +63,7 @@ do_trackpad_setup() {
 do_kill_running_apps()  {
   killall Dock
   killall ControlStrip
+  # TODO - how do I kill the trackpad or whatever
 }
 
 # Wipe everything back to factory defaults
