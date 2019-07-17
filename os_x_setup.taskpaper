@@ -10,9 +10,7 @@ Share/sync configs:
 App configuration:
 	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up
 	- Shell prompt
-Bash profile:
-- Add the following line to your ~/.bash_profile:
-	[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+	- Fix git completion
 Archive:
 	- The Archive @done
 	- Itsycal @done
