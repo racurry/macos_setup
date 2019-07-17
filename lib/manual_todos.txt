@@ -1,0 +1,14 @@
+Set spotlight search to Ctrl+space
+Set up a schedule for do not disturb, where it is only on from 2-2:01am
+Configure the 'today' view in notification center
+Set up iDrive backup schedule
+Set up Google photo backup
+Download & install The Archive: https://zettelkasten.de/the-archive/
+Log in to dropbox
+Run `mackup restore`
+Set up alfred: Advanced -> preference folder to `~/Dropbox/Alfred`
+Set up alfred: General -> set hotkey to cmd+space
+Set up alfred: General -> request permissions
+Set up Itsycal: Add calendars to Calendar.app
+Set up Itsycal: Set date format to `E, MMM d h:mm a`
+Set screenshot directory to ~/Screenshots

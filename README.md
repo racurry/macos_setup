@@ -11,26 +11,17 @@
 `mkdir ~/workspace`
 `git clone git@github.com:racurry/osx_setup.git ~/workspace`
 
-## Step 1: Run the setup 
+## Step 1: Run the setup
 
 ```
 cd osx_setup
 ./setup.rb
 ```
 
-## Step 2: Do a bunch of manual crap I haven't automated yet
-1. Enable window switching with backtick
-1. Set up a schedule for do not disturb, where it is only on from 2-2:01am
-1. Configure the "today" view in notification center
-1. Set spotlight search to Ctrl+_
+## Forget any manual todos?
 
-## Step 3: Get all settings right
-1. Log in to dropbox
-1. `mackup restore`
-1. Set up Alfred 
-	1. Advanced -> preference folder to `~/Dropbox/Alfred`
-	1. General -> set hotkey to cmd+space
-	1. General -> request permissions
+Add them to lib/manual_todos.txt
+
 
 ## References
 

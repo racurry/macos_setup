@@ -2,16 +2,15 @@ Do work/personal split:
 	- Work only apps
 	- git config
 Share/sync configs:
-	- Alfred
-	- Hazel
-	- Spectacle
-	- Bartender
-	- Itsycal
-	- Everything w/ mackup
-App configuration:
-	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up
 	- dotfiles
 Archive:
+	- Hazel @done
+	- Bartender @done
+	- Itsycal @done
+	- Alfred @done
+	- Spectacle @done
+	- Everything w/ mackup @done
+	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up @done
 	- Shell prompt @done
 	- Fix git completion @done
 	- Fix command + ~ for window switching @done
