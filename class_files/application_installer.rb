@@ -15,7 +15,7 @@ class ApplicationInstaller
   def initialize(applications)
     @applications = applications
   end
-
+  
   def install!
     applications.each do |application|
       method = "install_#{application.type}".to_sym

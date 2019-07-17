@@ -1,38 +1,6 @@
 {
 	"applications": [
-    {
-      "name": "XCode Command Line Tools",
-      "type": "shell",
-      "test": "gcc --help",
-      "command": "xcode-select --install"
-    },
-    {
-      "name": "Homebrew",
-      "type": "shell",
-      "command": "/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"",
-      "test": "brew help"
-    },
-    {
-      "name": "Homebrew Cask",
-      "type": "shell",
-      "command": "brew tap caskroom/cask",
-      "test": "brew tap | grep caskroom/cask"
-    },
-    {
-      "name": "rbenv",
-      "type": "homebrew",
-      "package": "rbenv"
-    },
-    {
-      "name": "zsh",
-      "type": "homebrew",
-      "package": "zsh"
-    },
-    {
-      "name": "git",
-      "type": "homebrew",
-      "package": "git"
-    },
+    
     {
       "name": "Caffeine",
       "type": "homebrewcask",

@@ -6,12 +6,12 @@ do_keyboard_setup() {
   echo "Setting up keyboard preferences..."
 
   # Fast key repeats
-  defaults write -g InitialKeyRepeat -int 7
-  defaults write -g KeyRepeat -int 0
+  defaults write -g InitialKeyRepeat -int 15
+  defaults write -g KeyRepeat -int 2
 }
 
 do_touchbar_setup() {
-  echo "Fixing the touchbar..."
+  echo "    ✅ Fixing the touchbar..."
   # Only show the regular control strip
   defaults write com.apple.touchbar.agent PresentationModeGlobal fullControlStrip
   # Show function keys on fn press
@@ -19,7 +19,7 @@ do_touchbar_setup() {
 }
 
 do_dock_setup() {
-  echo "Setting up the dock..."
+  echo "    ✅ Setting up the dock..."
 
 	# Only show active things in the dock
 	defaults write com.apple.dock static-only -bool true
@@ -40,12 +40,12 @@ do_dock_setup() {
   # 10: Put display to sleep
   # 11: Launchpad
   # 12: Notification Center
-  defaults write com.apple.dock wvous-bl-corner -int 5
+  defaults write com.apple.dock wvous-bl-corner -int 10
   defaults write com.apple.dock wvous-bl-modifier -int 0
 }
 
 do_trackpad_setup() {
-  echo "Setting up the trackpad..."
+  echo "    ✅ Setting up the trackpad..."
 
   # Enable one-click taps
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
@@ -72,8 +72,16 @@ do_config_resets() {
   defaults delete com.apple.dock
 }
 
-do_keyboard_setup
-do_trackpad_setup
-do_dock_setup
-do_touchbar_setup
-do_kill_running_apps
+do_setup() {
+  echo "----------------------------------------"
+  echo "Setting up macOS"
+  echo "----------------------------------------"
+  do_keyboard_setup
+  do_trackpad_setup
+  do_dock_setup
+  do_touchbar_setup
+  do_kill_running_apps
+}
+
+do_setup
+
