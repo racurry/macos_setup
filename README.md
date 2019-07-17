@@ -17,3 +17,11 @@
 cd osx_setup
 ./setup.rb
 ```
+
+## References
+
+### macOS settings
+- http://www.bresink.com/osx/TinkerTool.html
+
+### Cask lists
+- https://formulae.brew.sh/
