@@ -1,22 +1,23 @@
-Covert this to a functional script:
-	The config-based stuff is too hard to scan.
-	- Create a script
-Software to add:
-	- Taskpaper
-	- The Archive
-	- Bartender
-	- Itsycal
-	- Lastpass
-	- git autocomplete
-Do work/personal split
+Do work/personal split:
 	- Work only apps
 	- git config
-Share/sync configs
+Share/sync configs:
 	- Alfred
 	- Hazel
 	- Spectacle
 	- Bartender
 	- Itsycal
-App configuration
+App configuration:
 	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up
 	- Shell prompt
+Bash profile:
+- Add the following line to your ~/.bash_profile:
+	[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+Archive:
+	- The Archive @done
+	- Itsycal @done
+	- Lastpass @done
+	- git autocomplete @done
+	- Bartender @done
+	- Taskpaper @done
+	- Create a script @done

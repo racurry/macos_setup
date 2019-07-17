@@ -11,7 +11,7 @@ do_keyboard_setup() {
 }
 
 do_touchbar_setup() {
-  echo "    ✅ Fixing the touchbar..."
+  echo "    ✅  Fixing the touchbar..."
   # Only show the regular control strip
   defaults write com.apple.touchbar.agent PresentationModeGlobal fullControlStrip
   # Show function keys on fn press
@@ -19,7 +19,7 @@ do_touchbar_setup() {
 }
 
 do_dock_setup() {
-  echo "    ✅ Setting up the dock..."
+  echo "    ✅  Setting up the dock..."
 
 	# Only show active things in the dock
 	defaults write com.apple.dock static-only -bool true
@@ -45,7 +45,7 @@ do_dock_setup() {
 }
 
 do_trackpad_setup() {
-  echo "    ✅ Setting up the trackpad..."
+  echo "    ✅  Setting up the trackpad..."
 
   # Enable one-click taps
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true

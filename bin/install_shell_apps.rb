@@ -22,9 +22,9 @@ def install_shell_app(name:, test:, command:)
   if system("#{test} > /dev/null 2>&1")
     puts "    🆗  #{name} is already installed.  Skipping"
   elsif system(command)
-    puts "    ✅ #{name} successfully installed!"
+    puts "    ✅  #{name} successfully installed!"
   else
-    puts "    ⛔ Something went wrong with #{name}"
+    puts "    ⛔  Something went wrong with #{name}"
   end
 end
 
