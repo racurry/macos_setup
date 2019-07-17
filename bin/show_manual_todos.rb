@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 MANUAL_TODOS = [
-  "Enable accessibility so Alfred will work",
   "Set up iDrive backup schedule",
   "Set up Google photo backup",
   "Download & install The Archive: https://zettelkasten.de/the-archive/"

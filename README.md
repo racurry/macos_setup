@@ -22,10 +22,15 @@ cd osx_setup
 1. Enable window switching with backtick
 1. Set up a schedule for do not disturb, where it is only on from 2-2:01am
 1. Configure the "today" view in notification center
+1. Set spotlight search to Ctrl+_
 
 ## Step 3: Get all settings right
 1. Log in to dropbox
 1. `mackup restore`
+1. Set up Alfred 
+	1. Advanced -> preference folder to `~/Dropbox/Alfred`
+	1. General -> set hotkey to cmd+space
+	1. General -> request permissions
 
 ## References
 
