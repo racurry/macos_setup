@@ -11,6 +11,7 @@ App configuration:
 	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up
 	- Shell prompt
 	- Fix git completion
+	- dotfiles
 Archive:
 	- The Archive @done
 	- Itsycal @done
