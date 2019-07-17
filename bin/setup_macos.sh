@@ -60,9 +60,16 @@ do_trackpad_setup() {
   defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
 }
 
+do_notification_settings() {
+  # TODO this will just turn back on tomorrow.
+  defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturb -boolean true
+  defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturbDate -date "`date -u +\"%Y-%m-%d %H:%M:%S +000\"`"
+}
+
 do_kill_running_apps()  {
   killall Dock
   killall ControlStrip
+  killall NotificationCenter
   # TODO - how do I kill the trackpad or whatever
 }
 

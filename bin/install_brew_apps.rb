@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-BREW_APPS = %w{rbenv git zsh bash-completion}
+BREW_APPS = %w{rbenv git zsh bash-completion mackup}
 BREW_CASK_APPS = %w{caffeine spectacle alfred sublime-text 
   dropbox idrive google-photos-backup-and-sync flux bartender 
-  iterm2 taskpaper lastpass itsycal}
+  iterm2 taskpaper lastpass itsycal }
 
 def install_app(name:,command:'brew')
   if  `#{command} info #{name} 2>&1` !~ /Not installed/i

@@ -18,6 +18,15 @@ cd osx_setup
 ./setup.rb
 ```
 
+## Step 2: Do a bunch of manual crap I haven't automated yet
+1. Enable window switching with backtick
+1. Set up a schedule for do not disturb, where it is only on from 2-2:01am
+1. Configure the "today" view in notification center
+
+## Step 3: Get all settings right
+1. Log in to dropbox
+1. `mackup restore`
+
 ## References
 
 ### macOS settings

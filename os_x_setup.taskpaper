@@ -7,12 +7,15 @@ Share/sync configs:
 	- Spectacle
 	- Bartender
 	- Itsycal
+	- Everything w/ mackup
 App configuration:
 	- Add a gitignored file/folder and track which apps need manual set up, and have been manually set up
-	- Shell prompt
-	- Fix git completion
 	- dotfiles
 Archive:
+	- Shell prompt @done
+	- Fix git completion @done
+	- Fix command + ~ for window switching @done
+	- Disable macos notifications @done
 	- The Archive @done
 	- Itsycal @done
 	- Lastpass @done
