@@ -66,6 +66,15 @@ do_notification_settings() {
   defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturbDate -date "`date -u +\"%Y-%m-%d %H:%M:%S +000\"`"
 }
 
+do_fix_screenshots() {
+  # Make a screenshots folder
+  mkdir -p ~/Screen\ Shots
+  defaults write com.apple.screencapture location ~/Screen\ Shots
+
+  # To hell with preview thumbnails
+  defaults write com.apple.screencapture show-thumbnail -bool FALSE
+}
+
 do_kill_running_apps()  {
   killall Dock
   killall ControlStrip
@@ -87,6 +96,8 @@ do_setup() {
   do_trackpad_setup
   do_dock_setup
   do_touchbar_setup
+  do_fix_screenshots
+
   do_kill_running_apps
 }
 

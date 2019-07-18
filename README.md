@@ -18,6 +18,10 @@ cd osx_setup
 ./setup.rb
 ```
 
+## Other apps to consider
+- Lulu: `brew cask install lulu`
+- VNote: `brew cask install vnote`
+
 ## Forget any manual todos?
 
 Add them to lib/manual_todos.txt
