@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-BREW_APPS = %w{rbenv git zsh bash-completion mackup nvm yarn}
+BREW_APPS = %w{rbenv git zsh bash-completion nvm yarn}
 BREW_CASK_APPS = %w{caffeine spectacle alfred sublime-text
   dropbox idrive google-photos-backup-and-sync flux bartender
   iterm2 taskpaper lastpass itsycal }

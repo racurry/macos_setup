@@ -1,9 +1,11 @@
 Do work/personal split:
-	- Work only apps
 	- git config
 Share/sync configs:
 	- dotfiles
 Archive:
+	- Defaulting finder window to columns @done
+	- Dock icon size @done
+	- Work only apps @done
 	- Hazel @done
 	- Bartender @done
 	- Itsycal @done
