@@ -1,8 +1,7 @@
-Do work/personal split:
-	- git config
 Share/sync configs:
 	- dotfiles
 Archive:
+	- git config @done
 	- Defaulting finder window to columns @done
 	- Dock icon size @done
 	- Work only apps @done
