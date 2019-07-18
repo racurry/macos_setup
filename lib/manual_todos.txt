@@ -11,4 +11,5 @@ Set up alfred: General -> set hotkey to cmd+space
 Set up alfred: General -> request permissions
 Set up Itsycal: Add calendars to Calendar.app
 Set up Itsycal: Set date format to `E, MMM d h:mm a`
+Get those dotfiles going: https://github.com/racurry/dotfiles
 Set up your ~/.workrc

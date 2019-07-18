@@ -1,6 +1,7 @@
-Share/sync configs:
-	- dotfiles
+- Add some automation steps to the manual todos. Prompt for "are things ready," then run a bin or whatever
+
 Archive:
+	- dotfiles @done
 	- git config @done
 	- Defaulting finder window to columns @done
 	- Dock icon size @done
