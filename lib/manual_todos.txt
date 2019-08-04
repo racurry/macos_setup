@@ -5,7 +5,6 @@ Set up iDrive backup schedule
 Set up Google photo backup
 Download & install The Archive: https://zettelkasten.de/the-archive/
 Log in to dropbox
-Run `mackup restore`
 Set up alfred: Advanced -> preference folder to `~/Dropbox/Alfred`
 Set up alfred: General -> set hotkey to cmd+space
 Set up alfred: General -> request permissions
