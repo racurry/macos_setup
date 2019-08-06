@@ -126,7 +126,7 @@ do_finder_setup() {
   # Empty Trash securely by default
   defaults write com.apple.finder EmptyTrashSecurely -bool true
   # Set Desktop as the default location for new Finder windows
-# For other paths, use `PfLo` and `file:///full/path/here/`
+  # For other paths, use `PfLo` and `file:///full/path/here/`
   defaults write com.apple.finder NewWindowTarget -string "PfDe"
   defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/"
   # Show icons for hard drives, servers, and removable media on the desktop
@@ -134,6 +134,12 @@ do_finder_setup() {
   defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
   defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
   defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+}
+
+do_screensaver_setup() {
+  # Set screensaver to flurry, start never
+  defaults -currentHost write com.apple.screensaver moduleDict -dict path -string "/System/Library/Screen Savers/Flurry.saver" moduleName -string "Flurry" type -int 0
+  defaults -currentHost write com.apple.screensaver idleTime -int 0
 }
 
 do_kill_running_apps()  {
@@ -157,6 +163,7 @@ do_setup() {
   do_fix_screenshots
   do_finder_setup
   do_notification_settings
+  do_screensaver_setup
 
   do_kill_running_apps
   echo " macOS is setup.  I think you need to restart, though"
