@@ -21,6 +21,9 @@ do_global_settings() {
 
   # Stop iTunes from responding to the keyboard media keys
   launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
+
+  # Don't automatically adjust the brightness of the screen
+  sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
 }
 
 do_keyboard_setup() {
@@ -30,6 +33,9 @@ do_keyboard_setup() {
   defaults write -g InitialKeyRepeat -int 15
   defaults write -g KeyRepeat -int 2
   defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
+
+  # Disable auto-adjust of keyboard brightness
+  sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Keyboard Enabled" -bool false
 }
 
 do_touchbar_setup() {
@@ -42,6 +48,9 @@ do_touchbar_setup() {
 
 do_dock_setup() {
   echo "    ✅  Setting up the dock..."
+
+  # Remove all default apps from the dock
+  defaults write com.apple.dock persistent-apps -array
 
 	# Only show active things in the dock
 	defaults write com.apple.dock static-only -bool true
@@ -148,6 +157,8 @@ do_kill_running_apps()  {
   killall ControlStrip
   killall NotificationCenter
   killall Finder
+  killall SystemUIServer
+  killall cfprefsd
   # TODO - how do I kill the trackpad and the keyboard?
 }
 
