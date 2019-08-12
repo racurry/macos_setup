@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'io/console'
+require_relative '../lib/terminal_helpers.rb'
+
 DONE_FILE_NAME = '.todone'
 MANUAL_TODOS_FILE = 'lib/manual_todos.txt'
 
@@ -26,23 +29,30 @@ def mark_as_done(todo)
 end
 
 def tell_me_what_to_do
-  puts "-" * 40
-  puts "Do each of these!"
-  puts "-" * 40
+
+  section_header "Do it!"
 
   things_to_do.each do |todo|
-    puts "    - #{todo} (d=done,s=skip)"
-    reply = gets.chomp
+    print "    - #{todo} "
+    pprint "(d=done,s=skip)  ", color: :cyan, style: :italic
+    reply = STDIN.getch
     if reply == 'd'
       mark_as_done(todo)
+      puts "✅"
+    else
+      puts "❌"
     end
   end
 
   left_to_do = things_to_do.count
   if left_to_do == 0
-    puts "You don't have anything left to do!"
+    pputs "You don't have anything left to do!", style: :bold, color: :green
+  elsif left_to_do == 1
+    pprint "Still 1 to do.  ", style: :bold
+    puts "Run bin/show_manual_todos.rb any time to finish it"
   else
-    puts "Still #{left_to_do} things to do.  Run bin/show_manual_todos.rb any time to finish them"
+    pprint "Still #{left_to_do} things to do.  ", style: :bold
+    puts "Run bin/show_manual_todos.rb any time to finish them"
   end
 end
 
