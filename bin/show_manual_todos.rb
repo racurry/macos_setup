@@ -46,13 +46,13 @@ def tell_me_what_to_do
 
   left_to_do = things_to_do.count
   if left_to_do == 0
-    pputs "You don't have anything left to do!", style: :bold, color: :green
+    pputs "You don't have anything left to do!", style: :bold, color: :green, indent: 1
   elsif left_to_do == 1
     pprint "Still 1 to do.  ", style: :bold
-    puts "Run bin/show_manual_todos.rb any time to finish it"
+    pputs "Run bin/show_manual_todos.rb any time to finish it", indent: 1
   else
     pprint "Still #{left_to_do} things to do.  ", style: :bold
-    puts "Run bin/show_manual_todos.rb any time to finish them"
+    pputs "Run bin/show_manual_todos.rb any time to finish them", indent: 1
   end
 end
 

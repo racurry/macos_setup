@@ -1,9 +1,38 @@
-#!/bin/sh -e
+ #!/bin/bash
 
 # Set up all of the preferences
 
+indent() {
+  printf "    "
+}
+
+print_starting() {
+  indent
+  printf "\e[1m"
+  printf '%s ' "$@"
+  printf "\e[0m"
+}
+
+print_finished() {
+  CHAR_LENGTH=$1
+  declare -i REMAINING_CHARS
+  REMAINING_CHARS=74-$CHAR_LENGTH
+  for ((n=0;n<$REMAINING_CHARS;n++))
+  do
+    printf "."
+  done
+  printf "✅\n"
+}
+
+do_keep_sudo_alive() {
+  # Keep-alive: update existing `sudo` time stamp until `.macos` has finished
+  while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+}
+
 do_global_settings() {
-  echo "    ✅  Setting up some global preferences..."
+  ITEM="Setting up some global preferences"
+  print_starting $ITEM
+
   # Always show scrollbars
   defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 
@@ -24,10 +53,13 @@ do_global_settings() {
 
   # Don't automatically adjust the brightness of the screen
   sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
+
+  print_finished ${#ITEM}
 }
 
 do_keyboard_setup() {
-  echo "    ✅  Setting up keyboard preferences..."
+  ITEM="Setting up keyboard preferences"
+  print_starting $ITEM
 
   # Fast key repeats
   defaults write -g InitialKeyRepeat -int 15
@@ -36,18 +68,25 @@ do_keyboard_setup() {
 
   # Disable auto-adjust of keyboard brightness
   sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Keyboard Enabled" -bool false
+
+  print_finished ${#ITEM}
 }
 
 do_touchbar_setup() {
-  echo "    ✅  Fixing the touchbar..."
+  ITEM="Fixing the touchbar"
+  print_starting $ITEM
+
   # Only show the regular control strip
   defaults write com.apple.touchbar.agent PresentationModeGlobal fullControlStrip
   # Show function keys on fn press
   defaults write com.apple.touchbar.agent PresentationModeFnModes -dict-add fullControlStrip functionKeys
+
+  print_finished ${#ITEM}
 }
 
 do_dock_setup() {
-  echo "    ✅  Setting up the dock..."
+  ITEM="Setting up the dock"
+  print_starting $ITEM
 
   # Remove all default apps from the dock
   defaults write com.apple.dock persistent-apps -array
@@ -79,10 +118,13 @@ do_dock_setup() {
 
   # Set icon size
   defaults write com.apple.dock tilesize -int 36
+
+  print_finished ${#ITEM}
 }
 
 do_trackpad_setup() {
-  echo "    ✅  Setting up the trackpad..."
+  ITEM="Setting up the trackpad"
+  print_starting $ITEM
 
   # Enable one-click taps
   defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
@@ -95,27 +137,39 @@ do_trackpad_setup() {
   defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
   defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
   defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+
+  print_finished ${#ITEM}
 }
 
 do_notification_settings() {
-  echo "    ✅  Setting up notifications..."
+  ITEM="Setting up notifications"
+  print_starting $ITEM
+
   # TODO this will just turn back on tomorrow.
   # defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturb -boolean true
   # defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturbDate -date "`date -u +\"%Y-%m-%d %H:%M:%S +000\"`"
+
+  print_finished ${#ITEM}
 }
 
 do_fix_screenshots() {
-  echo "    ✅  Fixing screenshot behavior..."
+  ITEM="Fixing screenshot behavior"
+  print_starting $ITEM
+
   # Make a screenshots folder
   mkdir -p ~/Screen\ Shots
   defaults write com.apple.screencapture location ~/Screen\ Shots
 
   # To hell with preview thumbnails
   defaults write com.apple.screencapture show-thumbnail -bool FALSE
+
+  print_finished ${#ITEM}
 }
 
 do_finder_setup() {
-  echo "    ✅  Setting up the finder..."
+  ITEM="Setting up the finder"
+  print_starting $ITEM
+
   # Show all extensions
   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
   # Default new windows to column view
@@ -143,16 +197,25 @@ do_finder_setup() {
   defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
   defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
   defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+
+  print_finished ${#ITEM}
 }
 
 do_screensaver_setup() {
+  ITEM="Setting up the screensaver"
+  print_starting $ITEM
+
   # Set screensaver to flurry, start never
   defaults -currentHost write com.apple.screensaver moduleDict -dict path -string "/System/Library/Screen Savers/Flurry.saver" moduleName -string "Flurry" type -int 0
   defaults -currentHost write com.apple.screensaver idleTime -int 0
+
+  print_finished ${#ITEM}
 }
 
 do_kill_running_apps()  {
-  echo "    ✅  Restarting some things..."
+  ITEM="Restarting some things"
+  print_starting $ITEM
+
   killall Dock
   killall ControlStrip
   killall NotificationCenter
@@ -160,12 +223,16 @@ do_kill_running_apps()  {
   killall SystemUIServer
   killall cfprefsd
   # TODO - how do I kill the trackpad and the keyboard?
+
+  print_finished ${#ITEM}
 }
 
 do_setup() {
-  echo "----------------------------------------"
-  echo "Setting up macOS"
-  echo "----------------------------------------"
+  printf "\n\e[33;1mSetting up macOS\e[0m\n"
+  printf "\e[33;1m--------------------------------------------------------------------------------\e[0m\n"
+
+  do_keep_sudo_alive
+
   do_global_settings
   do_keyboard_setup
   do_trackpad_setup
@@ -177,7 +244,7 @@ do_setup() {
   do_screensaver_setup
 
   do_kill_running_apps
-  echo " macOS is setup.  I think you need to restart, though"
+  printf "\n\e[32;1m    macOS is setup.  I think you need to restart, though\e[0m\n"
 }
 
 # Wipe everything back to factory defaults
