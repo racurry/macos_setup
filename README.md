@@ -1,6 +1,10 @@
 # Setup a new OS X machine
 
-## Step 0: Clone this repo
+## Set up a new machine
+
+Or just update a current one.  These scripts should be idempotent.
+
+### Step 0: Clone this repo
 
 1. Generate a new ssh key:
 `ssh-keygen -t rsa`
@@ -11,7 +15,7 @@
 `mkdir ~/workspace`
 `git clone git@github.com:racurry/osx_setup.git ~/workspace`
 
-## Step 1: Run the setup
+### Step 1: Run the setup
 
 ```
 cd osx_setup

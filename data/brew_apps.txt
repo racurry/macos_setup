@@ -1,6 +1,6 @@
 rbenv
 git
 zsh
-bash-completion
 nvm
 yarn
+mas
