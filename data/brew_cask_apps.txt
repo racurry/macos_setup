@@ -1,0 +1,14 @@
+caffeine
+spectacle
+alfred
+sublime-text
+dropbox
+idrive
+google-photos-backup-and-sync
+flux
+bartender
+iterm2
+taskpaper
+lastpass
+itsycal
+brave-browser

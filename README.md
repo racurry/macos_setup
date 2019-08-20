@@ -18,9 +18,9 @@ cd osx_setup
 ./setup.rb
 ```
 
-## Forget any manual todos?
+## Adding new stuff
 
-Add them to lib/manual_todos.txt
+Dump it into the relevant `txt` file in `data`.
 
 ## References
 

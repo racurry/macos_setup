@@ -2,10 +2,8 @@
 
 require_relative '../lib/terminal_helpers.rb'
 
-BREW_APPS = %w{rbenv git zsh bash-completion nvm yarn}
-BREW_CASK_APPS = %w{caffeine spectacle alfred sublime-text
-  dropbox idrive google-photos-backup-and-sync flux bartender
-  iterm2 taskpaper lastpass itsycal brave-browser}
+BREW_APPS_FILE = 'data/brew_apps.txt'
+BREW_CASK_APPS_FILE = 'data/brew_cask_apps.txt'
 
 def install_app(name:,command:'brew')
   initial_text = "#{name}..."
@@ -30,15 +28,23 @@ def install_app(name:,command:'brew')
   puts emoji
 end
 
+def brew_apps
+  File.open(BREW_APPS_FILE).read.split(/\n/)
+end
+
+def brew_cask_apps
+  File.open(BREW_CASK_APPS_FILE).read.split(/\n/)
+end
+
 def install_apps
   section_header "Installing brew apps"
-  BREW_APPS.each do |app|
+  brew_apps.each do |app|
     install_app(name: app)
   end
   section_footer "Done installing brew apps"
 
   section_header "Installing brew cask apps"
-  BREW_CASK_APPS.each do |app|
+  brew_cask_apps.each do |app|
     install_app(name: app, command: 'brew cask')
   end
   section_footer "Done installing brew cask apps"

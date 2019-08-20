@@ -4,7 +4,7 @@ require 'io/console'
 require_relative '../lib/terminal_helpers.rb'
 
 DONE_FILE_NAME = '.todone'
-MANUAL_TODOS_FILE = 'lib/manual_todos.txt'
+MANUAL_TODOS_FILE = 'data/manual_todos.txt'
 
 def already_done
   if File.exists?(DONE_FILE_NAME)
