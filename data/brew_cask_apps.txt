@@ -12,3 +12,4 @@ taskpaper
 lastpass
 itsycal
 brave-browser
+yakyak
