@@ -13,3 +13,4 @@ lastpass
 itsycal
 brave-browser
 yakyak
+cardhop
