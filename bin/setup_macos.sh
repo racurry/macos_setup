@@ -69,6 +69,15 @@ do_keyboard_setup() {
   # Disable auto-adjust of keyboard brightness
   sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Keyboard Enabled" -bool false
 
+  # Disable autocorrect
+  defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
+
+  # Disable auto-capitalize
+  defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
+  # Disable auto period insert
+  defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
   print_finished ${#ITEM}
 }
 
