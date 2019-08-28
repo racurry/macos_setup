@@ -54,6 +54,9 @@ do_global_settings() {
   # Don't automatically adjust the brightness of the screen
   sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
 
+  # Disable "close windows when quitting an app"
+  defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
+
   print_finished ${#ITEM}
 }
 
