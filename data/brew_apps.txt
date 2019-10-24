@@ -4,3 +4,4 @@ zsh
 nvm
 yarn
 mas
+thefuck
