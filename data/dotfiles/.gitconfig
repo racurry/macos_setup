@@ -1,0 +1,49 @@
+[user]
+  email = aaron@aaroncurry.net
+	name = Aaron Curry
+
+[includeIf "gitdir:~/workspace/stitchfix/"]
+  path = ~/.gitconfig_work
+
+[alias]
+  # Command shortcuts
+  ci = commit
+  co = checkout
+  st = status
+
+  # Prettier, easier to follow logs.
+  lol = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
+
+  # Don't accidentally clobber someone else's stuff
+  pushf = push --force-with-lease
+  # Take some of the sting out of messing up
+  oops = commit --amend --no-edit
+
+[core]
+  excludesfile = ~/.gitignore_global
+  pager = cat
+
+[diff]
+  # Show renames/moves as such
+  renames = true
+
+[status]
+  # Recursively traverse untracked directories to display all contents
+  showUntrackedFiles = all
+
+[color]
+	ui = true
+
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+
+[color "diff"]
+	meta = 11
+	frag = magenta bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse

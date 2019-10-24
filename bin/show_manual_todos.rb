@@ -3,7 +3,7 @@
 require 'io/console'
 require_relative '../lib/terminal_helpers.rb'
 
-DONE_FILE_NAME = '.todone'
+DONE_FILE_NAME = 'data/.todone'
 MANUAL_TODOS_FILE = 'data/manual_todos.txt'
 
 def already_done

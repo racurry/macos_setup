@@ -4,6 +4,12 @@
 
 Or just update a current one.  These scripts should be idempotent.
 
+Things that happen
+1. Install a bunch of software
+2. Set a bunch of settings
+3. Sync up some dotfiles
+4. Remind you about some manual setup steps
+
 ### Step 0: Clone this repo
 
 1. Generate a new ssh key:
@@ -24,7 +30,7 @@ cd osx_setup
 
 ## Adding new stuff
 
-Dump it into the relevant `txt` file in `data`.
+Dump it into the relevant file in `/data`.
 
 ## References
 
