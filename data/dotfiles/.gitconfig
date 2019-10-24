@@ -21,7 +21,7 @@
 
 [core]
   excludesfile = ~/.gitignore_global
-  pager = cat
+  pager = "diff-so-fancy | less --tabs=4"
 
 [diff]
   # Show renames/moves as such

@@ -5,3 +5,4 @@ nvm
 yarn
 mas
 thefuck
+diff-so-fancy

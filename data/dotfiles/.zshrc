@@ -29,6 +29,9 @@ export PATH=$HOME/.rbenv/bin:/usr/local/bin:$HOME/.bin:$PATH
 export LANG=en_US.UTF-8
 export EDITOR='vim'
 
+# Keep less from paginating unless it needs to
+export LESS="$LESS -FRXK"
+
 # NVM!
 export NVM_DIR="$HOME/.nvm"
 [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
