@@ -12,17 +12,15 @@ HYPHEN_INSENSITIVE="true"
 # Display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 plugins=(git bundler)
 
 source $ZSH/oh-my-zsh.sh
 
-# load rbenv automatically
-eval "$(rbenv init - zsh)"
+# Set up some apps
+
+eval "$(rbenv init - zsh)" # rbenv
+eval $(thefuck --alias) # The fuck
 
 # Get the path correct
 export PATH=$HOME/.rbenv/bin:/usr/local/bin:$HOME/.bin:$PATH
@@ -32,10 +30,18 @@ export EDITOR='vim'
 # Keep less from paginating unless it needs to
 export LESS="$LESS -FRXK"
 
+# History
+HISTSIZE=10000
+HISTFILE=~/.zsh_history
+SAVEHIST=50000
+HISTDUP=erase # Erase duplicates in the history file
+setopt appendhistory # Append history to the history file (no overwriting)
+setopt sharehistory # Share history across terminals
+setopt incappendhistory # Immediately append to the history file, not just when a term is killed
+
 # NVM!
 export NVM_DIR="$HOME/.nvm"
 [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion" ] && . "/usr/local/opt/nvm/etc/bash_completion"  # This loads nvm bash_completion
 
 # Set up NPM_TOKEN if .npmrc exists
 if [ -f ~/.npmrc ]; then
@@ -53,12 +59,9 @@ cd () {
   ls -a;
 }
 
+# Help ems
 export workspace=~/workspace
 
-# The Fuck
-eval $(thefuck --alias)
-
-# Aliases
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl ~/.zshrc"
 alias ohmyzsh="subl ~/.oh-my-zsh"
