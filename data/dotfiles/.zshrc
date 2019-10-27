@@ -62,6 +62,9 @@ cd () {
 # Help ems
 export workspace=~/workspace
 
+# Keep friends in sync
+alias friends="friends --filename '~/Dropbox/friends.md'"
+
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl ~/.zshrc"
 alias ohmyzsh="subl ~/.oh-my-zsh"

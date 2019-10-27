@@ -2,6 +2,7 @@
 - Figure out how to have some kind of auto-update thing do git pulls periodically
 - Add some automation steps to the manual todos. Prompt for "are things ready," then run a bin or whatever
 - Add some flags to the root setup to let things run in auto or guided mode.  Todos & dotfiles require human intervention
+- Backups for other data.  Sublime, alfred?
 
 Archive:
 	- dotfiles @done
