@@ -25,7 +25,7 @@ Things that happen
 
 ```
 cd osx_setup
-./setup.rb
+./setup
 ```
 
 ## Adding new stuff

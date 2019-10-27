@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+system("./bin/setup_macos")
+system("./bin/install_shell_apps")
+system("./bin/install_brew_apps")
+system("./bin/install_brew_cask_apps")
+system("./bin/install_mac_app_store_apps")
+system("./bin/install_gems")
+system("./bin/set_shell_preferences")
+system("./bin/sync_dotfiles")
+system("./bin/show_manual_todos")
+
