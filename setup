@@ -1,19 +1,48 @@
 #!/usr/bin/env ruby
 
-def run_setup(options)
+require 'fileutils'
+require_relative './lib/terminal_helpers.rb'
+
+BIN_PATH = "./bin"
+TRACKING_FILES_PATH="./data/.meta/last_run"
+
+def run_file(filepath, options=[])
+  tracking_filepath = "#{TRACKING_FILES_PATH}/#{filepath}"
+  bin_filepath = "#{BIN_PATH}/#{filepath}"
+
+  tracking_file_exists = File.exists?(tracking_filepath)
+  tracking_file_created_on = tracking_file_exists ? File.mtime(tracking_filepath) : nil
+  bin_file_created_on = File.mtime(tracking_filepath)
+  bin_file_is_newer = tracking_file_exists && (tracking_file_created_on < bin_file_created_on)
+
+  file_needs_to_run = !tracking_file_exists || bin_file_is_newer
+
+
+  verbose = options.include?('--verbose')
   # The options are an array; we gotta re-jigger them
   # so they don't end up nested when passed through
   pass_through_options = options.join(' ')
 
-  system("./bin/setup_macos")
-  system("./bin/install_shell_apps")
-  system("./bin/install_brew_apps")
-  system("./bin/install_brew_cask_apps")
-  system("./bin/install_mac_app_store_apps")
-  system("./bin/install_gems")
-  system("./bin/set_shell_preferences")
-  system("./bin/sync_dotfiles #{pass_through_options}")
-  system("./bin/show_manual_todos #{pass_through_options}")
+  if file_needs_to_run
+    pputs("Running #{bin_filepath}", color: :yellow, style: :italic)
+    system("#{bin_filepath} #{pass_through_options}")
+    FileUtils.touch(tracking_filepath)
+  elsif verbose
+    pputs "Skipping #{bin_filepath} - it was run on #{tracking_file_created_on}", color: :yellow, style: :italic
+  end
+end
+
+
+def run_setup(options)
+  run_file("setup_macos", options)
+  run_file("install_shell_apps", options)
+  run_file("install_brew_apps", options)
+  run_file("install_brew_cask_apps", options)
+  run_file("install_mac_app_store_apps", options)
+  run_file("install_gems", options)
+  run_file("set_shell_preferences", options)
+  run_file("sync_dotfiles", options)
+  run_file("show_manual_todos", options)
 end
 
 run_setup(ARGV)

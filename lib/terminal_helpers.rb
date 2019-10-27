@@ -37,7 +37,7 @@ end
 def section_footer(text)
   pputs ""
   pputs text, style: :bold, color: :green, indent: 1
-  end
+end
 
 def pprint(text, opts={})
   color = opts[:color]
