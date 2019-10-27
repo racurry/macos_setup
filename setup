@@ -58,6 +58,11 @@ end
 
 
 def run_setup(options)
+
+  # This is just bullshitting
+  system("#{BIN_PATH}/cool_art")
+
+  # These are the actual setup files.  Order matters here
   run_file("setup_macos", options)
   run_file("install_shell_apps", options)
   run_file("install_brew_apps", options)
@@ -67,6 +72,8 @@ def run_setup(options)
   run_file("set_shell_preferences", options)
   run_file("sync_dotfiles", options)
   run_file("manual_todos", options)
+
+  pputs "All done!  This thing is good to go", style: :bold, color: :green
 end
 
 run_setup(ARGV)
