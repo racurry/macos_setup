@@ -2,7 +2,7 @@
 
 require_relative '../lib/terminal_helpers.rb'
 
-APP_STORE_APPS_FILE = 'data/mac_app_store_apps.txt'
+APP_STORE_APPS_FILE = 'data/install_mac_app_store_apps.txt'
 
 def install_app(name:,id:)
   initial_text = "#{name}..."

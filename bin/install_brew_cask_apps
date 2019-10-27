@@ -3,14 +3,14 @@
 require_relative '../lib/terminal_helpers.rb'
 require_relative '../lib/brew_apps_installer.rb'
 
-DATA_FILE = 'data/install_brew_apps.txt'
+DATA_FILE = 'data/install_brew_cask_apps.txt'
 
 def install_apps
-  section_header "Installing brew apps"
+  section_header "Installing brew cask apps"
   apps(DATA_FILE).each do |app|
-    install_app(name: app)
+    install_app(name: app, command: 'brew cask')
   end
-  section_footer "Done installing brew apps"
+  section_footer "Done installing brew cask apps"
 end
 
 install_apps

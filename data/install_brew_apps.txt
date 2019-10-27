@@ -1,6 +1,6 @@
 rbenv
-git
 zsh
+git
 nvm
 yarn
 mas

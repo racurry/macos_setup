@@ -4,31 +4,55 @@ require 'fileutils'
 require_relative './lib/terminal_helpers.rb'
 
 BIN_PATH = "./bin"
+DATA_PATH="./data"
 TRACKING_FILES_PATH="./data/.meta/last_run"
 
-def run_file(filepath, options=[])
-  tracking_filepath = "#{TRACKING_FILES_PATH}/#{filepath}"
-  bin_filepath = "#{BIN_PATH}/#{filepath}"
+DATA_FILE_EXTENSIONS = %w{txt json}
 
-  tracking_file_exists = File.exists?(tracking_filepath)
-  tracking_file_created_on = tracking_file_exists ? File.mtime(tracking_filepath) : nil
-  bin_file_created_on = File.mtime(tracking_filepath)
-  bin_file_is_newer = tracking_file_exists && (tracking_file_created_on < bin_file_created_on)
+def data_file(filename)
+  DATA_FILE_EXTENSIONS.each do |extension|
+    filepath = "#{DATA_PATH}/#{filename}.#{extension}"
+    return filepath if File.exists?(filepath)
+  end
+  nil
+end
 
-  file_needs_to_run = !tracking_file_exists || bin_file_is_newer
-
+def run_file(filename, options=[])
+  tracking_filepath = "#{TRACKING_FILES_PATH}/#{filename}"
+  bin_filepath = "#{BIN_PATH}/#{filename}"
+  data_file_path = data_file(filename)
 
   verbose = options.include?('--verbose')
+
+  pputs("Running #{bin_filepath}", color: :yellow, style: :italic) if verbose
+
+  raise "There is no such file as #{bin_filepath}!" unless File.exists?(bin_filepath)
+
+  tracking_file_exists = File.exists?(tracking_filepath)
+  tracking_file_modified_on = tracking_file_exists ? File.mtime(tracking_filepath) : nil
+  bin_file_modified_on = File.mtime(bin_filepath)
+  bin_file_is_newer = tracking_file_exists && (bin_file_modified_on > tracking_file_modified_on)
+  data_file_modified_on  = data_file_path ? File.mtime(data_file_path) : nil
+  data_file_is_newer = data_file_path && tracking_file_exists && (data_file_modified_on > tracking_file_modified_on)
+  file_needs_to_run = !tracking_file_exists || bin_file_is_newer || data_file_is_newer
+
+  if verbose
+    pputs("    data file: #{data_file_path ? data_file_path : 'None'}", color: :yellow, style: :italic)
+    pputs("    data file modified: #{data_file_path ? data_file_modified_on : 'n/a'}", color: :yellow, style: :italic)
+    pputs("    bin file modified: #{bin_file_modified_on}", color: :yellow, style: :italic)
+    pputs("    last executed:  #{tracking_file_exists ? tracking_file_modified_on : 'never'}", color: :yellow, style: :italic)
+  end
+
   # The options are an array; we gotta re-jigger them
   # so they don't end up nested when passed through
   pass_through_options = options.join(' ')
 
   if file_needs_to_run
-    pputs("Running #{bin_filepath}", color: :yellow, style: :italic)
+    pputs("    Executing #{bin_filepath}", color: :yellow, style: :italic) if verbose
     system("#{bin_filepath} #{pass_through_options}")
     FileUtils.touch(tracking_filepath)
   elsif verbose
-    pputs "Skipping #{bin_filepath} - it was run on #{tracking_file_created_on}", color: :yellow, style: :italic
+    pputs("    Skipping #{bin_filepath}", color: :yellow, style: :italic) if verbose
   end
 end
 
@@ -42,7 +66,7 @@ def run_setup(options)
   run_file("install_gems", options)
   run_file("set_shell_preferences", options)
   run_file("sync_dotfiles", options)
-  run_file("show_manual_todos", options)
+  run_file("manual_todos", options)
 end
 
 run_setup(ARGV)

@@ -2,7 +2,7 @@
 
 require_relative '../lib/terminal_helpers.rb'
 
-GEM_LIST_FILE = 'data/gems.txt'
+GEM_LIST_FILE = 'data/install_gems.txt'
 
 def gems
   File.open(GEM_LIST_FILE).read.split(/\n/)

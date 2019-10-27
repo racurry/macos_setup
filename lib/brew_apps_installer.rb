@@ -1,19 +1,16 @@
 #!/usr/bin/env ruby
 
-require 'json'
 require_relative '../lib/terminal_helpers.rb'
 
-SHELL_APPS_FILE = 'data/install_shell_apps.json'
-
-def install_shell_app(name:, test:, command:)
+def install_app(name:,command:'brew')
   initial_text = "#{name}..."
   pprint initial_text, indent: 1, style: :bold
 
-  if system("#{test} > /dev/null 2>&1")
+  if  `#{command} info #{name} 2>&1` !~ /Not installed/i
     final_text = "Already installed! "
     text_opts = { style: :italic }
     emoji = "🆗"
-  elsif system(command)
+  elsif system("#{command} install #{name} > /dev/null 2>&1")
     final_text = "Successfully installed!"
     text_opts = { style: :bold, color: :green }
     emoji = "✅"
@@ -28,23 +25,6 @@ def install_shell_app(name:, test:, command:)
   puts emoji
 end
 
-def shell_apps
-  json_file = File.read(SHELL_APPS_FILE)
-  parsed = JSON.parse(json_file, symbolize_names: true)
-  parsed[:apps]
+def apps(data_file_name)
+  File.open(data_file_name).read.split(/\n/)
 end
-
-def install_apps
-  section_header "Installing shell apps"
-
-  shell_apps.each do |app|
-    install_shell_app(
-      name: app[:name],
-      test: app[:test],
-      command: app[:command]
-    )
-  end
-  section_footer "Done installing shell apps"
-end
-
-install_apps
