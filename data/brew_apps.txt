@@ -6,3 +6,4 @@ yarn
 mas
 thefuck
 diff-so-fancy
+readline
