@@ -1,0 +1,19 @@
+{
+  "apps": [
+    {
+      "name": "XCode Command Line Tools",
+      "test": "gcc --help",
+      "command": "xcode-select --install"
+    },
+    {
+      "name": "Homebrew",
+      "command": "/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"",
+      "test": "brew help"
+    },
+    {
+      "name": "Homebrew Cask",
+      "command": "brew tap caskroom/cask",
+      "test": "brew tap | grep caskroom/cask"
+    }
+  ]
+}

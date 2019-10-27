@@ -1,12 +1,19 @@
 #!/usr/bin/env ruby
 
-system("./bin/setup_macos")
-system("./bin/install_shell_apps")
-system("./bin/install_brew_apps")
-system("./bin/install_brew_cask_apps")
-system("./bin/install_mac_app_store_apps")
-system("./bin/install_gems")
-system("./bin/set_shell_preferences")
-system("./bin/sync_dotfiles")
-system("./bin/show_manual_todos")
+def run_setup(options)
+  # The options are an array; we gotta re-jigger them
+  # so they don't end up nested when passed through
+  pass_through_options = options.join(' ')
 
+  system("./bin/setup_macos")
+  system("./bin/install_shell_apps")
+  system("./bin/install_brew_apps")
+  system("./bin/install_brew_cask_apps")
+  system("./bin/install_mac_app_store_apps")
+  system("./bin/install_gems")
+  system("./bin/set_shell_preferences")
+  system("./bin/sync_dotfiles #{pass_through_options}")
+  system("./bin/show_manual_todos")
+end
+
+run_setup(ARGV)
