@@ -13,7 +13,7 @@ def run_setup(options)
   system("./bin/install_gems")
   system("./bin/set_shell_preferences")
   system("./bin/sync_dotfiles #{pass_through_options}")
-  system("./bin/show_manual_todos")
+  system("./bin/show_manual_todos #{pass_through_options}")
 end
 
 run_setup(ARGV)

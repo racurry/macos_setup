@@ -28,6 +28,12 @@ cd osx_setup
 ./setup
 ```
 
+There are some bits that require human intervention.  If you want the system to just make all the decisions for you, run
+
+`./setup --unattended`
+
+instead.
+
 ## Adding new stuff
 
 Dump it into the relevant file in `/data`.

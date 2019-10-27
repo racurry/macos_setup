@@ -28,19 +28,25 @@ def mark_as_done(todo)
   File.write(DONE_FILE_NAME, "\n#{todo}", mode: "a")
 end
 
-def tell_me_what_to_do
+def tell_me_what_to_do(options)
+  unattended = options.include?('--unattended')
 
   section_header "Do it!"
 
   things_to_do.each do |todo|
-    print "    - #{todo} "
-    pprint "(d=done,s=skip)  ", color: :cyan, style: :italic
-    reply = STDIN.getch
-    if reply == 'd'
-      mark_as_done(todo)
-      puts "✅"
+
+    if unattended
+      puts "    ❏ #{todo} "
     else
-      puts "❌"
+      print "    ❏ #{todo} "
+      pprint "(d=done,s=skip)  ", color: :cyan, style: :italic
+      reply = STDIN.getch
+      if reply == 'd'
+        mark_as_done(todo)
+        puts "✅"
+      else
+        puts "❌"
+      end
     end
   end
 
@@ -52,8 +58,8 @@ def tell_me_what_to_do
     pputs "Run bin/show_manual_todos.rb any time to finish it", indent: 1
   else
     pprint "Still #{left_to_do} things to do.  ", style: :bold
-    pputs "Run bin/show_manual_todos.rb any time to finish them", indent: 1
+    pputs "Run bin/show_manual_todos any time to finish them", indent: 1
   end
 end
 
-tell_me_what_to_do
+tell_me_what_to_do(ARGV)
