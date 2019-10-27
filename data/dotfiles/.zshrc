@@ -1,8 +1,8 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+autoload -U promptinit; promptinit
+prompt pure
 
 HYPHEN_INSENSITIVE="true"
 

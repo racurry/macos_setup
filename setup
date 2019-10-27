@@ -75,6 +75,7 @@ def run_setup(options)
   run_file("install_gems", options)
   run_file("set_shell_preferences", options)
   run_file("sync_dotfiles", options)
+  run_file("configure_terminal", options)
   run_file("manual_todos", options)
 
 

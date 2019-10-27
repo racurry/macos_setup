@@ -7,3 +7,4 @@ mas
 thefuck
 diff-so-fancy
 readline
+zsh-syntax-highlighting

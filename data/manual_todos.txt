@@ -11,3 +11,4 @@ Set up alfred: General -> request permissions
 Set up Itsycal: Add calendars to Calendar.app
 Set up Itsycal: Set date format to `E, MMM d h:mm a`
 Set up your ~/.workrc
+Install snazzy colors: https://github.com/sindresorhus/iterm2-snazzy
