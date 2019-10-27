@@ -28,10 +28,14 @@ def print_column_fill(existing_strings, opts={})
   pprint('.' * chars_left, opts)
 end
 
+def horizontal_rule(color=:yellow)
+  pputs "-" * COLUMN_WIDTH, style: :bold, color: color
+end
+
 def section_header(text)
   pputs ""
   pputs text, style: :bold, color: :yellow
-  pputs "-" * COLUMN_WIDTH, style: :bold, color: :yellow
+  horizontal_rule(:yellow)
 end
 
 def section_footer(text)

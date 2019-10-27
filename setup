@@ -59,6 +59,10 @@ end
 
 def run_setup(options)
 
+  horizontal_rule(:cyan)
+  pputs "Setting up this bad boy here", style: :bold, color: :cyan
+  horizontal_rule(:cyan)
+
   # This is just bullshitting
   system("#{BIN_PATH}/cool_art")
 
@@ -73,7 +77,10 @@ def run_setup(options)
   run_file("sync_dotfiles", options)
   run_file("manual_todos", options)
 
+
+  horizontal_rule(:cyan)
   pputs "All done!  This thing is good to go", style: :bold, color: :green
+  horizontal_rule(:cyan)
 end
 
 run_setup(ARGV)
