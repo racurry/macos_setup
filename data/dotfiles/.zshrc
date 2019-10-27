@@ -1,5 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
+source $ZSH/oh-my-zsh.sh
+ZSH_THEME=""
 
 autoload -U promptinit; promptinit
 prompt pure
@@ -12,10 +14,7 @@ HYPHEN_INSENSITIVE="true"
 # Display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
-
 plugins=(git bundler)
-
-source $ZSH/oh-my-zsh.sh
 
 # Set up some apps
 
