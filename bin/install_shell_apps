@@ -1,24 +1,9 @@
 #!/usr/bin/env ruby
 
+require 'json'
 require_relative '../lib/terminal_helpers.rb'
 
-SHELL_APPS = [
-  {
-    name: "XCode Command Line Tools",
-    test: "gcc --help",
-    command: "xcode-select --install"
-  },
-  {
-    name: "Homebrew",
-    command: "/usr/bin/ruby -e \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)\"",
-    test: "brew help"
-  },
-  {
-    name: "Homebrew Cask",
-    command: "brew tap caskroom/cask",
-    test: "brew tap | grep caskroom/cask"
-  }
-]
+SHELL_APPS_FILE = 'data/shell_apps.json'
 
 def install_shell_app(name:, test:, command:)
   initial_text = "#{name}..."
@@ -43,10 +28,16 @@ def install_shell_app(name:, test:, command:)
   puts emoji
 end
 
+def shell_apps
+  json_file = File.read(SHELL_APPS_FILE)
+  parsed = JSON.parse(json_file, symbolize_names: true)
+  parsed[:apps]
+end
+
 def install_apps
   section_header "Installing shell apps"
 
-  SHELL_APPS.each do |app|
+  shell_apps.each do |app|
     install_shell_app(
       name: app[:name],
       test: app[:test],
