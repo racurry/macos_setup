@@ -16,3 +16,4 @@ yakyak
 cardhop
 font-monoid
 font-hack-nerd-font
+xscreensaver
