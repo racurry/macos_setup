@@ -6,6 +6,8 @@ require_relative '../lib/brew_apps_installer.rb'
 DATA_FILE = 'data/install_brew_cask_apps.txt'
 
 def install_apps
+  system("brew tap homebrew/cask-fonts")
+
   section_header "Installing brew cask apps"
   apps(DATA_FILE).each do |app|
     install_app(name: app, command: 'brew cask')
