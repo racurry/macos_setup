@@ -36,7 +36,7 @@ def handle_conflict_with_guidance(dotfile_name:, local_dotfile_path:, home_dir_d
     skip_file(dotfile_name)
   when 'r'
     print " Replacing #{dotfile_name}..."
-    File.delete(home_dir_dotfile)
+    File.delete(home_dir_dotfile_path)
     File.symlink(local_dotfile_path, home_dir_dotfile_path)
     pputs "Done!", color: :green, style: :bold
   when 'b'

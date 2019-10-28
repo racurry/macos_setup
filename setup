@@ -58,6 +58,7 @@ end
 
 
 def run_setup(options)
+  FileUtils.mkdir_p(TRACKING_FILES_PATH)
 
   horizontal_rule(:cyan)
   pputs "👾 Setting up this bad boy here", style: :bold, color: :cyan
