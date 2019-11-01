@@ -13,6 +13,7 @@
 
   # Prettier, easier to follow logs.
   lol = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
+  lds = log --pretty=format:\"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]\" --decorate --date=short
 
   # Pull the latest commit off, put leave the change staged
   uncommit = reset --soft HEAD~1
@@ -21,6 +22,9 @@
   pushf = push --force-with-lease
   # Take some of the sting out of messing up
   oops = commit --amend --no-edit
+
+  # Cleanliness
+  cleanb = !git remote update -p; git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
 
 [core]
   excludesfile = ~/.gitignore_global
