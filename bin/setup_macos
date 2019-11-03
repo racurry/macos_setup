@@ -81,7 +81,25 @@ do_keyboard_setup() {
   # Disable auto period insert
   defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
 
+  # Enable text replacement everywhere
+  defaults write -g WebAutomaticTextReplacementEnabled -bool true
+
   print_finished ${#ITEM}
+}
+
+do_text_replacement() {
+ # TODO - I have no idea why this doesn't work.  Anything added here works for a bit, but eventually gets replaced
+ # by whatever is set manually in the UI.
+
+  ITEM="Adding text replacement rules"
+  print_starting $ITEM
+
+  # copyright
+  defaults write -g NSUserDictionaryReplacementItems -array-add '{on=1;replace="(c)";with="\\U00a9";}'
+  # trademark
+  defaults write -g NSUserDictionaryReplacementItems -array-add '{on=1;replace="(tm)";with="\\U2122";}'
+
+  print_finished $ITEM
 }
 
 do_touchbar_setup() {
@@ -252,6 +270,7 @@ do_setup() {
 
   do_global_settings
   do_keyboard_setup
+  # do_text_replacement
   do_trackpad_setup
   do_dock_setup
   do_touchbar_setup
@@ -263,6 +282,7 @@ do_setup() {
   do_kill_running_apps
   printf "\n\e[32;1m    macOS is setup.  I think you need to restart, though\e[0m\n"
 }
+
 
 # Wipe everything back to factory defaults
 do_config_resets() {
