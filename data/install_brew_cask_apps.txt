@@ -18,3 +18,5 @@ cardhop
 font-monoid
 font-hack-nerd-font
 xscreensaver
+fantastical
+keyboard-maestro

@@ -20,11 +20,12 @@
 
   # Don't accidentally clobber someone else's stuff
   pushf = push --force-with-lease
+
   # Take some of the sting out of messing up
   oops = commit --amend --no-edit
 
-  # Cleanliness
-  cleanb = !git remote update -p; git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+  # Delete local branches that have been merged
+  cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d
 
 [core]
   excludesfile = ~/.gitignore_global
