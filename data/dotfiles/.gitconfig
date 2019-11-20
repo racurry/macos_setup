@@ -27,6 +27,9 @@
   # Delete local branches that have been merged
   cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d
 
+  # go to master, pull, cleanup
+  reup = !git checkout master && git pull && git cleanup
+
 [core]
   excludesfile = ~/.gitignore_global
   pager = "diff-so-fancy | less --tabs=4"
