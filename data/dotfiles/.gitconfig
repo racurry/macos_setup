@@ -3,7 +3,10 @@
 	name = Aaron Curry
 
 [includeIf "gitdir:~/workspace/stitchfix/"]
-  path = ~/.gitconfig_work
+  path = ~/.gitconfig_stitchfix
+
+[includeIf "gitdir:~/workspace/trustworthy/"]
+  path = ~/.gitconfig_trustworthy
 
 [alias]
   # Command shortcuts

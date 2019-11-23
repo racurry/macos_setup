@@ -48,9 +48,14 @@ if [ -f ~/.npmrc ]; then
   export NPM_TOKEN=`sed -n -e '/_authToken/ s/.*\= *//p' ~/.npmrc`
 fi
 
-# Grab any work-specific aliases & configs
-if [ -f ~/.workrc ]; then
-  source ~/.workrc
+# Grab any stitchfix-specific aliases & configs
+if [ -f ~/.stitchfixrc ]; then
+  source ~/.stitchfixrc
+fi
+
+# Grab any stitchfix-specific aliases & configs
+if [ -f ~/.trustworthyrc ]; then
+  source ~/.trustworthyrc
 fi
 
 # Automatically ls after cd
