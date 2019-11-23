@@ -3,6 +3,7 @@ export ZSH="$HOME/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
 ZSH_THEME=""
 
+# Use the pure prompt
 autoload -U promptinit; promptinit
 prompt pure
 
@@ -60,12 +61,13 @@ cd () {
 
 # Help ems
 export workspace=~/workspace
+export inbox=~/Inbox
 
 # Keep friends in sync
 alias friends="friends --filename '~/Dropbox/friends.md'"
 
 alias rezsh="source ~/.zshrc"
-alias zshconfig="subl ~/.zshrc"
+alias zshconfig="subl ~/workspace/osx_setup/data/dotfiles/.zshrc"
 alias ohmyzsh="subl ~/.oh-my-zsh"
 alias be="bundle exec"
 alias ls="ls -a"
