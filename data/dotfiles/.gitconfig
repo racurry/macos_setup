@@ -26,6 +26,8 @@
 
   # Take some of the sting out of messing up
   oops = commit --amend --no-edit
+  oopsall = !git add . && git oops
+  oopspush = !git oopsall && git pushf
 
   # Delete local branches that have been merged
   cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d
