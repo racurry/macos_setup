@@ -1,6 +1,6 @@
 - Figure out how to have some kind of auto-update thing do git pulls periodically
 - Add some automation steps to the manual todos. Prompt for "are things ready," then run a bin or whatever
-- Backups for other data.  Sublime, alfred?
+- Figure out which macOS steps require SIP off and separate them into a different script.  `csrutil status` can check if SIP is on/off
 
 Archive:
 	- Add some flags to the root setup to let things run in auto or guided mode.  Todos & dotfiles require human intervention @done
@@ -28,3 +28,4 @@ Archive:
 	- Bartender @done
 	- Taskpaper @done
 	- Create a script @done
+	- Backups for other data.  Sublime, alfred?

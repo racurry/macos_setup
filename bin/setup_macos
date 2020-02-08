@@ -247,6 +247,12 @@ do_screensaver_setup() {
   print_finished ${#ITEM}
 }
 
+do_sound_setup() {
+  ITEM="Setting up sound preferences"
+  # Set alert sound to submarine
+  defaults write .GlobalPreferences com.apple.sound.beep.sound /System/Library/Sounds/Submarine.aiff
+}
+
 do_kill_running_apps()  {
   ITEM="Restarting some things"
   print_starting $ITEM
@@ -278,6 +284,7 @@ do_setup() {
   do_finder_setup
   do_notification_settings
   do_screensaver_setup
+  do_sound_setup
 
   do_kill_running_apps
   printf "\n\e[32;1m    macOS is setup.  I think you need to restart, though\e[0m\n"

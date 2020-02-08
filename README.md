@@ -34,6 +34,16 @@ There are some bits that require human intervention.  If you want the system to 
 
 instead.
 
+## macOS settings and SIP
+Some of the settings in `/bin/setup_macos` need SIP turned off to actually work.  To make sure it all works,
+
+1. Restart your Mac, holding down Command-R until you see an Apple icon and a progress bar
+2. From the Utilities menu, select Terminal.
+3. `csrutil disable`
+4. Restart
+
+After running, re-run the steps using `csrutil enable`
+
 ## Adding new stuff
 
 Dump it into the relevant file in `/data`.
