@@ -64,6 +64,11 @@ cd () {
   ls -a;
 }
 
+# Slightly more user-friendly man pages
+function tldr() {
+  curl "cheat.sh/$1"
+}
+
 # Help ems
 export workspace=~/workspace
 export inbox=~/Inbox
