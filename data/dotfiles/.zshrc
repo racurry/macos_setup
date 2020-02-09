@@ -36,9 +36,6 @@ setopt appendhistory # Append history to the history file (no overwriting)
 setopt sharehistory # Share history across terminals
 setopt incappendhistory # Immediately append to the history file, not just when a term is killed
 
-# NVM!
-export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
 
 # Set up NPM_TOKEN if .npmrc exists
 if [ -f ~/.npmrc ]; then
@@ -50,7 +47,7 @@ if [ -f ~/.stitchfixrc ]; then
   source ~/.stitchfixrc
 fi
 
-# Grab any stitchfix-specific aliases & configs
+# Grab any trustworthy-specific aliases & configs
 if [ -f ~/.trustworthyrc ]; then
   source ~/.trustworthyrc
 fi
@@ -62,7 +59,7 @@ cd () {
 }
 
 # Slightly more user-friendly man pages
-function tldr() {
+tldr () {
   curl "cheat.sh/$1"
 }
 

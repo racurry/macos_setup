@@ -2,7 +2,6 @@ asdf
 diff-so-fancy
 git
 mas
-nvm
 readline
 thefuck
 wget
