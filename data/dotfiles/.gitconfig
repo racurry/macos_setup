@@ -14,8 +14,17 @@
   co = checkout
   st = status
 
+  # I like rebases
+  pur = pull --rebase
+
   # Add and commit everything
   aco = !git add -A && git commit -m
+
+  # Add, commit, rebase, then push
+  gobig = !git add -A && git commit && git pull --rebase && git push
+
+  # Stash pull and reapply
+  restash = !git stash -u && git pull --rebase && git stash apply
 
   # Prettier, easier to follow logs.
   lol = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
@@ -36,7 +45,7 @@
   cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d
 
   # go to master, pull, cleanup
-  reup = !git checkout master && git pull && git cleanup
+  reup = !git checkout master && git pull --rebase && git cleanup
 
 [core]
   excludesfile = ~/.gitignore_global
