@@ -1,8 +1,8 @@
+asdf
 diff-so-fancy
 git
 mas
 nvm
-rbenv
 readline
 thefuck
 wget

@@ -9,21 +9,18 @@ prompt pure
 
 HYPHEN_INSENSITIVE="true"
 
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS=true
-
 # Display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
 plugins=(git bundler)
 
-# Set up some apps
+# ASDF
+. $(brew --prefix asdf)/asdf.sh
+. $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
 
-eval "$(rbenv init - zsh)" # rbenv
-eval $(thefuck --alias) # The fuck
+# The fuck
+eval $(thefuck --alias)
 
-# Get the path correct
-export PATH=$HOME/.rbenv/bin:/usr/local/bin:$HOME/.bin:$PATH
 export LANG=en_US.UTF-8
 export EDITOR='vim'
 
@@ -83,3 +80,4 @@ alias be="bundle exec"
 alias ls="ls -a"
 # Fix zsh breaking rake like a total turd
 alias rake='noglob bundled_rake'
+
