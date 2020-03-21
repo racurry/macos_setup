@@ -1,6 +1,7 @@
 asdf
 diff-so-fancy
 git
+imagemagick
 mas
 readline
 thefuck
