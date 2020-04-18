@@ -69,10 +69,10 @@ export inbox=~/Inbox
 
 # Keep friends in sync
 alias friends="friends --filename '~/Dropbox/friends.md'"
-
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl ~/workspace/osx_setup/data/dotfiles/.zshrc"
 alias ohmyzsh="subl ~/.oh-my-zsh"
+alias worklog="jrnl work"
 alias be="bundle exec"
 alias ls="ls -a"
 # Fix zsh breaking rake like a total turd

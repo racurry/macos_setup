@@ -56,6 +56,12 @@ def run_file(filename, options=[])
   end
 end
 
+def add_executable_to_path
+  unless File.symlink?("/usr/local/bin/macos_setup")
+    system("sudo ln -s ~/workspace/osx_setup/macos_setup /usr/local/bin/macoscfg")
+  end
+end
+
 
 def run_setup(options)
   FileUtils.mkdir_p(TRACKING_FILES_PATH)
@@ -79,6 +85,7 @@ def run_setup(options)
   run_file("configure_terminal", options)
   run_file("manual_todos", options)
 
+  add_executable_to_path
 
   horizontal_rule(:cyan)
   pputs "🍻 All done!  This thing is good to go", style: :bold, color: :green

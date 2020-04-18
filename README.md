@@ -25,14 +25,18 @@ Things that happen
 
 ```
 cd osx_setup
-./setup
+./macos_setup
 ```
 
 There are some bits that require human intervention.  If you want the system to just make all the decisions for you, run
 
-`./setup --unattended`
+`./macos_setup --unattended`
 
 instead.
+
+## This adds a command to your path
+
+You can rerun the setup any time with `macoscfg`.
 
 ## macOS settings and SIP
 Some of the settings in `/bin/setup_macos` need SIP turned off to actually work.  To make sure it all works,
@@ -44,7 +48,7 @@ Some of the settings in `/bin/setup_macos` need SIP turned off to actually work.
 
 After running, re-run the steps using `csrutil enable`
 
-## Adding new stuff
+## Adding new stuffmacos_setup
 
 Dump it into the relevant file in `/data`.
 
