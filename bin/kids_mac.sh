@@ -2,7 +2,7 @@
 
  # A one-off for use on kids' computers
 
- brew cask install chrome
+ brew cask install google-chrome
  brew cask install openemu
  brew cask install obs
  brew cask install spotify
