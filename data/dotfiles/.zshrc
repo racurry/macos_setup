@@ -67,6 +67,10 @@ tldr () {
 export workspace=~/workspace
 export inbox=~/Inbox
 
+# Fiddle with that path
+path+=($workspace'/helper-scripts/bin')
+export PATH
+
 # Keep friends in sync
 alias friends="friends --filename '~/Dropbox/friends.md'"
 alias rezsh="source ~/.zshrc"
