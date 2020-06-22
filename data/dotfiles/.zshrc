@@ -71,12 +71,18 @@ export inbox=~/Inbox
 path+=($workspace'/helper-scripts/bin')
 export PATH
 
+# Work journaling
+alias wlog="jrnl work"
+alias wtoday="jrnl work -from today"
+alias wyester='jrnl work -from "yesterday 6am" -until "today 6am"'
+alias wweek='jrnl work -from "last week 6am" -until "today 6am"'
+alias wlweek='jrnl work -from "last monday 6am" -until "today 6am"'
+
 # Keep friends in sync
 alias friends="friends --filename '~/Dropbox/friends.md'"
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl ~/workspace/osx_setup/data/dotfiles/.zshrc"
 alias ohmyzsh="subl ~/.oh-my-zsh"
-alias worklog="jrnl work"
 alias be="bundle exec"
 alias ls="ls -a"
 # Fix zsh breaking rake like a total turd
