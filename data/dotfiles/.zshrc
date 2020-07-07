@@ -75,7 +75,8 @@ export PATH
 alias wlog="jrnl work"
 alias wlconfig="subl -nw ~/.config/jrnl/jrnl.yaml"
 alias wtoday="jrnl work -from today"
-alias wyester='jrnl work -from "yesterday 6am" -until "today 6am"'
+alias wtodayandyesterday="jrnl work -from yesterday"
+alias wyesterday='jrnl work -from "yesterday 6am" -until "today 6am"'
 alias wweek='jrnl work -from "last week 6am" -until "today 6am"'
 alias wlweek='jrnl work -from "last monday 6am" -until "today 6am"'
 
