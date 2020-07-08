@@ -14,6 +14,7 @@ idrive
 iterm2
 keyboard-maestro
 lastpass
+rocket
 sublime-text
 taskpaper
 yakyak
