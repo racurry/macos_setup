@@ -80,6 +80,9 @@ alias wyesterday='jrnl work -from "yesterday 6am" -until "today 6am"'
 alias wweek='jrnl work -from "last week 6am" -until "today 6am"'
 alias wlweek='jrnl work -from "last monday 6am" -until "today 6am"'
 
+# Personal journaling
+alias jmonth='jrnl -from "last month" -until "today"'
+
 # Keep friends in sync
 alias friends="friends --filename '~/Dropbox/friends.md'"
 alias rezsh="source ~/.zshrc"
