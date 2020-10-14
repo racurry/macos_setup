@@ -12,7 +12,7 @@ HYPHEN_INSENSITIVE="true"
 # Display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
-plugins=(git bundler)
+plugins=(git bundler rake)
 
 # ASDF
 . $(brew --prefix asdf)/asdf.sh
