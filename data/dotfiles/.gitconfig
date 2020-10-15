@@ -53,6 +53,9 @@
   # go to master, pull, cleanup
   reup = !git checkout master && git pull --rebase && git cleanup
 
+  # Open a PR
+  pr = !hub pull-request
+
 [core]
   excludesfile = ~/.gitignore_global
   pager = "diff-so-fancy | less --tabs=4"
