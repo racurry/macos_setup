@@ -44,6 +44,9 @@
   # Delete local branches that have been merged
   cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop\\|main' | xargs -n 1 git branch -d
 
+  # What branch is this
+  branch-name = !git rev-parse --abbrev-ref HEAD
+
   # Push up changes
   publish = !git push -u origin $(git branch-name)
 
