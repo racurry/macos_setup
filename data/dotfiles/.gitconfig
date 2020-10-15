@@ -13,12 +13,16 @@
   ci = commit
   co = checkout
   st = status
+  br = branch
 
   # What's your default branch?
   default-branch = "!git symbolic-ref refs/remotes/origin/HEAD | cut -f4 -d/"
 
   # What branch is this
   branch-name = !git rev-parse --abbrev-ref HEAD
+
+  # Which branches have been merged
+  merged-branches = !git branch --merged
 
   # I like rebases
   pur = pull --rebase
@@ -48,7 +52,7 @@
   oopspush = !git oopsall && git pushf
 
   # Delete local branches that have been merged
-  cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop\\|main' | xargs -n 1 git branch -d
+  cleanup = !git branch --merged | grep -v -e $(git default-branch) -e '\\*' | xargs -n 1 git branch -d && git remote prune origin
 
   # Push up changes
   publish = !git push -u origin $(git branch-name)
