@@ -1,6 +1,7 @@
 asdf
 diff-so-fancy
 git
+hub
 imagemagick
 jrnl
 mackup
