@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/terminal_helpers.rb'
+
+DIR="#{Dir.home}/workspace/osx_setup"
+
+section_header "Pulling latest config"
+Dir.chdir(DIR){
+  system 'git pull --rebase'
+}
+section_footer "Done"
