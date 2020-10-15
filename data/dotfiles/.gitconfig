@@ -14,6 +14,12 @@
   co = checkout
   st = status
 
+  # What's your default branch?
+  default-branch = "!git symbolic-ref refs/remotes/origin/HEAD | cut -f4 -d/"
+
+  # What branch is this
+  branch-name = !git rev-parse --abbrev-ref HEAD
+
   # I like rebases
   pur = pull --rebase
 
@@ -44,14 +50,11 @@
   # Delete local branches that have been merged
   cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop\\|main' | xargs -n 1 git branch -d
 
-  # What branch is this
-  branch-name = !git rev-parse --abbrev-ref HEAD
-
   # Push up changes
   publish = !git push -u origin $(git branch-name)
 
-  # go to master, pull, cleanup
-  reup = !git checkout master && git pull --rebase && git cleanup
+  # go to default branch, pull, cleanup
+  reup = !git checkout $(git default-branch) && git pull --rebase && git cleanup
 
   # Open a PR
   pr = !hub pull-request
