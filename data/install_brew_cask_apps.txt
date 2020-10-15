@@ -1,6 +1,5 @@
 alfred
 bartender
-brave-browser
 caffeine
 cardhop
 dropbox
@@ -14,6 +13,7 @@ idrive
 iterm2
 keyboard-maestro
 lastpass
+obsidian
 rocket
 sublime-text
 taskpaper
