@@ -8,7 +8,5 @@ Log in to dropbox
 Set up alfred: Advanced -> preference folder to `~/Dropbox/Alfred`
 Set up alfred: General -> set hotkey to cmd+space
 Set up alfred: General -> request permissions
-Set up Itsycal: Add calendars to Calendar.app
-Set up Itsycal: Set date format to `E, MMM d h:mm a`
 Set up your ~/.workrc
 Install snazzy colors: https://github.com/sindresorhus/iterm2-snazzy

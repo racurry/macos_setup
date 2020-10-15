@@ -42,7 +42,10 @@
   oopspush = !git oopsall && git pushf
 
   # Delete local branches that have been merged
-  cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop' | xargs -n 1 git branch -d
+  cleanup = !git branch --merged | grep  -v '\\*\\|master\\|develop\\|main' | xargs -n 1 git branch -d
+
+  # Push up changes
+  publish = !git push -u origin $(git branch-name)
 
   # go to master, pull, cleanup
   reup = !git checkout master && git pull --rebase && git cleanup
