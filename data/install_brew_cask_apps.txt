@@ -12,7 +12,6 @@ hazel
 idrive
 iterm2
 keyboard-maestro
-lastpass
 obsidian
 rocket
 sublime-text
