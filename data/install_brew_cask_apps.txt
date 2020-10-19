@@ -12,6 +12,8 @@ hazel
 idrive
 iterm2
 keyboard-maestro
+lastpass
+moom
 obsidian
 rocket
 sublime-text
