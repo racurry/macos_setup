@@ -10,3 +10,6 @@ Set up alfred: General -> set hotkey to cmd+space
 Set up alfred: General -> request permissions
 Set up your ~/.workrc
 Install snazzy colors: https://github.com/sindresorhus/iterm2-snazzy
+Set up touch id, if applicable
+Sublime: Install package control
+Sublime: Sync settings w/ dropbox folder

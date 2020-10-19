@@ -11,6 +11,7 @@ google-photos-backup-and-sync
 hazel
 idrive
 iterm2
+karabiner-elements
 keyboard-maestro
 lastpass
 moom
