@@ -16,6 +16,7 @@ keyboard-maestro
 lastpass
 obsidian
 rocket
+spotify
 sublime-text
 taskpaper
 yakyak

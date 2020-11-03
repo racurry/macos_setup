@@ -1,0 +1,7 @@
+export stitchfix=~/workspace/stitchfix/
+export minx=~/workspace/stitchfix/minx
+export whelpers=~/workspace/stitchfix/helper-scripts
+
+# Add sf-specific helper scripts to my path
+path+=($workspace'/stitchfix/helper-scripts/bin')
+export PATH
