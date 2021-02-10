@@ -3,6 +3,7 @@ diff-so-fancy
 git
 hub
 imagemagick
+lastpass-cli
 mas
 readline
 thefuck
