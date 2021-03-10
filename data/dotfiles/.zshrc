@@ -42,6 +42,10 @@ if [ -f ~/.npmrc ]; then
   export NPM_TOKEN=`sed -n -e '/_authToken/ s/.*\= *//p' ~/.npmrc`
 fi
 
+# Help ems
+export workspace=~/workspace
+export inbox=~/Inbox
+
 # Grab any stitchfix-specific aliases & configs
 if [ -f ~/.stitchfixrc ]; then
   source ~/.stitchfixrc
@@ -62,10 +66,6 @@ cd () {
 tldr () {
   curl "cheat.sh/$1"
 }
-
-# Help ems
-export workspace=~/workspace
-export inbox=~/Inbox
 
 # Fiddle with that path
 path+=($workspace'/helper-scripts/bin')
