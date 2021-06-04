@@ -35,6 +35,7 @@ HISTDUP=erase # Erase duplicates in the history file
 setopt appendhistory # Append history to the history file (no overwriting)
 setopt sharehistory # Share history across terminals
 setopt incappendhistory # Immediately append to the history file, not just when a term is killed
+unsetopt nomatch # Don't throw an error if there are no matches, just do the right thing
 
 
 # Set up NPM_TOKEN if .npmrc exists

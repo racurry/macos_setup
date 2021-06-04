@@ -94,3 +94,7 @@
 	whitespace = red reverse
 [push]
 	followTags = true
+[hub]
+	protocol = ssh
+[pull]
+	rebase = true
