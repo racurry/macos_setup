@@ -2,7 +2,9 @@ export stitchfix=~/workspace/stitchfix/
 
 export cals=~/workspace/stitchfix/client-agency-lifecycle-service
 export cfs=~/workspace/stitchfix/client-feedback-service
+export faa=~/workspace/stitchfix/fix-agency-api
 export fas=~/workspace/stitchfix/fix-agency-service
+export fours=~/workspace/stitchfix/styled-sku-selection-service
 export fps=~/workspace/stitchfix/fix-preview-service
 export kis=~/workspace/stitchfix/kept-items-service
 export minx=~/workspace/stitchfix/minx
