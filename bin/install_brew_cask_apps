@@ -10,7 +10,7 @@ def install_apps
 
   section_header "Installing brew cask apps"
   apps(DATA_FILE).each do |app|
-    install_app(name: app, command: 'brew cask')
+    install_app(name: app, command: 'brew')
   end
   section_footer "Done installing brew cask apps"
 end
