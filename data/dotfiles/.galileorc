@@ -1,0 +1,5 @@
+alias galileocfg="subl -nw ~/.galileorc"
+
+# Add sf-specific helper scripts to my path
+path+=($workspace'/stitchfix/helper-scripts/bin')
+export PATH

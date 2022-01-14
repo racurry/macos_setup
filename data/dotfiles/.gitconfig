@@ -8,6 +8,9 @@
 [includeIf "gitdir:~/workspace/trustworthy/"]
   path = ~/.gitconfig_trustworthy
 
+[includeIf "gitdir:~/workspace/galileo/"]
+  path = ~/.gitconfig_galileo
+
 [alias]
   # Command shortcuts
   ci = commit

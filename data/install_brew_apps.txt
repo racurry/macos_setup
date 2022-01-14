@@ -19,7 +19,6 @@ karabiner-elements
 keyboard-maestro
 lastpass-cli
 mas
-moom
 obsidian
 readline
 spotify
