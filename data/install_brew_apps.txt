@@ -24,7 +24,6 @@ obsidian
 readline
 spotify
 sublime-text
-taskpaper
 thefuck
 wget
 xscreensaver
