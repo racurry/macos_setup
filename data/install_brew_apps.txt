@@ -17,7 +17,6 @@ imagemagick
 iterm2
 karabiner-elements
 keyboard-maestro
-lastpass
 lastpass-cli
 mas
 moom

@@ -1,7 +1,6 @@
 425424353 - The Unarchiver
 1039633667 - Irvue
 1435957248 - Drafts
-1346203938 - OmniFocus
 419330170 - Moom
 904280696 - Things
 1440147259 - AdGuard for Safari
@@ -10,4 +9,4 @@
 1435957248 - Drafts
 1510445899 - Meeter
 1450049037 - HoverSee for Safari
-1510445899 - Meeter
+926036361 - LastPass
