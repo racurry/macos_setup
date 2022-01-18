@@ -2,3 +2,7 @@ alias galileocfg="subl -nw ~/.galileorc"
 
 # From galileo onboarding docs
 export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
+
+# Galileo projects
+export galileo=~/workspace/galileo/
+export gdots=~/workspace/galileo/dotfiles/
