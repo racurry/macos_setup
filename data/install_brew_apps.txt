@@ -20,6 +20,7 @@ keyboard-maestro
 lastpass-cli
 mas
 obsidian
+pure
 readline
 spotify
 sublime-text

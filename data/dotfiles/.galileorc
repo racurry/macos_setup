@@ -1,5 +1,4 @@
 alias galileocfg="subl -nw ~/.galileorc"
 
-# Add sf-specific helper scripts to my path
-path+=($workspace'/stitchfix/helper-scripts/bin')
-export PATH
+# From galileo onboarding docs
+export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"

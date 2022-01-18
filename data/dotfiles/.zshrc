@@ -47,14 +47,14 @@ fi
 export workspace=~/workspace
 export inbox=~/Inbox
 
-# Grab any stitchfix-specific aliases & configs
-if [ -f ~/.stitchfixrc ]; then
-  source ~/.stitchfixrc
-fi
-
 # Grab any trustworthy-specific aliases & configs
 if [ -f ~/.trustworthyrc ]; then
   source ~/.trustworthyrc
+fi
+
+# Grab any galileo-specific aliases & configs
+if [ -f ~/.galileorc ]; then
+  source ~/.galileorc
 fi
 
 # Automatically ls after cd
@@ -94,3 +94,7 @@ alias ls="ls -a"
 # Fix zsh breaking rake like a total turd
 alias rake='noglob bundled_rake'
 
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
