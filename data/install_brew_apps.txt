@@ -21,6 +21,7 @@ lastpass-cli
 mas
 obsidian
 pure
+pyenv
 readline
 spotify
 sublime-text

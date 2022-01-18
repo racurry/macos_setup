@@ -66,6 +66,7 @@
 
   # Open a PR
   pr = !hub pull-request
+	refresh = !git commit --amend -m \"$(git log -1 --format=%s)\"
 
 [core]
   excludesfile = ~/.gitignore_global

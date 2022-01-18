@@ -3,6 +3,17 @@ alias galileocfg="subl -nw ~/.galileorc"
 # From galileo onboarding docs
 export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
 
+
+# Galileo auto-bootstraping
+# Automatically update bootstrap
+git -C ~/workspace/galileo/dotfiles reset --hard origin/master > /dev/null 2>&1
+git -C ~/workspace/galileo/dotfiles pull > /dev/null 2>&1
+
+# Source library functions from bootstrap
+source ~/workspace/galileo/dotfiles/bootstrap.sh
+
 # Galileo projects
 export galileo=~/workspace/galileo/
 export gdots=~/workspace/galileo/dotfiles/
+
+
