@@ -6,7 +6,7 @@ def install_app(name:,command:'brew')
   initial_text = "#{name}..."
   pprint initial_text, indent: 1, style: :bold
 
-  if  `#{command} info #{name} 2>&1` !~ /Not installed/i
+  if  `#{command} info #{name}` !~ /Not installed/i
     final_text = "Already installed! "
     text_opts = { style: :italic }
     emoji = "🆗"

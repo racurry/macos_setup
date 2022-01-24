@@ -1,15 +1,11 @@
 Set spotlight search to Ctrl+space
-Set up a schedule for do not disturb, where it is only on from 2-2:01am
-Configure the 'today' view in notification center
-Set up iDrive backup schedule
-Set up Google photo backup
-Download & install The Archive: https://zettelkasten.de/the-archive/
+Set up iDrive backup schedule (on personal machines)
 Log in to dropbox
-Set up alfred: Advanced -> preference folder to `~/Dropbox/Alfred`
-Set up alfred: General -> set hotkey to cmd+space
-Set up alfred: General -> request permissions
-Set up your ~/.workrc
+Set dropbox sync to local only for App backups
+Set dropbox sync to local only for notes
+Set up alfred
+Set up caffeine
+Set up bartender
 Install snazzy colors: https://github.com/sindresorhus/iterm2-snazzy
-Set up touch id, if applicable
 Sublime: Install package control
 Sublime: Sync settings w/ dropbox folder

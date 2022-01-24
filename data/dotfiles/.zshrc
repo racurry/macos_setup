@@ -4,6 +4,7 @@ source $ZSH/oh-my-zsh.sh
 ZSH_THEME=""
 
 # Use the pure prompt
+fpath+=/opt/homebrew/share/zsh/site-functions
 autoload -U promptinit; promptinit
 prompt pure
 
@@ -67,7 +68,7 @@ fi
 
 # Grab any galileo-specific aliases & configs
 if [ -f ~/.galileorc ]; then
-  source ~/.galileorc
+  # source ~/.galileorc
 fi
 
 # Automatically ls after cd

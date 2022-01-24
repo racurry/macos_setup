@@ -6,7 +6,8 @@ cardhop
 diff-so-fancy
 dropbox
 fantastical
-flux
+homebrew/cask/docker
+homebrew/cask/flux
 font-hack-nerd-font
 font-monoid
 git
