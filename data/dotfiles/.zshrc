@@ -68,7 +68,7 @@ fi
 
 # Grab any galileo-specific aliases & configs
 if [ -f ~/.galileorc ]; then
-  # source ~/.galileorc
+  source ~/.galileorc
 fi
 
 # Automatically ls after cd
