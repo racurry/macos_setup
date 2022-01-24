@@ -6,6 +6,9 @@ Set dropbox sync to local only for notes
 Set up alfred
 Set up caffeine
 Set up bartender
+Set up Karabiner Elements hyperkey
+Set up moom shortcuts - defaults import com.manytricks.Moom /Users/aaron/Dropbox/App\ settings\ backups/Moom/moom_one_time_export.plist
+Set up Fantastical
 Install snazzy colors: https://github.com/sindresorhus/iterm2-snazzy
 Sublime: Install package control
 Sublime: Sync settings w/ dropbox folder
