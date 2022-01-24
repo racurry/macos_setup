@@ -102,3 +102,5 @@
 	protocol = ssh
 [pull]
 	rebase = true
+[submodule]
+	recurse = true
