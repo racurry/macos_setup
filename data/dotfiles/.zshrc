@@ -18,6 +18,9 @@ alias goarm="env /usr/bin/arch -arm64 /bin/zsh --login"
 if [[ $OSTYPE == darwin* && $CPUTYPE == arm64 ]]; then
   ## Here is the ARM bit
 
+  # Get brew on the path
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+
   # Brew
   alias brew=/opt/homebrew/bin/brew
 
@@ -105,7 +108,7 @@ export PKG_CONFIG_PATH="$(brew --prefix)/opt/libffi/lib/pkgconfig"
 
 # Fiddle with that path
 path+=($workspace'/helper-scripts/bin')
-export PATH
+export PATH="$PATH:/Users/aaron/.local/bin"
 
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
@@ -116,7 +119,6 @@ alias ls="ls -a"
 alias rake='noglob bundled_rake'
 
 
-# Created by `pipx` on 2022-01-18 18:51:04
-export PATH="$PATH:/Users/aaron/.local/bin"
+
 
 
