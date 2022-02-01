@@ -3,11 +3,6 @@ export ZSH="$HOME/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
 ZSH_THEME=""
 
-# Use the pure prompt
-fpath+=/opt/homebrew/share/zsh/site-functions
-autoload -U promptinit; promptinit
-prompt pure
-
 HYPHEN_INSENSITIVE="true"
 
 # Display red dots whilst waiting for completion.
@@ -15,25 +10,44 @@ COMPLETION_WAITING_DOTS="true"
 
 plugins=(git bundler rake)
 
-# ASDF
-. $(brew --prefix asdf)/asdf.sh
-. $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
+# Change architectures as needed
+alias gointel="env /usr/bin/arch -x86_64 /bin/zsh --login"
+alias goarm="env /usr/bin/arch -arm64 /bin/zsh --login"
+
+# Work in multiple architectures
+if [[ $OSTYPE == darwin* && $CPUTYPE == arm64 ]]; then
+  ## Here is the ARM bit
+
+  # Brew
+  alias brew=/opt/homebrew/bin/brew
+
+
+  # ASDF
+  . $(brew --prefix asdf)/asdf.sh
+  . $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
+
+  # Cocoa pods
+  alias pod='arch -x86_64 pod'
+else
+  ## Let's go intel
+
+  # Brew
+  alias brew="arch -x86_64 /usr/local/homebrew/bin/brew"
+
+  # ASDF
+  . /usr/local/homebrew/opt/asdf/libexec/asdf.sh
+
+  # OpenSSL
+  export PATH="/usr/local/homebrew/opt/openssl@3/bin:$PATH"
+fi
+
+# Use the pure prompt
+fpath+=/opt/homebrew/share/zsh/site-functions
+autoload -U promptinit; promptinit
+prompt pure
 
 # The fuck
 eval $(thefuck --alias)
-
-# Pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init --path)"
-
-# NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
 
 export LANG=en_US.UTF-8
 export EDITOR='vim'
@@ -61,11 +75,6 @@ fi
 export workspace=~/workspace
 export inbox=~/Inbox
 
-# Grab any trustworthy-specific aliases & configs
-if [ -f ~/.trustworthyrc ]; then
-  source ~/.trustworthyrc
-fi
-
 # Grab any galileo-specific aliases & configs
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
@@ -82,24 +91,22 @@ tldr () {
   curl "cheat.sh/$1"
 }
 
+# Desparately flailing at my M1 mac
+# https://stackoverflow.com/questions/69012676/install-older-ruby-versions-on-a-m1-macbook
+export CFLAGS="-Wno-error=implicit-function-declaration"
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1) --with-readline-dir=$(brew --prefix readline)"
+export LDFLAGS="-L$(brew --prefix)/opt/readline/lib"
+export CPPFLAGS="-I$(brew --prefix)/opt/readline/include"
+export PKG_CONFIG_PATH="$(brew --prefix)/opt/readline/lib/pkgconfig"
+export optflags="-Wno-error=implicit-function-declaration"
+export LDFLAGS="-L$(brew --prefix)/opt/libffi/lib"
+export CPPFLAGS="-I$(brew --prefix)/opt/libffi/include"
+export PKG_CONFIG_PATH="$(brew --prefix)/opt/libffi/lib/pkgconfig"
+
 # Fiddle with that path
 path+=($workspace'/helper-scripts/bin')
 export PATH
 
-# Work journaling
-alias wlog="jrnl work"
-alias wlconfig="subl -nw ~/.config/jrnl/jrnl.yaml"
-alias wtoday="jrnl work -from today"
-alias wtodayandyesterday="jrnl work -from yesterday"
-alias wyesterday='jrnl work -from "yesterday 6am" -until "today 6am"'
-alias wweek='jrnl work -from "last week 6am" -until "today 6am"'
-alias wlweek='jrnl work -from "last monday 6am" -until "today 6am"'
-
-# Personal journaling
-alias jmonth='jrnl -from "last month" -until "today"'
-
-# Keep friends in sync
-alias friends="friends --filename '~/Dropbox/friends.md'"
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
 alias ohmyzsh="subl -nw ~/.oh-my-zsh"
@@ -108,5 +115,8 @@ alias ls="ls -a"
 # Fix zsh breaking rake like a total turd
 alias rake='noglob bundled_rake'
 
+
 # Created by `pipx` on 2022-01-18 18:51:04
 export PATH="$PATH:/Users/aaron/.local/bin"
+
+
