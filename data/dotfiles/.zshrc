@@ -15,8 +15,10 @@ alias gointel="env /usr/bin/arch -x86_64 /bin/zsh --login"
 alias goarm="env /usr/bin/arch -arm64 /bin/zsh --login"
 
 # Work in multiple architectures
-if [[ $OSTYPE == darwin* && $CPUTYPE == arm64 ]]; then
+if [[ "$(uname -m)" == "arm64" ]]; then
   ## Here is the ARM bit
+
+  echo "Using arm architecture"
 
   # Get brew on the path
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -33,6 +35,8 @@ if [[ $OSTYPE == darwin* && $CPUTYPE == arm64 ]]; then
   alias pod='arch -x86_64 pod'
 else
   ## Let's go intel
+
+  echo "Using x86 architecture"
 
   # Brew
   alias brew="arch -x86_64 /usr/local/homebrew/bin/brew"
