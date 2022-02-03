@@ -26,16 +26,12 @@ if [[ "$(uname -m)" == "arm64" ]]; then
   # Brew
   alias brew=/opt/homebrew/bin/brew
 
-
   # ASDF
   . $(brew --prefix asdf)/asdf.sh
   . $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
 
-  # Cocoa pods
-  alias pod='arch -x86_64 pod'
 else
   ## Let's go intel
-
   echo "Using x86 architecture"
 
   # Brew
@@ -43,6 +39,12 @@ else
 
   # ASDF
   . /usr/local/homebrew/opt/asdf/libexec/asdf.sh
+
+  # Cocoa pods
+  alias pod='arch -x86_64 pod'
+
+  # Bundler
+  alias bundle="arch -x86_64 bundle"
 
   # OpenSSL
   export PATH="/usr/local/homebrew/opt/openssl@3/bin:$PATH"
@@ -117,8 +119,11 @@ export PATH="$PATH:/Users/aaron/.local/bin"
 alias rezsh="source ~/.zshrc"
 alias zshconfig="subl -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
 alias ohmyzsh="subl -nw ~/.oh-my-zsh"
-alias be="bundle exec"
 alias ls="ls -a"
+
+# bundler
+alias be="bundle exec"
+
 # Fix zsh breaking rake like a total turd
 alias rake='noglob bundled_rake'
 
