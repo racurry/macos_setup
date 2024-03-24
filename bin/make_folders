@@ -1,0 +1,11 @@
+#!/bin/bash
+
+mkdir -p ~/Screen\ Shots
+mkdir -p ~/Documents/000.\ 📥\ Inbox
+mkdir -p ~/Documents/100.\ ⚙️\ Process
+mkdir -p ~/Documents/200.\ 🚧\ Projects
+mkdir -p ~/Documents/300.\ 🚶\ People
+mkdir -p ~/Documents/400.\ 🗓️\ Time
+mkdir -p ~/Documents/500.\ 🎨\ Areas
+mkdir -p ~/Documents/700.\ 🧠\ Resources
+mkdir -p ~/Documents/800.\ 📰️\ Output
