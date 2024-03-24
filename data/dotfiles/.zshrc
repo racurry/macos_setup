@@ -27,8 +27,7 @@ if [[ "$(uname -m)" == "arm64" ]]; then
   alias brew=/opt/homebrew/bin/brew
 
   # ASDF
-  . $(brew --prefix asdf)/asdf.sh
-  . $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
+ . /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 else
   ## Let's go intel
@@ -100,6 +99,11 @@ tldr () {
   curl "cheat.sh/$1"
 }
 
+findandkill() {  
+  lsof -n -i:$1 | grep LISTEN | awk '{ print $2 }' | uniq | xargs kill -9
+} 
+alias killport=findandkill
+
 # Desparately flailing at my M1 mac
 # https://stackoverflow.com/questions/69012676/install-older-ruby-versions-on-a-m1-macbook
 export CFLAGS="-Wno-error=implicit-function-declaration"
@@ -125,7 +129,7 @@ alias ls="ls -a"
 alias be="bundle exec"
 
 # Fix zsh breaking rake like a total turd
-alias rake='noglob bundled_rake'
+alias rake='noglob rake'
 
 
 
