@@ -80,6 +80,7 @@ def run_setup(options)
   run_file("install_shell_apps", options)
 
   # That installed brew - now we have to do a tap
+  system("brew tap homebrew/cask")
   system("brew tap homebrew/cask-fonts")
 
   run_file("install_brew_apps", options)

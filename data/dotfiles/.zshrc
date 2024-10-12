@@ -33,20 +33,20 @@ else
   ## Let's go intel
   echo "Using x86 architecture"
 
-  # Brew
-  alias brew="arch -x86_64 /usr/local/homebrew/bin/brew"
-
-  # ASDF
-  . /usr/local/homebrew/opt/asdf/libexec/asdf.sh
-
   # Cocoa pods
   alias pod='arch -x86_64 pod'
 
   # Bundler
   alias bundle="arch -x86_64 bundle"
 
+  # Brew
+  eval "$(/usr/local/bin/brew shellenv)"
+
   # OpenSSL
   export PATH="/usr/local/homebrew/opt/openssl@3/bin:$PATH"
+
+  # ASDF
+  . /usr/local/opt/asdf/libexec/asdf.sh
 fi
 
 # Use the pure prompt
@@ -80,8 +80,8 @@ if [ -f ~/.npmrc ]; then
 fi
 
 # Help ems
-export workspace=~/workspace
-export inbox=~/Inbox
+export workspace=~/Documents/workspace
+export inbox=~/Documents/Inbox
 
 # Grab any galileo-specific aliases & configs
 if [ -f ~/.galileorc ]; then
@@ -115,6 +115,8 @@ export optflags="-Wno-error=implicit-function-declaration"
 export LDFLAGS="-L$(brew --prefix)/opt/libffi/lib"
 export CPPFLAGS="-I$(brew --prefix)/opt/libffi/include"
 export PKG_CONFIG_PATH="$(brew --prefix)/opt/libffi/lib/pkgconfig"
+export LDFLAGS="-L/usr/local/opt/bison/lib"
+export PATH="$(brew --prefix bison)/bin:$PATH"
 
 # Fiddle with that path
 path+=($workspace'/helper-scripts/bin')
@@ -130,8 +132,4 @@ alias be="bundle exec"
 
 # Fix zsh breaking rake like a total turd
 alias rake='noglob rake'
-
-
-
-
 
