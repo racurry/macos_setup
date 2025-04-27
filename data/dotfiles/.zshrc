@@ -50,7 +50,6 @@ else
 fi
 
 # Use the pure prompt
-fpath+=/opt/homebrew/share/zsh/site-functions
 autoload -U promptinit; promptinit
 prompt pure
 
@@ -104,19 +103,14 @@ findandkill() {
 } 
 alias killport=findandkill
 
-# Desparately flailing at my M1 mac
-# https://stackoverflow.com/questions/69012676/install-older-ruby-versions-on-a-m1-macbook
-export CFLAGS="-Wno-error=implicit-function-declaration"
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1) --with-readline-dir=$(brew --prefix readline)"
-export LDFLAGS="-L$(brew --prefix)/opt/readline/lib"
-export CPPFLAGS="-I$(brew --prefix)/opt/readline/include"
-export PKG_CONFIG_PATH="$(brew --prefix)/opt/readline/lib/pkgconfig"
-export optflags="-Wno-error=implicit-function-declaration"
-export LDFLAGS="-L$(brew --prefix)/opt/libffi/lib"
-export CPPFLAGS="-I$(brew --prefix)/opt/libffi/include"
-export PKG_CONFIG_PATH="$(brew --prefix)/opt/libffi/lib/pkgconfig"
-export LDFLAGS="-L/usr/local/opt/bison/lib"
-export PATH="$(brew --prefix bison)/bin:$PATH"
+# Homebrew (Apple Silicon) paths for libraries and headers
+export PATH="/opt/homebrew/opt/bison/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/bison/lib -L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/opt/readline/lib -L/opt/homebrew/opt/libyaml/lib -L/opt/homebrew/opt/gmp/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/bison/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/opt/readline/include -I/opt/homebrew/opt/libyaml/include -I/opt/homebrew/opt/gmp/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/bison/lib/pkgconfig:/opt/homebrew/opt/openssl@3/lib/pkgconfig:/opt/homebrew/opt/readline/lib/pkgconfig:/opt/homebrew/opt/libyaml/lib/pkgconfig:/opt/homebrew/opt/gmp/lib/pkgconfig"
+
+# For Ruby builds (asdf, ruby-build, etc.)
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@3)"
 
 # Fiddle with that path
 path+=($workspace'/helper-scripts/bin')
