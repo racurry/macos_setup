@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 # Set up all of the preferences
 
@@ -49,17 +49,20 @@ do_global_settings() {
   # Automatically quit printer app once the print jobs complete
   defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-  # Disable the “Are you sure you want to open this application?” dialog
+  # Disable the "Are you sure you want to open this application?" dialog
   defaults write com.apple.LaunchServices LSQuarantine -bool false
 
-  # Stop iTunes from responding to the keyboard media keys
-  launchctl unload -w /System/Library/LaunchAgents/com.apple.rcd.plist 2> /dev/null
+  # Prevent Music app from auto-launching when media keys are pressed
+  defaults write com.apple.Music AutoLaunch -bool false
 
   # Don't automatically adjust the brightness of the screen
   sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
 
   # Disable "close windows when quitting an app"
   defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
+
+  # Enable dark mode
+  defaults write NSGlobalDomain AppleInterfaceStyle -string "Dark"
 
   print_finished ${#ITEM}
 }
@@ -73,8 +76,8 @@ do_keyboard_setup() {
   defaults write -g KeyRepeat -int 2
   defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
-  # Disable auto-adjust of keyboard brightness
-  sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Keyboard Enabled" -bool false
+  # Disable automatic keyboard brightness
+  defaults write com.apple.BezelServices kDim -bool false
 
   # Disable autocorrect
   defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
@@ -91,33 +94,6 @@ do_keyboard_setup() {
   print_finished ${#ITEM}
 }
 
-do_text_replacement() {
- # TODO - I have no idea why this doesn't work.  Anything added here works for a bit, but eventually gets replaced
- # by whatever is set manually in the UI.
-
-  ITEM="Adding text replacement rules"
-  print_starting $ITEM
-
-  # copyright
-  defaults write -g NSUserDictionaryReplacementItems -array-add '{on=1;replace="(c)";with="\\U00a9";}'
-  # trademark
-  defaults write -g NSUserDictionaryReplacementItems -array-add '{on=1;replace="(tm)";with="\\U2122";}'
-
-  print_finished $ITEM
-}
-
-do_touchbar_setup() {
-  ITEM="Fixing the touchbar"
-  print_starting $ITEM
-
-  # Only show the regular control strip
-  defaults write com.apple.touchbar.agent PresentationModeGlobal fullControlStrip
-  # Show function keys on fn press
-  defaults write com.apple.touchbar.agent PresentationModeFnModes -dict-add fullControlStrip functionKeys
-
-  print_finished ${#ITEM}
-}
-
 do_dock_setup() {
   ITEM="Setting up the dock"
   print_starting $ITEM
@@ -125,14 +101,14 @@ do_dock_setup() {
   # Remove all default apps from the dock
   defaults write com.apple.dock persistent-apps -array
 
-	# Only show active things in the dock
-	defaults write com.apple.dock static-only -bool true
-	# Autohide the dock
-	defaults write com.apple.dock autohide -bool true
-	# Put it on the left
+  # Only show active things in the dock
+  defaults write com.apple.dock static-only -bool true
+  # Autohide the dock
+  defaults write com.apple.dock autohide -bool true
+  # Put it on the left
   defaults write com.apple.Dock orientation -string "left"
 
-    # Hot corners
+  # Hot corners
   # Possible values:
   #  0: no-op
   #  2: Mission Control
@@ -140,7 +116,6 @@ do_dock_setup() {
   #  4: Desktop
   #  5: Start screen saver
   #  6: Disable screen saver
-  #  7: Dashboard
   # 10: Put display to sleep
   # 11: Launchpad
   # 12: Notification Center
@@ -172,16 +147,9 @@ do_trackpad_setup() {
   defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
   defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
 
-  print_finished ${#ITEM}
-}
-
-do_notification_settings() {
-  ITEM="Setting up notifications"
-  print_starting $ITEM
-
-  # TODO this will just turn back on tomorrow.
-  # defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturb -boolean true
-  # defaults -currentHost write ~/Library/Preferences/ByHost/com.apple.notificationcenterui doNotDisturbDate -date "`date -u +\"%Y-%m-%d %H:%M:%S +000\"`"
+  # Enable Force Click and haptic feedback
+  defaults write NSGlobalDomain com.apple.trackpad.forceClick -bool true
+  defaults write com.apple.AppleMultitouchTrackpad ForceSuppressed -bool false
 
   print_finished ${#ITEM}
 }
@@ -196,6 +164,9 @@ do_fix_screenshots() {
 
   # To hell with preview thumbnails
   defaults write com.apple.screencapture show-thumbnail -bool FALSE
+
+  # Use PNG format for screenshots
+  defaults write com.apple.screencapture type -string "png"
 
   print_finished ${#ITEM}
 }
@@ -223,7 +194,6 @@ do_finder_setup() {
   # Empty Trash securely by default
   defaults write com.apple.finder EmptyTrashSecurely -bool true
   # Set Desktop as the default location for new Finder windows
-  # For other paths, use `PfLo` and `file:///full/path/here/`
   defaults write com.apple.finder NewWindowTarget -string "PfDe"
   defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/"
   # Show icons for hard drives, servers, and removable media on the desktop
@@ -239,12 +209,8 @@ do_screensaver_setup() {
   ITEM="Setting up the screensaver"
   print_starting $ITEM
 
-  # If pacman is installed, use that, otherise use flurry
-  if [ -f "/Users/aaron/Library/Screen Savers/Pacman.saver" ]; then
-    defaults -currentHost write com.apple.screensaver moduleDict -dict path -string "/Users/aaron/Library/Screen Savers/Pacman.saver" moduleName -string "Pacman" type -int 0
-  else
-    defaults -currentHost write com.apple.screensaver moduleDict -dict path -string "/System/Library/Screen Savers/Flurry.saver" moduleName -string "Flurry" type -int 0
-  fi
+  # Use Flurry screensaver
+  defaults -currentHost write com.apple.screensaver moduleDict -dict path -string "/System/Library/Screen Savers/Flurry.saver" moduleName -string "Flurry" type -int 0
   # Never start it
   defaults -currentHost write com.apple.screensaver idleTime -int 0
 
@@ -253,8 +219,20 @@ do_screensaver_setup() {
 
 do_sound_setup() {
   ITEM="Setting up sound preferences"
+  print_starting $ITEM
   # Set alert sound to submarine
   defaults write .GlobalPreferences com.apple.sound.beep.sound /System/Library/Sounds/Submarine.aiff
+  print_finished ${#ITEM}
+}
+
+do_set_spotlight_preferences() {
+  ITEM="Setting up spotlight preferences"
+  print_starting $ITEM
+
+  # Set spotlight keyboard shortcut to control+space
+  defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "{ enabled = 1; value = { parameters = (32, 49, 262144); type = 'standard'; }; }"
+
+  print_finished ${#ITEM}
 }
 
 do_kill_running_apps()  {
@@ -262,8 +240,7 @@ do_kill_running_apps()  {
   print_starting $ITEM
 
   killall Dock
-  killall ControlStrip
-  killall NotificationCenter
+  killall "Notification Center"
   killall Finder
   killall SystemUIServer
   killall cfprefsd
@@ -276,24 +253,22 @@ do_setup() {
   printf "\n\e[33;1mSetting up macOS\e[0m\n"
   printf "\e[33;1m--------------------------------------------------------------------------------\e[0m\n"
 
-  do_keep_sudo_alive
+# 
+  # do_keep_sudo_alive 
 
   do_global_settings
   do_keyboard_setup
-  # do_text_replacement
   do_trackpad_setup
   do_dock_setup
-  do_touchbar_setup
   do_fix_screenshots
   do_finder_setup
-  do_notification_settings
   do_screensaver_setup
   do_sound_setup
+  do_set_spotlight_preferences
 
   do_kill_running_apps
   printf "\n\e[32;1m    macOS is setup.  I think you need to restart, though\e[0m\n"
 }
-
 
 # Wipe everything back to factory defaults
 do_config_resets() {

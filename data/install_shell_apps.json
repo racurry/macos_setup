@@ -11,11 +11,6 @@
       "test": "brew help"
     },
     {
-      "name": "Homebrew cask",
-      "command": "brew tap homebrew/cask",
-      "test": "brew tap homebrew/cask"
-    },
-    {
       "name": "Oh My Zsh",
       "command": "sh -c \"$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\"",
       "test": "grep /zsh$ /etc/shells | tail -1"

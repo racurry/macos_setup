@@ -1,34 +1,34 @@
+1password-cli
+--cask arc
 alfred
 asdf
 bartender
 caffeine
 cardhop
 diff-so-fancy
+--cask docker
 dropbox
-fantastical
-homebrew/cask/docker
-homebrew/cask/flux
+--cask flux
 font-hack-nerd-font
 font-monoid
 git
 hazel
 hub
-idrive
 imagemagick
 iterm2
 karabiner-elements
 keyboard-maestro
-lastpass-cli
 mas
+moom
+--cask mos
 obsidian
 pure
 pyenv
-readline
 spotify
-sublime-text
+the-unarchiver
 thefuck
+--cask visual-studio-code
 wget
-xscreensaver
 yarn
 zsh
 zsh-syntax-highlighting

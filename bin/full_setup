@@ -11,7 +11,7 @@ DATA_FILE_EXTENSIONS = %w{txt json}
 def data_file(filename)
   DATA_FILE_EXTENSIONS.each do |extension|
     filepath = "#{DATA_PATH}/#{filename}.#{extension}"
-    return filepath if File.exists?(filepath)
+    return filepath if File.exist?(filepath)
   end
   nil
 end
@@ -25,9 +25,9 @@ def run_file(filename, options=[])
 
   pputs("Running #{bin_filepath}", color: :yellow, style: :italic) if verbose
 
-  raise "There is no such file as #{bin_filepath}!" unless File.exists?(bin_filepath)
+  raise "There is no such file as #{bin_filepath}!" unless File.exist?(bin_filepath)
 
-  tracking_file_exists = File.exists?(tracking_filepath)
+  tracking_file_exists = File.exist?(tracking_filepath)
   tracking_file_modified_on = tracking_file_exists ? File.mtime(tracking_filepath) : nil
   bin_file_modified_on = File.mtime(bin_filepath)
   bin_file_is_newer = tracking_file_exists && (bin_file_modified_on > tracking_file_modified_on)
@@ -78,16 +78,8 @@ def run_setup(options)
   run_file("setup_macos", options)
   run_file("sync_dotfiles", options)
   run_file("install_shell_apps", options)
-
-  # That installed brew - now we have to do a tap
-  system("brew tap homebrew/cask")
-  system("brew tap homebrew/cask-fonts")
-
   run_file("install_brew_apps", options)
   run_file("install_mac_app_store_apps", options)
-  run_file("install_gems", options)
-  run_file("set_shell_preferences", options)
-  run_file("configure_terminal", options)
   run_file("manual_todos", options)
 
   add_executable_to_path

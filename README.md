@@ -18,8 +18,11 @@ Things that happen
 `pbcopy < ~/.ssh/id_rsa.pub`
 3. Add it here: [github settings](https://github.com/settings/keys)
 4. Clone the repo:
-`mkdir ~/workspace`
-`git clone git@github.com:racurry/osx_setup.git ~/workspace`
+```
+mkdir ~/workspace
+cd ~/workspace
+git clone git@github.com:racurry/osx_setup.git
+```
 
 ### Step 1: Run the setup
 
