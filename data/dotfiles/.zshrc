@@ -117,8 +117,8 @@ path+=($workspace'/helper-scripts/bin')
 export PATH="$PATH:/Users/aaron/.local/bin"
 
 alias rezsh="source ~/.zshrc"
-alias zshconfig="subl -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
-alias ohmyzsh="subl -nw ~/.oh-my-zsh"
+alias zshconfig="code -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
+alias ohmyzsh="code -nw ~/.oh-my-zsh"
 alias ls="ls -a"
 
 # bundler

@@ -11,7 +11,7 @@ export minx=~/workspace/stitchfix/minx
 export sms=~/workspace/stitchfix/styling-merchandise-service
 export whelpers=~/workspace/stitchfix/helper-scripts
 
-alias sfconfig="subl -nw ~/.stitchfixrc"
+alias sfconfig="code -nw ~/.stitchfixrc"
 
 # Add sf-specific helper scripts to my path
 path+=($workspace'/stitchfix/helper-scripts/bin')

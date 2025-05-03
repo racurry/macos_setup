@@ -1,4 +1,4 @@
-alias galileocfg="subl -nw ~/.galileorc"
+alias galileocfg="code -nw ~/.galileorc"
 alias sequel="LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN=y /Applications/Sequel\ Pro.app/Contents/MacOS/Sequel\ Pro &"
 alias mysql_port="docker port api_flask | grep -Eo '[0-9]+$'"
 
