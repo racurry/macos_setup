@@ -77,7 +77,7 @@ def run_setup(options)
   # These are the actual setup files.  Order matters here
   run_file("setup_macos", options)
   run_file("sync_dotfiles", options)
-  run_file("install_shell_apps", options)
+  run_file("install_apps", options)
   system("brew bundle --file=#{DATA_PATH}/Brewfile")
   run_file("manual_todos", options)
 

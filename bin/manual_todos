@@ -7,7 +7,7 @@ DONE_FILE_NAME = 'data/.meta/.todone'
 MANUAL_TODOS_FILE = 'data/manual_todos.txt'
 
 def already_done
-  if File.exists?(DONE_FILE_NAME)
+  if File.exist?(DONE_FILE_NAME)
     donezo = File.open(DONE_FILE_NAME)
     donezo.read.split(/\n/)
   else

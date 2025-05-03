@@ -34,7 +34,7 @@ def shell_apps
   parsed[:apps]
 end
 
-def install_apps
+def install_shell_apps
   section_header "Installing shell apps"
 
   shell_apps.each do |app|
@@ -45,6 +45,17 @@ def install_apps
     )
   end
   section_footer "Done installing shell apps"
+end
+
+def install_brew_apps
+  section_header "Installing Brew and App Store apps"
+  system("brew bundle --file=data/Brewfile")
+  section_footer "Done installing Brew and App Store apps"
+end
+
+def install_apps
+  install_shell_apps
+  install_brew_apps
 end
 
 install_apps
