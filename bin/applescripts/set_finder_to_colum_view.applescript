@@ -44,24 +44,24 @@ tell application "Finder"
                     set allCheckboxes to (every checkbox)
                     log "Found " & (count of allCheckboxes) & " checkboxes"
                     
-                    -- Click each checkbox
+                    -- Click each checkbox only if it's not already checked
                     repeat with cb in allCheckboxes
-                        log "Clicking checkbox: " & (name of cb)
-                        click cb
-                        delay 0.2
+                        set cbValue to (value of cb)
+                        log "Checkbox: " & (name of cb) & " - Value: " & cbValue
+                        
+                        if cbValue is 0 then
+                            log "Clicking checkbox: " & (name of cb)
+                            click cb
+                            delay 0.2
+                        else
+                            log "Checkbox already checked: " & (name of cb)
+                        end if
                     end repeat
                     
                     log "Finished processing checkboxes"
                 end tell
             end tell
         end tell
-        
-        -- Ask before restarting Finder
-        log "Would you like to restart Finder to apply changes? (y/n)"
-        set userInput to do shell script "echo -n 'Restart Finder? (y/n): '; read response; echo $response"
-        if userInput is "y" then
-            do shell script "killall Finder"
-        end if
     on error errMsg
         log "Error setting Column view as default: " & errMsg
     end try
