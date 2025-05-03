@@ -2,12 +2,6 @@
   email = aaron@aaroncurry.net
 	name = Aaron Curry
 
-[includeIf "gitdir:~/workspace/stitchfix/"]
-  path = ~/.gitconfig_stitchfix
-
-[includeIf "gitdir:~/workspace/trustworthy/"]
-  path = ~/.gitconfig_trustworthy
-
 [includeIf "gitdir:~/workspace/galileo/"]
   path = ~/.gitconfig_galileo
 
