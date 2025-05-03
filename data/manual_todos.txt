@@ -8,3 +8,4 @@ Install meeter https://www.trymeeter.com/
 Set up Obsidian sync
 Sync VS code
 Deal w/ Cursor.com
+Add MuteDeck https://mutedeck.com/downloads

@@ -1,0 +1,43 @@
+# Homebrew packages
+brew "1password-cli"
+brew "alfred"
+brew "asdf"
+brew "caffeine"
+brew "cardhop"
+brew "diff-so-fancy"
+brew "dropbox"
+brew "font-hack-nerd-font"
+brew "font-monoid"
+brew "git"
+brew "hazel"
+brew "hub"
+brew "imagemagick"
+brew "iterm2"
+brew "karabiner-elements"
+brew "keyboard-maestro"
+brew "mas"  # Required for Mac App Store apps
+brew "moom"
+brew "obsidian"
+brew "pure"
+brew "pyenv"
+brew "spotify"
+brew "the-unarchiver"
+brew "thefuck"
+brew "wget"
+brew "yarn"
+brew "zsh"
+brew "zsh-syntax-highlighting"
+
+# Homebrew casks
+cask "arc"
+cask "docker"
+cask "elgato-stream-deck"
+cask "flux"
+cask "jordanbaird-ice"
+cask "mos"
+cask "visual-studio-code"
+
+# Mac App Store apps
+mas "Meeter", id: 1510445899
+mas "The Unarchiver", id: 425424353
+mas "Things", id: 904280696 
