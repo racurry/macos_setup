@@ -1,28 +1,17 @@
+-- This shit still doesn't work
+
 tell application "Finder"
-    activate
     try
-        -- Close any open dialog windows
-        tell application "System Events"
-            tell process "Finder"
-                repeat while (exists (window 1 whose subrole is "AXDialog"))
-                    click button "Cancel" of window 1 whose subrole is "AXDialog"
-                end repeat
-            end tell
-        end tell
-
-        -- Close all windows except first one
-        repeat while (count of Finder windows) > 1
-            close window 2
-        end repeat
+        -- Kill Finder to ensure clean state
+        do shell script "killall Finder"
+        delay 1
         
-        -- Create window if none exists
-        if not (exists window 1) then
-            make new Finder window
-        end if
-
-        -- Set the target folder to root directory
-        set target_folder to startup disk
-        set target of window 1 to target_folder
+        -- Ensure Finder is active
+        activate application "Finder"
+        delay 1
+        
+        -- Open startup disk in a new window
+        open startup disk
         
         -- Set the view to Column view
         set current view of Finder window 1 to column view
@@ -32,11 +21,15 @@ tell application "Finder"
             tell process "Finder"
                 keystroke "j" using command down
                 
-                -- Wait for dialog to appear
-                delay 1
-                
                 -- Find the View Options dialog (system floating window)
-                set viewOptionsWindow to first window whose subrole is "AXSystemFloatingWindow"
+                repeat 5 times
+                    try
+                        set viewOptionsWindow to first window whose subrole is "AXSystemFloatingWindow"
+                        exit repeat
+                    on error
+                        delay 0.5
+                    end try
+                end repeat
                 
                 -- Try to interact with the checkboxes
                 tell viewOptionsWindow
@@ -62,6 +55,8 @@ tell application "Finder"
                 end tell
             end tell
         end tell
+
+        do shell script "killall Finder"
     on error errMsg
         log "Error setting Column view as default: " & errMsg
     end try
