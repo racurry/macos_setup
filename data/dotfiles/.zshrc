@@ -10,44 +10,11 @@ COMPLETION_WAITING_DOTS="true"
 
 plugins=(git bundler rake)
 
-# Change architectures as needed
-alias gointel="env /usr/bin/arch -x86_64 /bin/zsh --login"
-alias goarm="env /usr/bin/arch -arm64 /bin/zsh --login"
-
-# Work in multiple architectures
-if [[ "$(uname -m)" == "arm64" ]]; then
-  ## Here is the ARM bit
-
-  echo "Using arm architecture"
-
-  # Get brew on the path
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-
-  # Brew
-  alias brew=/opt/homebrew/bin/brew
-
-  # ASDF
- . /opt/homebrew/opt/asdf/libexec/asdf.sh
-
-else
-  ## Let's go intel
-  echo "Using x86 architecture"
-
-  # Cocoa pods
-  alias pod='arch -x86_64 pod'
-
-  # Bundler
-  alias bundle="arch -x86_64 bundle"
-
-  # Brew
-  eval "$(/usr/local/bin/brew shellenv)"
-
-  # OpenSSL
-  export PATH="/usr/local/homebrew/opt/openssl@3/bin:$PATH"
-
-  # ASDF
-  . /usr/local/opt/asdf/libexec/asdf.sh
-fi
+# Homebrew and ASDF setup
+# Ensure Homebrew is on the path and asdf is sourced
+# (Order matters if asdf is installed via Homebrew)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # Use the pure prompt
 autoload -U promptinit; promptinit
@@ -60,7 +27,7 @@ export LANG=en_US.UTF-8
 export EDITOR='vim'
 
 # Keep less from paginating unless it needs to
-export LESS="$LESS -FRXK"
+export LESS="-FRXK"
 
 # History
 HISTSIZE=10000
@@ -72,13 +39,12 @@ setopt sharehistory # Share history across terminals
 setopt incappendhistory # Immediately append to the history file, not just when a term is killed
 unsetopt nomatch # Don't throw an error if there are no matches, just do the right thing
 
-
 # Set up NPM_TOKEN if .npmrc exists
 if [ -f ~/.npmrc ]; then
   export NPM_TOKEN=`sed -n -e '/_authToken/ s/.*\= *//p' ~/.npmrc`
 fi
 
-# Help ems
+# Workspace shortcuts
 export workspace=~/Documents/workspace
 export inbox=~/Documents/Inbox
 
@@ -98,6 +64,7 @@ tldr () {
   curl "cheat.sh/$1"
 }
 
+# Kill process on a port
 findandkill() {  
   lsof -n -i:$1 | grep LISTEN | awk '{ print $2 }' | uniq | xargs kill -9
 } 
@@ -112,18 +79,17 @@ export PKG_CONFIG_PATH="/opt/homebrew/opt/bison/lib/pkgconfig:/opt/homebrew/opt/
 # For Ruby builds (asdf, ruby-build, etc.)
 export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@3)"
 
-# Fiddle with that path
-path+=($workspace'/helper-scripts/bin')
-export PATH="$PATH:/Users/aaron/.local/bin"
+# PATH modifications (grouped)
+export PATH="$PATH:$workspace/helper-scripts/bin:/Users/aaron/.local/bin"
 
+# Aliases and convenience functions
 alias rezsh="source ~/.zshrc"
 alias zshconfig="code -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
 alias ohmyzsh="code -nw ~/.oh-my-zsh"
-alias ls="ls -a"
-
+# Enhanced ls: show all files and use color
+alias ls="ls -aG"
 # bundler
 alias be="bundle exec"
-
 # Fix zsh breaking rake like a total turd
 alias rake='noglob rake'
 
