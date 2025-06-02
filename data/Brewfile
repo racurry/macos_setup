@@ -1,6 +1,7 @@
 # Homebrew packages (brew)
 brew "asdf"
 brew "diff-so-fancy"
+brew "gh"
 brew "git"
 brew "hub"
 brew "imagemagick"
@@ -35,6 +36,7 @@ cask "moom"
 cask "mos"
 cask "obsidian"
 cask "spotify"
+cask "superhuman"
 cask "visual-studio-code"
 
 # Mac App Store apps
