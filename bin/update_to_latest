@@ -6,7 +6,7 @@ require_relative '../lib/terminal_helpers.rb'
 # Go up one level to get the repo root
 REPO_DIRECTORY = File.dirname(File.dirname(File.realpath(__FILE__)))
 
-section_header "Pulling latest config"
+section_header "🔄 Pulling latest config"
 Dir.chdir(REPO_DIRECTORY) do
   system 'git pull --rebase'
 end

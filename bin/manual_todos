@@ -29,24 +29,17 @@ def mark_as_done(todo)
 end
 
 def tell_me_what_to_do(options)
-  unattended = options.include?('--unattended')
-
-  section_header "Do it!"
+  section_header "✅ Do it!"
 
   things_to_do.each do |todo|
-
-    if unattended
-      puts "    ❏ #{todo} "
+    print "    ❏ #{todo} "
+    pprint "(d=done,s=skip)  ", color: :cyan, style: :italic
+    reply = STDIN.getch
+    if reply == 'd'
+      mark_as_done(todo)
+      puts "✅"
     else
-      print "    ❏ #{todo} "
-      pprint "(d=done,s=skip)  ", color: :cyan, style: :italic
-      reply = STDIN.getch
-      if reply == 'd'
-        mark_as_done(todo)
-        puts "✅"
-      else
-        puts "❌"
-      end
+      puts "❌"
     end
   end
 

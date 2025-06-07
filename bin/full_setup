@@ -62,6 +62,14 @@ def add_executable_to_path
 end
 
 def run_setup(options)
+  # Handle force flag - clear tracking data to force complete re-run
+  if options.include?('--force')
+    if Dir.exist?(TRACKING_FILES_PATH)
+      pputs "🗑️ Clearing tracking data for forced re-run...", style: :bold, color: :yellow
+      FileUtils.rm_rf(TRACKING_FILES_PATH)
+    end
+  end
+  
   FileUtils.mkdir_p(TRACKING_FILES_PATH)
 
   horizontal_rule(:cyan)

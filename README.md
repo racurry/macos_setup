@@ -31,11 +31,13 @@ cd osx_setup
 ./macos_setup
 ```
 
-There are some bits that require human intervention.  If you want the system to just make all the decisions for you, run
+There are some bits that require human intervention.
 
-`./macos_setup --unattended`
+To force a complete re-run (ignoring previous execution tracking):
 
-instead.
+```
+./macos_setup --force
+```
 
 ## This adds a command to your path
 
@@ -53,9 +55,7 @@ Dump it into the relevant file in `/data`.
 ### Cask lists
 - https://formulae.brew.sh/
 
-
 ## Fixes
-- [ ] Get rid of dialog; take sudo from command line for any file
 - [ ] Sync Claude settings globally
 - [ ] Add a step to do symlink for karabiner elements
 - [ ] Sync stream deck profiles

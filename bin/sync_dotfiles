@@ -47,7 +47,7 @@ def handle_conflict_with_guidance(dotfile_name:, local_dotfile_path:, home_dir_d
   end
 end
 
-def sync_file(dotfile_name:, unattended:false, skip_conflicts:false)
+def sync_file(dotfile_name:, skip_conflicts:false)
   home_dir_dotfile_path = "#{HOME_DIR}/#{dotfile_name}"
   local_dotfile_path = "#{local_dotfiles_dir}/#{dotfile_name}"
 
@@ -57,9 +57,7 @@ def sync_file(dotfile_name:, unattended:false, skip_conflicts:false)
 
   if File.exist?(home_dir_dotfile_path) || File.symlink?(home_dir_dotfile_path)
     pprint "    #{dotfile_name} already exists!", style: :bold
-    if unattended
-      backup_and_replace(dotfile_name:dotfile_name, local_dotfile_path:local_dotfile_path, home_dir_dotfile_path:home_dir_dotfile_path)
-    elsif skip_conflicts
+    if skip_conflicts
       skip_file(dotfile_name)
      else
       handle_conflict_with_guidance(dotfile_name:dotfile_name, local_dotfile_path:local_dotfile_path, home_dir_dotfile_path:home_dir_dotfile_path)
@@ -72,15 +70,14 @@ def sync_file(dotfile_name:, unattended:false, skip_conflicts:false)
 end
 
 def sync_dotfiles(options)
-  unattended = options.include?('--unattended')
   skip_conflicts = options.include?('--skip_conflicts')
 
-  section_header "Syncing dotfiles #{unattended ? '(unattended mode)' : ''}"
+  section_header "⚙️ Syncing dotfiles"
 
   all_files = Dir.entries(local_dotfiles_dir)
   dotfiles = all_files - IGNORED_FILES
   dotfiles.each do |dotfile|
-    sync_file(dotfile_name:dotfile, unattended:unattended, skip_conflicts:skip_conflicts)
+    sync_file(dotfile_name:dotfile, skip_conflicts:skip_conflicts)
   end
 end
 

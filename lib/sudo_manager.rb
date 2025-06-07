@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require_relative 'terminal_helpers'
+
 class SudoManager
   def self.ensure_sudo_available
     # Check if we already have a valid temp file
@@ -10,7 +12,7 @@ class SudoManager
     end
 
     # Need to create new sudo session
-    puts "Administrator privileges required for this operation."
+    section_header "🔐 Administrator Authentication Required"
     print "Password: "
     system("stty -echo")  # Hide password input
     password = STDIN.gets.chomp

@@ -10,11 +10,11 @@ This is a sophisticated macOS setup automation system built with Ruby orchestrat
 
 ### Main Setup
 - `./macos_setup` - Primary entry point for complete macOS setup with secure password collection
-- `./macos_setup --unattended` - Automated setup without interactive prompts
+- `./macos_setup --force` - Force complete re-run by clearing execution tracking data
 - `macoscfg` - Global command (created after first run) for re-running setup from anywhere
 
 ### Individual Components (for development/testing)
-- `bin/full_setup [--verbose|--unattended]` - Main orchestrator with smart execution tracking
+- `bin/full_setup [--verbose] [--force]` - Main orchestrator with smart execution tracking
 - `bin/setup_macos` - Configure macOS system preferences and defaults
 - `bin/sync_dotfiles` - Sync configuration files with interactive conflict resolution
 - `bin/install_apps` - Install shell applications and Brewfile packages
