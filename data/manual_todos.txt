@@ -1,7 +1,7 @@
 Set dropbox sync to local only for App backups
 Set up alfred
 Set up caffeine
-Set up bartender
+Set up Ice
 Set up Karabiner Elements hyperkey
 Set up moom shortcuts - defaults import com.manytricks.Moom /Users/aaron/Dropbox/App\ settings\ backups/Moom/moom_one_time_export.plist
 Install meeter https://www.trymeeter.com/

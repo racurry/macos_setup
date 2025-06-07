@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(diff:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(brew list:*)",
+      "Bash(mas list:*)",
+      "Bash(brew install:*)",
+      "Bash(brew search:*)",
+      "Bash(brew bundle:*)",
+      "Bash(ls:*)",
+      "Bash(chmod:*)"
+    ],
+    "deny": []
+  }
+}
