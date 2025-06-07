@@ -1,6 +1,0 @@
-# Apps that require sudo privileges for installation
-# These will prompt for password via GUI dialog
-
-cask "elgato-stream-deck"
-cask "google-drive"
-cask "karabiner-elements"

@@ -2,6 +2,7 @@
 
 require 'json'
 require_relative '../lib/terminal_helpers.rb'
+require_relative '../lib/sudo_manager.rb'
 
 SHELL_APPS_FILE = 'data/install_shell_apps.json'
 
@@ -50,41 +51,22 @@ end
 def install_brew_apps
   section_header "Installing Brew and App Store apps"
   
-  # Install regular apps first (no sudo required)
-  pprint "Installing apps that don't require sudo...", style: :bold, indent: 1
-  regular_success = system("brew bundle --file=data/Brewfile")
-  
-  if regular_success
-    pprint "✅ Regular apps installed successfully!", style: :bold, color: :green, indent: 1
-  else
-    pprint "⚠️ Some regular apps failed to install", style: :bold, color: :yellow, indent: 1
+  # Ensure sudo is available for apps that require it
+  unless SudoManager.ensure_sudo_available
+    pprint "❌ Sudo authentication failed - skipping apps that require admin privileges", style: :bold, color: :red, indent: 1
+    return
   end
   
-  # Install sudo-requiring apps with askpass helper
-  if File.exist?("data/Brewfile_needs_sudo")
-    # Check if sudo apps are already installed using brew bundle check
-    if system("brew bundle check --file=data/Brewfile_needs_sudo > /dev/null 2>&1")
-      pprint "✅ All admin-required apps already installed!", style: :bold, color: :green, indent: 1
+  success = system("brew bundle --file=data/Brewfile")
+  
+  if success
+    pprint "✅ All apps installed successfully!", style: :bold, color: :green, indent: 1
+  else
+    # Check actual installation status (brew bundle may fail due to Rosetta errors even when apps install)
+    if system("brew bundle check --file=data/Brewfile > /dev/null 2>&1")
+      pprint "✅ All apps installed successfully (despite some warnings)!", style: :bold, color: :green, indent: 1
     else
-      pprint "Installing apps that require admin password...", style: :bold, indent: 1
-      
-      # Set up askpass helper for sudo prompts
-      askpass_script = File.join(Dir.pwd, "bin", "askpass_helper")
-      ENV['SUDO_ASKPASS'] = askpass_script
-      
-      # Pre-authenticate sudo to cache credentials
-      if system("sudo -A true")
-        sudo_success = system("brew bundle --file=data/Brewfile_needs_sudo")
-        
-        if sudo_success
-          pprint "✅ Admin-required apps installed successfully!", style: :bold, color: :green, indent: 1
-        else
-          pprint "⚠️ Some admin-required apps failed to install", style: :bold, color: :yellow, indent: 1
-        end
-      else
-        pprint "❌ Admin authentication cancelled - skipping sudo apps", style: :bold, color: :red, indent: 1
-        pprint "You can install them manually later with: brew bundle --file=data/Brewfile_needs_sudo", style: :italic, indent: 2
-      end
+      pprint "⚠️ Some apps failed to install", style: :bold, color: :yellow, indent: 1
     end
   end
   

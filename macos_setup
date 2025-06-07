@@ -1,8 +1,17 @@
 #!/usr/bin/env ruby
 
-DIR="#{Dir.home}/workspace/osx_setup/"
+# Get the directory where this script is located
+DIR = File.dirname(File.realpath(__FILE__))
 
-Dir.chdir(DIR){
-  system "bin/full_setup #{ARGV}"
-}
+Dir.chdir(DIR) do
+  require_relative 'lib/sudo_manager'
+  
+  puts "macOS Setup requires administrator privileges for some installations."
+  if SudoManager.ensure_sudo_available
+    system "bin/full_setup #{ARGV.join(' ')}"
+  else
+    puts "Setup cancelled - administrator authentication required."
+    exit 1
+  end
+end
 

@@ -10,7 +10,13 @@
       "Bash(brew search:*)",
       "Bash(brew bundle:*)",
       "Bash(ls:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(./macos_setup)",
+      "Bash(echo:*)",
+      "Bash(grep:*)",
+      "Bash(arch)",
+      "Bash(brew uninstall:*)",
+      "Bash(SUDO_ASKPASS=bin/askpass_helper brew uninstall --cask elgato-stream-deck google-drive karabiner-elements)"
     ],
     "deny": []
   }

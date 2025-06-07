@@ -78,7 +78,6 @@ def run_setup(options)
   run_file("setup_macos", options)
   run_file("sync_dotfiles", options)
   run_file("install_apps", options)
-  system("brew bundle --file=#{DATA_PATH}/Brewfile")
   run_file("manual_todos", options)
 
   add_executable_to_path

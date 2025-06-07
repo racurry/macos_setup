@@ -1,0 +1,12 @@
+#!/bin/bash
+# Sudo helper that reads password from secure temp file
+temp_file="/tmp/macos_setup_$(ps -o ppid= -p $PPID | tr -d ' ' | xargs ps -o ppid= -p | tr -d ' ')"
+if [ -f "$temp_file" ]; then
+    cat "$temp_file"
+else
+    # Fallback: try to find any macos_setup temp file
+    temp_file=$(ls /tmp/macos_setup_* 2>/dev/null | head -1)
+    if [ -f "$temp_file" ]; then
+        cat "$temp_file"
+    fi
+fi

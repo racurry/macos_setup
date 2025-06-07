@@ -2,6 +2,7 @@
 
 require 'io/console'
 require_relative '../lib/terminal_helpers.rb'
+require_relative '../lib/sudo_manager.rb'
 
 HOME_DIR = File.expand_path('~')
 DOTFILES_PATH = '/data/dotfiles'

@@ -52,3 +52,11 @@ Dump it into the relevant file in `/data`.
 
 ### Cask lists
 - https://formulae.brew.sh/
+
+
+## Fixes
+- [ ] Get rid of dialog; take sudo from command line for any file
+- [ ] Sync Claude settings globally
+- [ ] Add a step to do symlink for karabiner elements
+- [ ] Sync stream deck profiles
+- [ ] xcode command line tools check is slow as hell

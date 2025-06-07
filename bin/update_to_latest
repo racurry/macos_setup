@@ -2,10 +2,12 @@
 
 require_relative '../lib/terminal_helpers.rb'
 
-DIR="#{Dir.home}/workspace/osx_setup"
+# Get the directory where this script is located (should be bin/)
+# Go up one level to get the repo root
+REPO_DIRECTORY = File.dirname(File.dirname(File.realpath(__FILE__)))
 
 section_header "Pulling latest config"
-Dir.chdir(DIR){
+Dir.chdir(REPO_DIRECTORY) do
   system 'git pull --rebase'
-}
+end
 section_footer "Done"
