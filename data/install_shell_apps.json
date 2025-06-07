@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "XCode Command Line Tools",
-      "test": "gcc --help",
+      "test": "xcode-select -p",
       "command": "xcode-select --install"
     },
     {

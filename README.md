@@ -59,4 +59,7 @@ Dump it into the relevant file in `/data`.
 - [ ] Sync Claude settings globally
 - [ ] Add a step to do symlink for karabiner elements
 - [ ] Sync stream deck profiles
-- [ ] xcode command line tools check is slow as hell
+- [ ] App upgrade/clean up steps
+- [ ] oh my zsh-style automatic update checks
+- [ ] Actually make sure the macos settings work
+- [ ] Move data sync/set up stuff to icloud, see how I can automate it
