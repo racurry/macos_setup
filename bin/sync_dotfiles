@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'io/console'
+require 'fileutils'
 require_relative '../lib/terminal_helpers.rb'
 require_relative '../lib/sudo_manager.rb'
 
@@ -14,7 +15,11 @@ end
 
 def backup_and_replace(dotfile_name:, local_dotfile_path:, home_dir_dotfile_path:)
   print " Backing up #{dotfile_name}..."
-  File.rename(home_dir_dotfile_path, "#{home_dir_dotfile_path}.backup")
+  if File.directory?(home_dir_dotfile_path)
+    FileUtils.mv(home_dir_dotfile_path, "#{home_dir_dotfile_path}.backup")
+  else
+    File.rename(home_dir_dotfile_path, "#{home_dir_dotfile_path}.backup")
+  end
   pputs "Done!", color: :green, style: :bold
   print "    Linking #{dotfile_name}..."
   File.symlink(local_dotfile_path, home_dir_dotfile_path)
@@ -37,7 +42,11 @@ def handle_conflict_with_guidance(dotfile_name:, local_dotfile_path:, home_dir_d
     skip_file(dotfile_name)
   when 'r'
     print " Replacing #{dotfile_name}..."
-    File.delete(home_dir_dotfile_path)
+    if File.directory?(home_dir_dotfile_path)
+      FileUtils.rm_rf(home_dir_dotfile_path)
+    else
+      File.delete(home_dir_dotfile_path)
+    end
     File.symlink(local_dotfile_path, home_dir_dotfile_path)
     pputs "Done!", color: :green, style: :bold
   when 'b'

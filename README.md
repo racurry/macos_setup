@@ -56,10 +56,10 @@ Dump it into the relevant file in `/data`.
 - https://formulae.brew.sh/
 
 ## Fixes
-- [ ] Sync Claude settings globally
-- [ ] Add a step to do symlink for karabiner elements
 - [ ] Sync stream deck profiles
 - [ ] App upgrade/clean up steps
 - [ ] oh my zsh-style automatic update checks
 - [ ] Actually make sure the macos settings work
 - [ ] Move data sync/set up stuff to icloud, see how I can automate it
+    - [ ] Check for existence of app; custom command?  Symlinks, like karabiner?
+- [ ] Figure out workspace path
