@@ -57,7 +57,7 @@ def install_brew_apps
     return
   end
   
-  success = system("brew bundle --file=data/Brewfile")
+  success = system("arch -arm64 brew bundle --file=data/Brewfile")
   
   if success
     pprint "✅ All apps installed successfully!", style: :bold, color: :green, indent: 1
