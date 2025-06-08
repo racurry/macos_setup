@@ -4,6 +4,7 @@
 #       one line per thing, ideally
 # TODO: Add a "deepclean" that is interactive, and offers to update global .tool-versions
 #               Also cleans up local data/backups
+# TODO: This entire file should just be making upgrade/update calls to other files
 
 require_relative '../lib/terminal_helpers'
 
@@ -116,6 +117,7 @@ end
 
 def sync_dotfiles
   # TODO: Implement unattended mode for sync_dotfiles to avoid user input prompts
+  return
   pputs "Skipping dotfiles sync (requires user input)", indent: 1, style: :italic, color: :yellow
   pputs "Run 'bin/sync_dotfiles' manually if needed", indent: 2, color: :cyan
   pputs ""
