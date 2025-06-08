@@ -51,20 +51,12 @@ To run system hygiene (update packages, plugins, and configurations):
 
 You can rerun the setup any time with `macoscfg`.
 
-## System Hygiene
+## Extra stuff
 
-The `--update` flag runs a comprehensive system hygiene routine that:
-
-- Updates the osx_setup repository
-- Updates asdf plugins and checks for newer tool versions  
-- Updates oh-my-zsh
-- Updates Homebrew packages
-- Verifies Brewfile package compliance
-- Syncs app configurations
-- Cleans up old packages
-- Runs health checks on critical development tools
-
-This can also be run directly with `bin/hygiene` or the `machygiene` command (available after initial setup).
+```bash
+    ./bin/setup_app_configs --export # Export settings from apps that don't support cloud sync
+    ./bin/setup_app_configs --import # Import settings into apps that don't support cloud sync 
+```
 
 ## Adding new stuff
 

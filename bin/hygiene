@@ -3,6 +3,7 @@
 # TODO: Update this to REALLY slim down the output
 #       one line per thing, ideally
 # TODO: Add a "deepclean" that is interactive, and offers to update global .tool-versions
+#               Also cleans up local data/backups
 
 require_relative '../lib/terminal_helpers'
 
