@@ -77,5 +77,5 @@ Dump it into the relevant file in `/data`.
 - https://formulae.brew.sh/
 
 ## Fixes
-- [ ] Actually make sure the macos settings work
 - [ ] Create a generic folder action for copy path in finder
+- [ ] Auto install things from .tool-versions.  Install known packages, like claude code

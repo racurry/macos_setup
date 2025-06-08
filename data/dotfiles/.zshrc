@@ -107,6 +107,37 @@ tldr () {
   fi
 }
 
+# Remove quarantine flag from downloaded apps
+unquarantine() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: unquarantine /path/to/app.app"
+    echo "Removes macOS quarantine flag from downloaded applications"
+    return 1
+  fi
+  
+  local app_path="$1"
+  
+  # Check if path exists
+  if [[ ! -e "$app_path" ]]; then
+    echo "Error: '$app_path' does not exist"
+    return 1
+  fi
+  
+  # Check if quarantine flag exists
+  if xattr -l "$app_path" 2>/dev/null | grep -q "com.apple.quarantine"; then
+    echo "Removing quarantine flag from: $app_path"
+    xattr -d com.apple.quarantine "$app_path"
+    if [[ $? -eq 0 ]]; then
+      echo "✅ Successfully unquarantined: $app_path"
+    else
+      echo "❌ Failed to remove quarantine flag"
+      return 1
+    fi
+  else
+    echo "ℹ️  No quarantine flag found on: $app_path"
+  fi
+}
+
 # Kill process on a port
 findandkill() {  
   lsof -n -i:$1 | grep LISTEN | awk '{ print $2 }' | uniq | xargs kill -9
