@@ -13,6 +13,7 @@ class AppConfigsSetup
   APP_SETTINGS_SUBDIR = 'App settings sync'
   KARABINER_LOCAL_PATH = '~/.config/karabiner'
   KARABINER_SUBDIR = 'karabiner'
+  ITERM2_SUBDIR = 'iTerm2'
 
   def initialize
     @icloud_drive = ICLOUD_DRIVE_PATH
@@ -31,6 +32,7 @@ class AppConfigsSetup
     end
     
     setup_karabiner
+    setup_iterm2
     
     section_footer "App configuration setup complete"
   end
@@ -50,11 +52,17 @@ class AppConfigsSetup
       return
     end
     
-    # Remove existing config if it exists
+    # Check existing config and handle appropriately
     if File.exist?(local_config_path)
       if File.symlink?(local_config_path)
-        pputs "Removing existing symlink: #{local_config_path}", color: :yellow
-        File.unlink(local_config_path)
+        current_target = File.readlink(local_config_path)
+        if current_target == icloud_config_path
+          pputs "Symlink already points to correct target: #{local_config_path} → #{icloud_config_path}", color: :green
+          return
+        else
+          pputs "Removing symlink pointing to wrong target: #{local_config_path} → #{current_target}", color: :yellow
+          File.unlink(local_config_path)
+        end
       else
         pputs "Removing existing directory: #{local_config_path}", color: :yellow
         FileUtils.rm_rf(local_config_path)
@@ -68,6 +76,62 @@ class AppConfigsSetup
     # Create symlink
     File.symlink(icloud_config_path, local_config_path)
     pputs "Created symlink: #{local_config_path} → #{icloud_config_path}", color: :green
+  end
+
+  def setup_iterm2
+    pputs "Setting up iTerm2 configuration", color: :cyan, style: :bold
+    
+    expanded_icloud_base = File.expand_path(@icloud_base)
+    iterm_sync_dir = File.join(expanded_icloud_base, ITERM2_SUBDIR)
+    
+    unless File.exist?(iterm_sync_dir)
+      pputs "iTerm2 config not found at: #{iterm_sync_dir}", color: :red
+      return
+    end
+    
+    # Check current settings
+    load_prefs_current = `defaults read com.googlecode.iterm2 LoadPrefsFromCustomFolder 2>/dev/null`.strip
+    prefs_folder_current = `defaults read com.googlecode.iterm2 PrefsCustomFolder 2>/dev/null`.strip
+    no_sync_current = `defaults read com.googlecode.iterm2 NoSyncNeverRemindPrefsChangesLostForFile 2>/dev/null`.strip
+    
+    # Check if settings are already correct
+    settings_correct = (
+      load_prefs_current == "1" &&
+      prefs_folder_current == iterm_sync_dir &&
+      no_sync_current == "1"
+    )
+    
+    if settings_correct
+      pputs "iTerm2 preferences already configured correctly", color: :green
+      return
+    end
+    
+    # Quit iTerm2 if running
+    if system("pgrep -q iTerm2")
+      pputs "Quitting iTerm2...", color: :yellow
+      system("osascript -e 'tell application \"iTerm2\" to quit'")
+      sleep 2  # Give iTerm2 time to fully quit
+    end
+    
+    # Set preferences
+    pputs "Configuring iTerm2 preferences...", indent: 1
+    
+    if load_prefs_current != "1"
+      system("defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true")
+      pputs "Set LoadPrefsFromCustomFolder to true", indent: 2, color: :green
+    end
+    
+    if prefs_folder_current != iterm_sync_dir
+      system("defaults write com.googlecode.iterm2 PrefsCustomFolder -string \"#{iterm_sync_dir}\"")
+      pputs "Set PrefsCustomFolder to #{iterm_sync_dir}", indent: 2, color: :green
+    end
+    
+    if no_sync_current != "1"
+      system("defaults write com.googlecode.iterm2 NoSyncNeverRemindPrefsChangesLostForFile -bool true")
+      pputs "Set NoSyncNeverRemindPrefsChangesLostForFile to true", indent: 2, color: :green
+    end
+    
+    pputs "iTerm2 configuration complete. Restart iTerm2 to apply changes.", color: :green
   end
 end
 
