@@ -256,27 +256,49 @@ def upgrade_tool_versions(verbose_mode = false)
   successful_upgrades.any? || updates_needed.empty?
 end
 
-def install_asdf_packages(update_mode = false, verbose_mode = false)
+def install_asdf_packages(update_mode = false, verbose_mode = false, tool_versions_file = nil)
   if update_mode
     check_asdf_versions
     return true
   end
   
-  pputs "Installing asdf packages from ~/.tool-versions...", style: :bold
-  pprint "Running asdf install", indent: 1
-  
-  install_command = "asdf install"
-  install_command += " > /dev/null 2>&1" unless verbose_mode
-  if system(install_command)
-    print_column_fill("  Running asdf install", indent: 1, color: :green)
-    pputs " completed", color: :green
-    pputs ""
-    true
+  # Use specified file or fall back to symlinked ~/.tool-versions
+  if tool_versions_file && File.exist?(tool_versions_file)
+    pputs "Installing asdf packages from #{tool_versions_file}...", style: :bold
+    pprint "Running asdf install", indent: 1
+    
+    # Change to the directory containing the tool-versions file and unset env vars
+    tool_versions_dir = File.dirname(File.expand_path(tool_versions_file))
+    install_command = "cd #{tool_versions_dir} && unset ASDF_RUBY_VERSION ASDF_NODEJS_VERSION ASDF_PYTHON_VERSION LDFLAGS CPPFLAGS && asdf plugin update ruby && asdf install"
+    # install_command += " > /dev/null 2>&1" unless verbose_mode  # Temporarily force verbose
+    if system(install_command)
+      print_column_fill("  Running asdf install", indent: 1, color: :green)
+      pputs " completed", color: :green
+      pputs ""
+      true
+    else
+      print_column_fill("  Running asdf install", indent: 1, color: :red)
+      pputs " failed", color: :red
+      pputs ""
+      false
+    end
   else
-    print_column_fill("  Running asdf install", indent: 1, color: :red)
-    pputs " failed", color: :red
-    pputs ""
-    false
+    pputs "Installing asdf packages from ~/.tool-versions...", style: :bold
+    pprint "Running asdf install", indent: 1
+    
+    install_command = "asdf install"
+    install_command += " > /dev/null 2>&1" unless verbose_mode
+    if system(install_command)
+      print_column_fill("  Running asdf install", indent: 1, color: :green)
+      pputs " completed", color: :green
+      pputs ""
+      true
+    else
+      print_column_fill("  Running asdf install", indent: 1, color: :red)
+      pputs " failed", color: :red
+      pputs ""
+      false
+    end
   end
 end
 
@@ -464,7 +486,8 @@ def main(options = [])
   end
   
   # Install/update asdf packages first (provides language runtimes)
-  unless install_asdf_packages(update_mode, verbose_mode)
+  tool_versions_file = File.exist?('data/dotfiles/.tool-versions') ? 'data/dotfiles/.tool-versions' : nil
+  unless install_asdf_packages(update_mode, verbose_mode, tool_versions_file)
     pputs "Failed to #{action.downcase} asdf packages. Check output above for details.", color: :red
     exit 1
   end

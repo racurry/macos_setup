@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# TODO - double check if the thing is already done; symlink to same file and/or some content
+
 require 'io/console'
 require 'fileutils'
 require_relative '../lib/terminal_helpers.rb'
