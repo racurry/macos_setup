@@ -37,12 +37,14 @@ if [[ " $* " == *" --update "* ]]; then
     exec bin/hygiene
 else
     # Call the Ruby script that handles sudo and setup
+    # Pass arguments as environment variable to avoid Ruby flag conflicts
+    export SETUP_ARGS="$*"
     ruby -r "./lib/sudo_manager" -e "
         if SudoManager.ensure_sudo_available
-            system \"bin/full_setup #{ARGV.join(' ')}\"
+            system \"bin/full_setup \#{ENV['SETUP_ARGS']}\"
         else
             puts \"Setup cancelled - administrator authentication required.\"
             exit 1
         end
-    " "$@"
+    "
 fi
