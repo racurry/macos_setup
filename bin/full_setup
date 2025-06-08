@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 
+# TODO: extract the entrypoint logic into its own script
+
 require 'fileutils'
 require_relative '../lib/terminal_helpers.rb'
+require_relative '../lib/sudo_manager.rb'
 
 BIN_PATH = "./bin"
 DATA_PATH="./data"
@@ -98,4 +101,21 @@ def run_setup(options)
   horizontal_rule(:cyan)
 end
 
-run_setup(ARGV)
+# Main entry point
+def main(options)
+  # Handle --update flag to run hygiene instead of full setup
+  if options.include?('--update')
+    puts "Running system hygiene..."
+    exec "bin/hygiene"
+  else
+    # Ensure sudo is available for the full setup
+    unless SudoManager.ensure_sudo_available
+      puts "Setup cancelled - administrator authentication required."
+      exit 1
+    end
+    
+    run_setup(options)
+  end
+end
+
+main(ARGV)
