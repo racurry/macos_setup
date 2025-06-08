@@ -1,22 +1,48 @@
-#!/usr/bin/env ruby
+#!/bin/bash
 
 # Get the directory where this script is located
-DIR = File.dirname(File.realpath(__FILE__))
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$DIR"
 
-Dir.chdir(DIR) do
-  # Handle --update flag to run hygiene instead of full setup
-  if ARGV.include?('--update')
-    puts "Running system hygiene..."
-    exec "bin/hygiene"
-  else
-    require_relative 'lib/sudo_manager'
+# Function to find the best Ruby version to use
+find_ruby_version() {
+    # Check if asdf is available
+    if ! command -v asdf &> /dev/null; then
+        echo "system"
+        return
+    fi
     
-    if SudoManager.ensure_sudo_available
-      system "bin/full_setup #{ARGV.join(' ')}"
+    # Check if ruby plugin is installed
+    if ! asdf plugin list | grep -q "^ruby$"; then
+        echo "system"
+        return
+    fi
+    
+    # Get latest installed Ruby version
+    latest_ruby=$(asdf list ruby 2>/dev/null | grep -E "^\s*[0-9]" | tail -1 | xargs)
+    
+    if [ -n "$latest_ruby" ]; then
+        echo "$latest_ruby"
     else
-      puts "Setup cancelled - administrator authentication required."
-      exit 1
-    end
-  end
-end
+        echo "system"
+    fi
+}
 
+# Set Ruby version
+export ASDF_RUBY_VERSION=$(find_ruby_version)
+
+# Handle --update flag to run hygiene instead of full setup
+if [[ " $* " == *" --update "* ]]; then
+    echo "Running system hygiene..."
+    exec bin/hygiene
+else
+    # Call the Ruby script that handles sudo and setup
+    ruby -r "./lib/sudo_manager" -e "
+        if SudoManager.ensure_sudo_available
+            system \"bin/full_setup #{ARGV.join(' ')}\"
+        else
+            puts \"Setup cancelled - administrator authentication required.\"
+            exit 1
+        end
+    " "$@"
+fi

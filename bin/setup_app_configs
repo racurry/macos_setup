@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'fileutils'
 require_relative '../lib/terminal_helpers'
 
 class AppConfigsSetup
