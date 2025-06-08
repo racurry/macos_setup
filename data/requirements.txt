@@ -1,0 +1,4 @@
+# Global Python packages for development
+# Add your global pip packages here
+# numpy>=1.21.0
+# requests>=2.25.0

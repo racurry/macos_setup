@@ -87,6 +87,7 @@ def run_setup(options)
   run_file("setup_macos", options)
   run_file("sync_dotfiles", options)
   run_file("install_apps", options)
+  run_file("manage_packages", options)
   run_file("setup_app_configs", options)
   run_file("manual_todos", options)
 

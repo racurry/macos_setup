@@ -1,0 +1,10 @@
+{
+  "name": "osx-setup-global-packages",
+  "version": "1.0.0",
+  "description": "Global npm packages for macOS development setup",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/claude-code": "latest",
+    "@openai/codex": "latest"
+  }
+}

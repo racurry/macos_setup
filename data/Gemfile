@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+# Global Ruby gems for development
+
+# Add your global gems here
+# gem 'bundler'
+# gem 'rake'
