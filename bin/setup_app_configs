@@ -190,7 +190,8 @@ class AppConfigsSetup
     # Quit Stream Deck if running
     if system("pgrep -q 'Stream Deck'")
       pputs "Quitting Stream Deck...", color: :yellow
-      system("osascript -e 'tell application \"Stream Deck\" to quit'")
+      # Try graceful quit first, then force quit if needed
+      system("osascript -e 'tell application \"Elgato Stream Deck\" to quit' 2>/dev/null || pkill -f 'Stream Deck'")
       sleep 2
     end
     
@@ -238,7 +239,8 @@ class AppConfigsSetup
     # Quit Stream Deck if running
     if system("pgrep -q 'Stream Deck'")
       pputs "Quitting Stream Deck...", color: :yellow
-      system("osascript -e 'tell application \"Stream Deck\" to quit'")
+      # Try graceful quit first, then force quit if needed
+      system("osascript -e 'tell application \"Elgato Stream Deck\" to quit' 2>/dev/null || pkill -f 'Stream Deck'")
       sleep 2
     end
     
