@@ -59,8 +59,11 @@ do_keyboard_setup() {
   # Fast key repeats
   defaults write -g InitialKeyRepeat -int 15
   defaults write -g KeyRepeat -int 2
-  # Disable press-and-hold for special characters to allow proper key repeat in Sequoia
+  
+  # Disable press-and-hold for special characters (requires logout/restart)
   defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+  
+  # Enable full keyboard access for all controls
   defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 
   # Disable automatic keyboard brightness
@@ -74,6 +77,12 @@ do_keyboard_setup() {
 
   # Disable auto period insert
   defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
+  # Disable smart quotes (useful for developers)
+  defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+  # Disable smart dashes (useful for developers)
+  defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 
   # Enable text replacement everywhere
   defaults write -g WebAutomaticTextReplacementEnabled -bool true
@@ -114,6 +123,12 @@ do_dock_setup() {
 
   # Set icon size
   defaults write com.apple.dock tilesize -int 36
+
+  # Don't automatically rearrange Spaces based on most recent use
+  defaults write com.apple.dock mru-spaces -bool false
+
+  # Speed up Mission Control animations
+  defaults write com.apple.dock expose-animation-duration -float 0.1
 
   print_finished ${#ITEM}
 }
@@ -194,6 +209,15 @@ do_finder_setup() {
   defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
   defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 
+  # Show the ~/Library folder
+  chflags nohidden ~/Library
+
+  # Enable spring loading for directories
+  defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+
+  # Remove the spring loading delay for directories
+  defaults write NSGlobalDomain com.apple.springing.delay -float 0
+
   print_finished ${#ITEM}
 }
 
@@ -214,6 +238,16 @@ do_sound_setup() {
   print_starting $ITEM
   # Set alert sound to submarine
   defaults write .GlobalPreferences com.apple.sound.beep.sound /System/Library/Sounds/Submarine.aiff
+  print_finished ${#ITEM}
+}
+
+do_menubar_setup() {
+  ITEM="Setting up menu bar preferences"
+  print_starting $ITEM
+
+  # Show battery percentage in menu bar
+  defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
+
   print_finished ${#ITEM}
 }
 
@@ -294,11 +328,13 @@ do_setup() {
   do_finder_setup
   do_screensaver_setup
   do_sound_setup
+  do_menubar_setup
   do_set_spotlight_preferences
 
   do_kill_running_apps
-  printf "\n\e[32;1m    macOS is setup.  I think you need to restart, though\e[0m\n"
+  printf "\n\e[32;1m    macOS is setup.\e[0m\n"
+  printf "\e[33;1m    Note: Key repeat and press-and-hold settings require logout/restart to take effect.\e[0m\n"
+  printf "\e[33;1m    Other settings (trackpad, keyboard brightness) may also need a restart.\e[0m\n"
 }
 
 do_setup
-

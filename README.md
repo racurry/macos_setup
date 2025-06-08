@@ -5,6 +5,7 @@
 Or just update a current one.  These scripts should be idempotent.
 
 Things that happen
+
 1. Install a bunch of software
 2. Set a bunch of settings
 3. Sync up some dotfiles
@@ -18,7 +19,8 @@ Things that happen
 `pbcopy < ~/.ssh/id_rsa.pub`
 3. Add it here: [github settings](https://github.com/settings/keys)
 4. Clone the repo:
-```
+
+```bash
 mkdir ~/workspace
 cd ~/workspace
 git clone git@github.com:racurry/osx_setup.git
@@ -26,7 +28,7 @@ git clone git@github.com:racurry/osx_setup.git
 
 ### Step 1: Run the setup
 
-```
+```bash
 cd osx_setup
 ./macos_setup
 ```
@@ -35,13 +37,13 @@ There are some bits that require human intervention.
 
 To force a complete re-run (ignoring previous execution tracking):
 
-```
+```bash
 ./macos_setup --force
 ```
 
 To run system hygiene (update packages, plugins, and configurations):
 
-```
+```bash
 ./macos_setup --update
 ```
 
@@ -71,11 +73,14 @@ Dump it into the relevant file in `/data`.
 ## References
 
 ### macOS settings
-- http://www.bresink.com/osx/TinkerTool.html
+
+- <http://www.bresink.com/osx/TinkerTool.html>
 
 ### Cask lists
-- https://formulae.brew.sh/
+
+- <https://formulae.brew.sh/>
 
 ## Fixes
+
 - [ ] Create a generic folder action for copy path in finder
 - [ ] Auto install things from .tool-versions.  Install known packages, like claude code
