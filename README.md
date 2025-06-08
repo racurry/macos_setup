@@ -39,9 +39,30 @@ To force a complete re-run (ignoring previous execution tracking):
 ./macos_setup --force
 ```
 
+To run system hygiene (update packages, plugins, and configurations):
+
+```
+./macos_setup --update
+```
+
 ## This adds a command to your path
 
 You can rerun the setup any time with `macoscfg`.
+
+## System Hygiene
+
+The `--update` flag runs a comprehensive system hygiene routine that:
+
+- Updates the osx_setup repository
+- Updates asdf plugins and checks for newer tool versions  
+- Updates oh-my-zsh
+- Updates Homebrew packages
+- Verifies Brewfile package compliance
+- Syncs app configurations
+- Cleans up old packages
+- Runs health checks on critical development tools
+
+This can also be run directly with `bin/hygiene` or the `machygiene` command (available after initial setup).
 
 ## Adding new stuff
 
@@ -56,10 +77,5 @@ Dump it into the relevant file in `/data`.
 - https://formulae.brew.sh/
 
 ## Fixes
-- [ ] App upgrade/clean up steps
-- [ ] oh my zsh-style automatic update checks
-    - [ ] asdf plugin updates
 - [ ] Actually make sure the macos settings work
 - [ ] Create a generic folder action for copy path in finder
-- [ ] Shottr settings?
-- [ ] Sync stream deck profiles

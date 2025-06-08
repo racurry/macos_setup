@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+
+# TODO: add shottr settings
+# TODO: Sync stream deck profiles
+
 require_relative '../lib/terminal_helpers'
 
 class AppConfigsSetup

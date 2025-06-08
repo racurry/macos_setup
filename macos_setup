@@ -4,13 +4,19 @@
 DIR = File.dirname(File.realpath(__FILE__))
 
 Dir.chdir(DIR) do
-  require_relative 'lib/sudo_manager'
-  
-  if SudoManager.ensure_sudo_available
-    system "bin/full_setup #{ARGV.join(' ')}"
+  # Handle --update flag to run hygiene instead of full setup
+  if ARGV.include?('--update')
+    puts "Running system hygiene..."
+    exec "bin/hygiene"
   else
-    puts "Setup cancelled - administrator authentication required."
-    exit 1
+    require_relative 'lib/sudo_manager'
+    
+    if SudoManager.ensure_sudo_available
+      system "bin/full_setup #{ARGV.join(' ')}"
+    else
+      puts "Setup cancelled - administrator authentication required."
+      exit 1
+    end
   end
 end
 
