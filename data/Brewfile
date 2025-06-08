@@ -1,6 +1,9 @@
 # Homebrew packages (brew)
 brew "asdf"
+brew "bat"
 brew "diff-so-fancy"
+brew "eza"
+brew "fzf"
 brew "gh"
 brew "git"
 brew "hub"
@@ -12,6 +15,7 @@ brew "thefuck"
 brew "wget"
 brew "yarn"
 brew "zsh"
+brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
 # Homebrew casks

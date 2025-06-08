@@ -1,0 +1,146 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/terminal_helpers'
+
+# Path constants
+DOCUMENTS_PATH = "~/Documents"
+SCREEN_SHOTS_PATH = "~/Screen Shots"
+WORKSPACE_SYMLINK_PATH = "~/workspace"
+ICLOUD_SYMLINK_PATH = "~/iCloud"
+ICLOUD_SOURCE_PATH = "~/Library/Mobile Documents/com~apple~CloudDocs"
+
+# Individual folder name constants
+FOLDER_AUTO = "@auto"
+FOLDER_INBOX = "000. 📥 Inbox"
+FOLDER_PEOPLE = "100. 🚶 People"
+FOLDER_GROUPS = "110. 👥 Groups"
+FOLDER_COMPANIES = "120. 🏢️ Companies"
+FOLDER_TIME = "200. 🗓️ Time"
+FOLDER_AREAS = "300. 🎨 Areas"
+FOLDER_GOALS = "320. 🏆 Goals"
+FOLDER_PROJECTS = "330. 🚧 Projects"
+FOLDER_TOPICS = "400. 🤔 Topics"
+FOLDER_LIBRARIES = "700. 📚️ Libraries"
+FOLDER_RESOURCES = "700. 🧠 Resources"
+FOLDER_OUTPUT = "900. 📰️ Output"
+FOLDER_STORIES = "910. ✍️ Stories"
+FOLDER_WORKSPACE = "950. 💻 Workspace"
+
+# Folder names array
+ESSENTIAL_FOLDERS = [
+  FOLDER_AUTO,
+  FOLDER_INBOX,
+  FOLDER_PEOPLE,
+  FOLDER_GROUPS,
+  FOLDER_COMPANIES,
+  FOLDER_TIME,
+  FOLDER_AREAS,
+  FOLDER_GOALS,
+  FOLDER_PROJECTS,
+  FOLDER_TOPICS,
+  FOLDER_LIBRARIES,
+  FOLDER_RESOURCES,
+  FOLDER_OUTPUT,
+  FOLDER_STORIES,
+  FOLDER_WORKSPACE
+]
+
+# Section titles
+FOLDERS_HEADER = "Creating Essential Folders"
+FOLDERS_FOOTER = "Essential folders are ready"
+SYMLINKS_HEADER = "Creating Essential Symlinks"
+SYMLINKS_FOOTER = "Essential symlinks are ready"
+
+section_header(FOLDERS_HEADER)
+
+home_documents = File.expand_path(DOCUMENTS_PATH)
+
+pputs "Creating #{ESSENTIAL_FOLDERS.length} essential folders", indent: 1
+
+# Create each folder if it doesn't exist
+ESSENTIAL_FOLDERS.each do |folder_name|
+  folder_path = File.join(home_documents, folder_name)
+  
+  if File.directory?(folder_path)
+    pprint "#{folder_name}", indent: 1
+    print_column_fill("    #{folder_name}", indent: 1, color: :green)
+    pputs " exists", color: :green
+  else
+    Dir.mkdir(folder_path)
+    pprint "#{folder_name}", indent: 1
+    print_column_fill("    #{folder_name}", indent: 1, color: :green)
+    pputs " created", color: :green
+  end
+end
+
+# Create Screen Shots folder in home directory
+screen_shots_path = File.expand_path(SCREEN_SHOTS_PATH)
+
+if File.directory?(screen_shots_path)
+  pprint "Screen Shots", indent: 1
+  print_column_fill("    Screen Shots", indent: 1, color: :green)
+  pputs " exists", color: :green
+else
+  Dir.mkdir(screen_shots_path)
+  pprint "Screen Shots", indent: 1
+  print_column_fill("    Screen Shots", indent: 1, color: :green)
+  pputs " created", color: :green
+end
+
+section_footer(FOLDERS_FOOTER)
+
+section_header(SYMLINKS_HEADER)
+
+# Create symlink to workspace folder
+workspace_source = File.join(home_documents, FOLDER_WORKSPACE)
+workspace_symlink = File.expand_path(WORKSPACE_SYMLINK_PATH)
+
+if File.symlink?(workspace_symlink)
+  if File.readlink(workspace_symlink) == workspace_source
+    pprint "~/workspace", indent: 1
+    print_column_fill("    ~/workspace", indent: 1, color: :green)
+    pputs " exists", color: :green
+  else
+    # Remove incorrect symlink and create new one
+    File.unlink(workspace_symlink)
+    File.symlink(workspace_source, workspace_symlink)
+    pprint "~/workspace", indent: 1
+    print_column_fill("    ~/workspace", indent: 1, color: :green)
+    pputs " updated", color: :green
+  end
+elsif File.exist?(workspace_symlink)
+  pputs "Warning: ~/workspace exists but is not a symlink", indent: 1, color: :yellow
+else
+  File.symlink(workspace_source, workspace_symlink)
+  pprint "~/workspace", indent: 1
+  print_column_fill("    ~/workspace", indent: 1, color: :green)
+  pputs " created", color: :green
+end
+
+# Create iCloud Drive symlink
+icloud_source = File.expand_path(ICLOUD_SOURCE_PATH)
+icloud_symlink = File.expand_path(ICLOUD_SYMLINK_PATH)
+
+if File.symlink?(icloud_symlink)
+  if File.readlink(icloud_symlink) == icloud_source
+    pprint "~/iCloud", indent: 1
+    print_column_fill("    ~/iCloud", indent: 1, color: :green)
+    pputs " exists", color: :green
+  else
+    # Remove incorrect symlink and create new one
+    File.unlink(icloud_symlink)
+    File.symlink(icloud_source, icloud_symlink)
+    pprint "~/iCloud", indent: 1
+    print_column_fill("    ~/iCloud", indent: 1, color: :green)
+    pputs " updated", color: :green
+  end
+elsif File.exist?(icloud_symlink)
+  pputs "Warning: ~/iCloud exists but is not a symlink", indent: 1, color: :yellow
+else
+  File.symlink(icloud_source, icloud_symlink)
+  pprint "~/iCloud", indent: 1
+  print_column_fill("    ~/iCloud", indent: 1, color: :green)
+  pputs " created", color: :green
+end
+
+section_footer(SYMLINKS_FOOTER)

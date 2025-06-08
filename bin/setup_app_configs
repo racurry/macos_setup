@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/terminal_helpers'
+
+class AppConfigsSetup
+
+  # Path constants
+  ICLOUD_DRIVE_PATH = '~/Library/Mobile Documents/com~apple~CloudDocs'
+  APP_SETTINGS_SUBDIR = 'App settings sync'
+  KARABINER_LOCAL_PATH = '~/.config/karabiner'
+  KARABINER_SUBDIR = 'karabiner'
+
+  def initialize
+    @icloud_drive = ICLOUD_DRIVE_PATH
+    @icloud_base = File.join(@icloud_drive, APP_SETTINGS_SUBDIR)
+  end
+
+  def run
+    section_header "App-Specific Configuration Setup"
+    
+    # Verify iCloud Drive exists before proceeding
+    expanded_icloud_path = File.expand_path(@icloud_drive)
+    unless File.exist?(expanded_icloud_path)
+      pputs "iCloud Drive not found at: #{expanded_icloud_path}", color: :red
+      pputs "This computer may not be syncing with iCloud Drive", color: :red
+      exit 1
+    end
+    
+    setup_karabiner
+    
+    section_footer "App configuration setup complete"
+  end
+
+  private
+
+  def setup_karabiner
+    # Based on https://karabiner-elements.pqrs.org/docs/manual/misc/configuration-file-path/
+    pputs "Setting up Karabiner Elements configuration", color: :cyan, style: :bold
+    
+    local_config_path = File.expand_path(KARABINER_LOCAL_PATH)
+    expanded_icloud_base = File.expand_path(@icloud_base)
+    icloud_config_path = File.join(expanded_icloud_base, KARABINER_SUBDIR)
+    
+    unless File.exist?(icloud_config_path)
+      pputs "Karabiner config not found at: #{icloud_config_path}", color: :red
+      return
+    end
+    
+    # Remove existing config if it exists
+    if File.exist?(local_config_path)
+      if File.symlink?(local_config_path)
+        pputs "Removing existing symlink: #{local_config_path}", color: :yellow
+        File.unlink(local_config_path)
+      else
+        pputs "Removing existing directory: #{local_config_path}", color: :yellow
+        FileUtils.rm_rf(local_config_path)
+      end
+    end
+    
+    # Create parent directory if needed
+    config_dir = File.dirname(local_config_path)
+    FileUtils.mkdir_p(config_dir) unless File.exist?(config_dir)
+    
+    # Create symlink
+    File.symlink(icloud_config_path, local_config_path)
+    pputs "Created symlink: #{local_config_path} → #{icloud_config_path}", color: :green
+  end
+end
+
+if __FILE__ == $0
+  AppConfigsSetup.new.run
+end

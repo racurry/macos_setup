@@ -1,3 +1,7 @@
+# ============================================================================
+# OH-MY-ZSH CONFIGURATION
+# ============================================================================
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 source $ZSH/oh-my-zsh.sh
@@ -10,11 +14,28 @@ COMPLETION_WAITING_DOTS="true"
 
 plugins=(git bundler rake)
 
+# ============================================================================
+# PACKAGE MANAGERS & TOOL SETUP
+# ============================================================================
+
 # Homebrew and ASDF setup
 # Ensure Homebrew is on the path and asdf is sourced
-# (Order matters if asdf is installed via Homebrew)
+# (Order matters as asdf is installed via Homebrew)
 eval "$(/opt/homebrew/bin/brew shellenv)"
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+. $(brew --prefix asdf)/libexec/asdf.sh
+
+# Add asdf completions
+fpath=(${ASDF_DIR}/completions $fpath)
+
+# fzf integration (if installed)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# zsh-autosuggestions (if installed)
+[ -f $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# ============================================================================
+# SHELL APPEARANCE & BEHAVIOR
+# ============================================================================
 
 # Use the pure prompt
 autoload -U promptinit; promptinit
@@ -23,13 +44,21 @@ prompt pure
 # The fuck
 eval $(thefuck --alias)
 
+# ============================================================================
+# ENVIRONMENT VARIABLES
+# ============================================================================
+
 export LANG=en_US.UTF-8
-export EDITOR='vim'
+export LC_ALL=en_US.UTF-8
+export EDITOR='code'
 
 # Keep less from paginating unless it needs to
 export LESS="-FRXK"
 
-# History
+# ============================================================================
+# HISTORY CONFIGURATION
+# ============================================================================
+
 HISTSIZE=10000
 HISTFILE=~/.zsh_history
 SAVEHIST=50000
@@ -39,29 +68,43 @@ setopt sharehistory # Share history across terminals
 setopt incappendhistory # Immediately append to the history file, not just when a term is killed
 unsetopt nomatch # Don't throw an error if there are no matches, just do the right thing
 
+# ============================================================================
+# APPLICATION-SPECIFIC SETUP
+# ============================================================================
+
 # Set up NPM_TOKEN if .npmrc exists
 if [ -f ~/.npmrc ]; then
   export NPM_TOKEN=`sed -n -e '/_authToken/ s/.*\= *//p' ~/.npmrc`
 fi
 
-# Workspace shortcuts
-export workspace=~/Documents/workspace
-export inbox=~/Documents/Inbox
+# ============================================================================
+# DIRECTORY SHORTCUTS
+# ============================================================================
 
-# Grab any galileo-specific aliases & configs
-if [ -f ~/.galileorc ]; then
-  source ~/.galileorc
-fi
+export workspace=~/Documents/"950. 💻 Workspace"
+export inbox=~/Documents/"000. 📥 Inbox"
+export iCloud=~/iCloud
+export icloud=~/iCloud  # Both cases for convenience - prevents typos
+
+# ============================================================================
+# CUSTOM FUNCTIONS
+# ============================================================================
 
 # Automatically ls after cd
 cd () {
   builtin cd "$@";
-  ls -a;
+  ls;
 }
 
 # Slightly more user-friendly man pages
 tldr () {
-  curl "cheat.sh/$1"
+  if curl -s "cheat.sh/$1" 2>/dev/null; then
+    # Success - curl worked
+    :
+  else
+    echo "Failed to fetch cheat sheet for '$1', falling back to man page..."
+    man "$1"
+  fi
 }
 
 # Kill process on a port
@@ -70,26 +113,51 @@ findandkill() {
 } 
 alias killport=findandkill
 
-# Homebrew (Apple Silicon) paths for libraries and headers
-export PATH="/opt/homebrew/opt/bison/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/bison/lib -L/opt/homebrew/opt/openssl@3/lib -L/opt/homebrew/opt/readline/lib -L/opt/homebrew/opt/libyaml/lib -L/opt/homebrew/opt/gmp/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/bison/include -I/opt/homebrew/opt/openssl@3/include -I/opt/homebrew/opt/readline/include -I/opt/homebrew/opt/libyaml/include -I/opt/homebrew/opt/gmp/include"
-export PKG_CONFIG_PATH="/opt/homebrew/opt/bison/lib/pkgconfig:/opt/homebrew/opt/openssl@3/lib/pkgconfig:/opt/homebrew/opt/readline/lib/pkgconfig:/opt/homebrew/opt/libyaml/lib/pkgconfig:/opt/homebrew/opt/gmp/lib/pkgconfig"
+# ============================================================================
+# PATH CONFIGURATION
+# ============================================================================
 
-# For Ruby builds (asdf, ruby-build, etc.)
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@3)"
+# PATH modifications
+export PATH="/opt/homebrew/opt/bison/bin:$PATH"  # Modern bison for parser generation
+export PATH="$PATH:$workspace/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
 
-# PATH modifications (grouped)
-export PATH="$PATH:$workspace/helper-scripts/bin:/Users/aaron/.local/bin"
+# Remove duplicates from PATH
+typeset -U PATH
 
-# Aliases and convenience functions
+# ============================================================================
+# ALIASES & SHORTCUTS
+# ============================================================================
+
+# Shell convenience
 alias rezsh="source ~/.zshrc"
-alias zshconfig="code -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
-alias ohmyzsh="code -nw ~/.oh-my-zsh"
-# Enhanced ls: show all files and use color
-alias ls="ls -aG"
-# bundler
-alias be="bundle exec"
-# Fix zsh breaking rake like a total turd
-alias rake='noglob rake'
+alias zshcfg="code -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
+alias omzcfg="code -nw ~/.oh-my-zsh"
 
+# Enhanced & tool overwrites
+command -v bat >/dev/null 2>&1 && alias cat='bat'
+if command -v eza >/dev/null 2>&1; then
+  alias ls='eza -a'
+  alias tree='eza --tree'
+else
+  alias ls="ls -aG"  # Enhanced ls: show all files and use color (fallback)
+fi
+
+# Development tools
+alias be="bundle exec"  # bundler
+alias rake='noglob rake'  # Fix zsh breaking rake like a total turd
+
+# Directory navigation shortcuts
+alias pd='pushd'
+alias pp='popd'
+alias dirs='dirs -v'
+
+# Say the magic word
+alias please='sudo $(fc -ln -1)'
+
+# ============================================================================
+# Work laptop overrides
+# ============================================================================
+# Grab any galileo-specific aliases & configs
+if [ -f ~/.galileorc ]; then
+  source ~/.galileorc
+fi

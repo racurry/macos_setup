@@ -158,8 +158,7 @@ do_fix_screenshots() {
   ITEM="Fixing screenshot behavior"
   print_starting $ITEM
 
-  # Make a screenshots folder
-  mkdir -p ~/Screen\ Shots
+  # Set screenshot location (folder created by create_folders script)
   defaults write com.apple.screencapture location ~/Screen\ Shots
 
   # To hell with preview thumbnails
