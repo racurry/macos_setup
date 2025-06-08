@@ -489,4 +489,4 @@ def main(options = [])
   section_footer "Development Packages #{action} Complete"
 end
 
-main(ARGV) if __FILE__ == $0
+main(ARGV)
