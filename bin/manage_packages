@@ -308,15 +308,17 @@ def install_npm_packages(update_mode = false, verbose_mode = false)
     if !update_mode && system("npm list -g #{package} > /dev/null 2>&1")
       print_column_fill("  #{action} #{package}", indent: 1, color: :green)
       pputs " already installed", color: :green
-    npm_command = "npm install -g #{package} --silent --no-fund"
-    npm_command += " > /dev/null 2>&1" unless verbose_mode
-    elsif system(npm_command)
-      print_column_fill("  #{action} #{package}", indent: 1, color: :green)
-      pputs " completed", color: :green
     else
-      print_column_fill("  #{action} #{package}", indent: 1, color: :red)
-      pputs " failed", color: :red
-      success = false
+      npm_command = "npm install -g #{package} --silent --no-fund"
+      npm_command += " > /dev/null 2>&1" unless verbose_mode
+      if system(npm_command)
+        print_column_fill("  #{action} #{package}", indent: 1, color: :green)
+        pputs " completed", color: :green
+      else
+        print_column_fill("  #{action} #{package}", indent: 1, color: :red)
+        pputs " failed", color: :red
+        success = false
+      end
     end
   end
   
