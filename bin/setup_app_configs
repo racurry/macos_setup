@@ -64,6 +64,9 @@ class AppConfigsSetup
 
   def setup_karabiner
     # Based on https://karabiner-elements.pqrs.org/docs/manual/misc/configuration-file-path/
+    pputs "Skipping Karabiner; cloud sync breaks it", color: :cyan, style: :bold
+    return
+
     pputs "Setting up Karabiner Elements configuration", color: :cyan, style: :bold
     
     local_config_path = File.expand_path(KARABINER_LOCAL_PATH)
