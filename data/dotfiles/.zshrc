@@ -55,6 +55,8 @@ export EDITOR='code'
 # Keep less from paginating unless it needs to
 export LESS="-FRXK"
 
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
 # ============================================================================
 # HISTORY CONFIGURATION
 # ============================================================================
