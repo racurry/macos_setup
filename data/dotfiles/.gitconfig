@@ -65,6 +65,7 @@
 [core]
   excludesfile = ~/.gitignore_global
   pager = "diff-so-fancy | less --tabs=4"
+  editor = "code --wait"
 
 [diff]
   # Show renames/moves as such
