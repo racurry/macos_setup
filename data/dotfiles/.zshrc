@@ -239,3 +239,10 @@ fi
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
 fi
+# added by Snowflake SnowSQL installer v1.2
+export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/acurry/.lmstudio/bin"
+# End of LM Studio CLI section
+
