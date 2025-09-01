@@ -246,3 +246,4 @@ export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH
 export PATH="$PATH:/Users/acurry/.lmstudio/bin"
 # End of LM Studio CLI section
 
+alias dbt="python3 -m dbt.cli.main"

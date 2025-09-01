@@ -49,7 +49,9 @@
   oopspush = !git oopsall && git pushf
 
   # Delete local branches that have been merged
-  cleanup = !git branch --merged | grep -v -e $(git default-branch) -e '\\*' | xargs -n 1 git branch -d && git remote prune origin
+  cleanup-merged = !git branch --merged | grep -v -e $(git default-branch) -e '\\*' | xargs -n 1 git branch -d 2>/dev/null || true
+  cleanup-gone = !git branch --format='%(refname:short) %(upstream:track)' | grep '\\[gone\\]' | awk '{print $1}' | xargs -r git branch -D
+  cleanup = !git cleanup-merged && git cleanup-gone && git remote prune origin
 
   # Push up changes
   publish = !git push -u origin $(git branch-name)
