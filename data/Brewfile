@@ -22,7 +22,6 @@ brew "zsh-syntax-highlighting"
 
 # Homebrew casks
 cask "1password-cli"
-cask "alfred"
 cask "arc"
 cask "caffeine"
 cask "cardhop"
@@ -34,16 +33,14 @@ cask "google-drive"
 cask "hazel"
 cask "iterm2"
 cask "jordanbaird-ice"
-cask "karabiner-elements"
 cask "keyboard-maestro"
-cask "moom"
 cask "mos"
 cask "obsidian"
+cask "raycast"
 cask "renamer"
 cask "shottr"
 cask "spotify"
 cask "superhuman"
-cask "vimcal"
 cask "visual-studio-code"
 
 # Mac App Store apps
@@ -52,3 +49,8 @@ mas "Meeter", id: 1510445899
 mas "The Unarchiver", id: 425424353
 mas "Things", id: 904280696
 mas "Toolkit for YNAB", id: 1592912837 
+
+# Let's try to not use these, see if Raycast is worth it
+# cask "moom"
+# cask "karabiner-elements"
+# cask "alfred"

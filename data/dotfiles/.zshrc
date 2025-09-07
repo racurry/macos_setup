@@ -189,7 +189,10 @@ alias killport=findandkill
 
 # PATH modifications
 export PATH="/opt/homebrew/opt/bison/bin:$PATH"  # Modern bison for parser generation
+export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH # 
+export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$workspace/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
+
 
 # Remove duplicates from PATH
 typeset -U PATH
@@ -236,6 +239,9 @@ alias dirs='dirs -v'
 # Say the magic word
 alias please='sudo $(fc -ln -1)'
 
+# dbt
+alias dbt="python3 -m dbt.cli.main"
+
 # ============================================================================
 # PERIODIC UPDATE CHECKING
 # ============================================================================
@@ -279,12 +285,4 @@ fi
 # Grab any galileo-specific aliases & configs
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
-fi
-# added by Snowflake SnowSQL installer v1.2
-export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/acurry/.lmstudio/bin"
-# End of LM Studio CLI section
-
-alias dbt="python3 -m dbt.cli.main"
+fi 
