@@ -256,6 +256,44 @@ def upgrade_tool_versions(verbose_mode = false)
   successful_upgrades.any? || updates_needed.empty?
 end
 
+def ensure_asdf_plugins_installed(managed_tools, verbose_mode = false)
+  pputs "Ensuring asdf plugins are installed...", style: :bold
+  
+  missing_plugins = []
+  installed_plugins = `asdf plugin list 2>/dev/null`.strip.split("\n")
+  
+  managed_tools.each_key do |plugin|
+    unless installed_plugins.include?(plugin)
+      missing_plugins << plugin
+    end
+  end
+  
+  if missing_plugins.empty?
+    pputs "All required plugins already installed", indent: 1, color: :green
+    return true
+  end
+  
+  success = true
+  missing_plugins.each do |plugin|
+    pprint "Installing #{plugin} plugin", indent: 1
+    
+    install_command = "asdf plugin add #{plugin}"
+    install_command += " > /dev/null 2>&1" unless verbose_mode
+    
+    if system(install_command)
+      print_column_fill("  Installing #{plugin} plugin", indent: 1, color: :green)
+      pputs " completed", color: :green
+    else
+      print_column_fill("  Installing #{plugin} plugin", indent: 1, color: :red)
+      pputs " failed", color: :red
+      success = false
+    end
+  end
+  
+  pputs ""
+  success
+end
+
 def install_asdf_packages(update_mode = false, verbose_mode = false, tool_versions_file = nil)
   if update_mode
     check_asdf_versions
@@ -265,6 +303,24 @@ def install_asdf_packages(update_mode = false, verbose_mode = false, tool_versio
   # Use specified file or fall back to symlinked ~/.tool-versions
   if tool_versions_file && File.exist?(tool_versions_file)
     pputs "Installing asdf packages from #{tool_versions_file}...", style: :bold
+    
+    # Parse the tool-versions file to get managed tools
+    managed_tools = {}
+    File.readlines(tool_versions_file).each do |line|
+      line = line.strip
+      next if line.empty? || line.start_with?('#')
+      parts = line.split(' ', 2)
+      if parts.length >= 2
+        managed_tools[parts[0]] = parts[1]
+      end
+    end
+    
+    # Ensure all required plugins are installed
+    unless ensure_asdf_plugins_installed(managed_tools, verbose_mode)
+      pputs "Failed to install required asdf plugins", color: :red
+      return false
+    end
+    
     pprint "Running asdf install", indent: 1
     
     # Change to the directory containing the tool-versions file and unset env vars
@@ -284,6 +340,21 @@ def install_asdf_packages(update_mode = false, verbose_mode = false, tool_versio
     end
   else
     pputs "Installing asdf packages from ~/.tool-versions...", style: :bold
+    
+    # Get managed tools from symlinked ~/.tool-versions
+    managed_tools, _ = get_managed_tools
+    
+    if managed_tools.nil?
+      pputs "~/.tool-versions not found", indent: 1, color: :red
+      return false
+    end
+    
+    # Ensure all required plugins are installed
+    unless ensure_asdf_plugins_installed(managed_tools, verbose_mode)
+      pputs "Failed to install required asdf plugins", color: :red
+      return false
+    end
+    
     pprint "Running asdf install", indent: 1
     
     install_command = "asdf install"
