@@ -60,7 +60,10 @@ end
 
 def add_executable_to_path
   unless File.symlink?("/usr/local/bin/macoscfg")
-    system("sudo ln -s ~/workspace/osx_setup/macos_setup /usr/local/bin/macoscfg")
+    system("sudo ln -s ~/workspace/infra/osx_setup/macos_setup /usr/local/bin/macoscfg")
+  end
+  unless File.symlink?("/usr/local/bin/machygiene")
+    system("sudo ln -s ~/workspace/infra/osx_setup/bin/hygiene /usr/local/bin/machygiene")
   end
 end
 

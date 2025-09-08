@@ -83,8 +83,8 @@ fi
 # DIRECTORY SHORTCUTS
 # ============================================================================
 
-export workspace=~/Documents/"950. 💻 Workspace"
-export inbox=~/Documents/"000. 📥 Inbox"
+export workspace=~/workspace
+export inbox=~/Documents/"000_Inbox"
 export iCloud=~/iCloud
 export icloud=~/iCloud  # Both cases for convenience - prevents typos
 
@@ -191,7 +191,7 @@ alias killport=findandkill
 export PATH="/opt/homebrew/opt/bison/bin:$PATH"  # Modern bison for parser generation
 export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH # 
 export PATH="$PATH:$HOME/.lmstudio/bin"
-export PATH="$PATH:$workspace/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
+export PATH="$PATH:$workspace/infra/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
 
 
 # Remove duplicates from PATH
@@ -203,19 +203,19 @@ typeset -U PATH
 
 # Shell convenience
 alias rezsh="source ~/.zshrc"
-alias zshcfg="code -nw ~/workspace/osx_setup/data/dotfiles/.zshrc"
+alias zshcfg="code -nw ~/workspace/infra/osx_setup/data/dotfiles/.zshrc"
 alias omzcfg="code -nw ~/.oh-my-zsh"
 
 # Dotfile sync monitoring
 alias checkdots="check-dotfiles"
-alias syncdots="\"$workspace\"/osx_setup/bin/sync_dotfiles"
+alias syncdots="\"$workspace\"/infra/osx_setup/bin/sync_dotfiles"
 
 # macOS setup shortcuts
-alias macos_setup="\"$workspace\"/osx_setup/macos_setup"
+alias macos_setup="\"$workspace\"/infra/osx_setup/macos_setup"
 
 # System hygiene with automatic directory handling
 machygiene() {
-  (cd "$workspace/osx_setup" && bin/hygiene)
+  (cd "$workspace/infra/osx_setup" && bin/hygiene)
 }
 
 # Enhanced & tool overwrites
@@ -248,7 +248,7 @@ alias dbt="python3 -m dbt.cli.main"
 
 # Check if it's time to suggest running system hygiene
 _check_osx_setup_update() {
-  local last_update_file="$workspace/osx_setup/data/.meta/last_hygiene_check"
+  local last_update_file="$workspace/infra/osx_setup/data/.meta/last_hygiene_check"
   local current_time=$(date +%s)
   local update_interval=$((7 * 24 * 60 * 60))  # 7 days in seconds
   
