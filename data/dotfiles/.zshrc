@@ -132,7 +132,7 @@ check-dotfiles() {
 # Automatically ls after cd
 cd () {
   builtin cd "$@";
-  ls;
+  ls -a;
 }
 
 # Slightly more user-friendly man pages
