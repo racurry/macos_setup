@@ -12,7 +12,7 @@ HYPHEN_INSENSITIVE="true"
 # Display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
 
-plugins=(git bundler rake)
+plugins=(git)
 
 # ============================================================================
 # PACKAGE MANAGERS & TOOL SETUP
@@ -237,8 +237,8 @@ else
 fi
 
 # Development tools
-alias be="bundle exec"  # bundler
-alias rake='noglob rake'  # Fix zsh breaking rake like a total turd
+alias be="bundle exec"
+alias rake="noglob rake"
 
 # Directory navigation shortcuts
 alias pd='pushd'
