@@ -19,6 +19,7 @@ brew "yarn"
 brew "zsh"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
+brew "zsh-you-should-use"
 
 # Homebrew casks
 cask "1password-cli"

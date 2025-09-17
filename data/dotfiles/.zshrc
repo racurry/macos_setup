@@ -27,11 +27,20 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # Add asdf completions
 fpath=(${ASDF_DIR}/completions $fpath)
 
-# fzf integration (if installed)
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Source Homebrew-installed zsh plugins
+_brew_prefix="$(brew --prefix)"
+source_brew_plugin() {
+  [ -f "$_brew_prefix/$1" ] && source "$_brew_prefix/$1"
+}
 
-# zsh-autosuggestions (if installed)
-[ -f $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source_brew_plugin "opt/fzf/shell/completion.zsh"
+source_brew_plugin "opt/fzf/shell/key-bindings.zsh"
+source_brew_plugin "share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+source_brew_plugin "share/zsh-you-should-use/you-should-use.plugin.zsh"
+source_brew_plugin "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"  # Must be last
+
+unset -f source_brew_plugin
+unset _brew_prefix
 
 # ============================================================================
 # SHELL APPEARANCE & BEHAVIOR
