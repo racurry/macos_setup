@@ -1,5 +1,5 @@
 [user]
-  email = aaron@aaroncurry.net
+  email = aaroncurry@gmail.com
 	name = Aaron Curry
 
 [includeIf "gitdir:~/workspace/galileo/"]
