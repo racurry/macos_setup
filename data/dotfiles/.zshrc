@@ -20,15 +20,18 @@ COMPLETION_WAITING_DOTS="true"
 # Ensure Homebrew is on the path and asdf is sourced
 # (Order matters as asdf is installed via Homebrew)
 eval "$(/opt/homebrew/bin/brew shellenv)"
-. $(brew --prefix asdf)/libexec/asdf.sh
+
+# Set Homebrew prefix for reuse throughout shell and exported for subprocesses
+export BREW_PREFIX=$(brew --prefix)
+
+. $BREW_PREFIX/opt/asdf/libexec/asdf.sh
 
 # Add asdf completions
 fpath=(${ASDF_DIR}/completions $fpath)
 
 # Source Homebrew-installed zsh plugins
-_brew_prefix="$(brew --prefix)"
 source_brew_plugin() {
-  [ -f "$_brew_prefix/$1" ] && source "$_brew_prefix/$1"
+  [ -f "$BREW_PREFIX/$1" ] && source "$BREW_PREFIX/$1"
 }
 
 source_brew_plugin "opt/fzf/shell/completion.zsh"
@@ -38,7 +41,6 @@ source_brew_plugin "share/zsh-you-should-use/you-should-use.plugin.zsh"
 source_brew_plugin "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"  # Must be last
 
 unset -f source_brew_plugin
-unset _brew_prefix
 
 # ============================================================================
 # SHELL APPEARANCE & BEHAVIOR
@@ -195,7 +197,7 @@ alias killport=findandkill
 # ============================================================================
 
 # PATH modifications
-export PATH="/opt/homebrew/opt/bison/bin:$PATH"  # Modern bison for parser generation
+export PATH="$BREW_PREFIX/opt/bison/bin:$PATH"  # Modern bison for parser generation
 export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH # 
 export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$workspace/infra/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
