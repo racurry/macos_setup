@@ -4,13 +4,14 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-source $ZSH/oh-my-zsh.sh
+
+# Configuration must be set before sourcing oh-my-zsh
 ZSH_THEME=""
-
 HYPHEN_INSENSITIVE="true"
-
-# Display red dots while waiting for completion.
 COMPLETION_WAITING_DOTS="true"
+plugins=()
+
+source $ZSH/oh-my-zsh.sh 
 
 # ============================================================================
 # PACKAGE MANAGERS & TOOL SETUP
