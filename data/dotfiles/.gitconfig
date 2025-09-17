@@ -7,8 +7,11 @@
 
 [alias]
   # Command shortcuts
+  a = add
+  aa = add -A
   ci = commit
   co = checkout
+  cb = checkout -b
   st = status
   br = branch
 
@@ -27,9 +30,6 @@
   # Add and commit everything
   aco = !git add -A && git commit -m
 
-  # Add, commit, rebase, then push
-  gobig = !git add -A && git commit && git pull --rebase && git push
-
   # Stash pull and reapply
   restash = !git stash -u && git pull --rebase && git stash apply
 
@@ -44,9 +44,9 @@
   pushf = push --force-with-lease
 
   # Take some of the sting out of messing up
-  oops = commit --amend --no-edit
-  oopsall = !git add . && git oops
-  oopspush = !git oopsall && git pushf
+  amend = commit --amend --no-edit
+  oops = !git add . && git amend
+  oopspush = !git oops && git pushf
 
   # Delete local branches that have been merged
   cleanup-merged = !git branch --merged | grep -v -e $(git default-branch) -e '\\*' | xargs -n 1 git branch -d 2>/dev/null || true
@@ -59,6 +59,12 @@
 
   # go to default branch, pull, cleanup
   reup = !git checkout $(git default-branch) && git pull --rebase && git cleanup
+
+  # Add, commit, rebase, then push
+  gobig = !git add -A && git commit && git pull --rebase && git push
+
+  # Rebase current branch onto latest default branch and force push with lease
+  rebase-and-push = !git fetch origin && git rebase origin/$(git default-branch) && git push --force-with-lease
 
   # kill everything locally
   wipe = !git reset --hard && git clean -fd

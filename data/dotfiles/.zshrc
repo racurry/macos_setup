@@ -9,10 +9,8 @@ ZSH_THEME=""
 
 HYPHEN_INSENSITIVE="true"
 
-# Display red dots whilst waiting for completion.
+# Display red dots while waiting for completion.
 COMPLETION_WAITING_DOTS="true"
-
-plugins=(git)
 
 # ============================================================================
 # PACKAGE MANAGERS & TOOL SETUP
@@ -236,7 +234,7 @@ else
   alias ls="ls -aG"  # Enhanced ls: show all files and use color (fallback)
 fi
 
-# Development tools
+# Ruby aliases
 alias be="bundle exec"
 alias rake="noglob rake"
 
@@ -248,8 +246,18 @@ alias dirs='dirs -v'
 # Say the magic word
 alias please='sudo $(fc -ln -1)'
 
-# dbt
-alias dbt="python3 -m dbt.cli.main"
+# ============================================================================
+# GIT SHORTHANDS
+# ============================================================================
+# Shorthand the stuff I most frequently use
+alias gst='git status'
+alias gaco='git aco'
+alias gpub='git pub'
+alias greup='git reup'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gdff='git diff'
+alias grbp='git rebase-and-push'
 
 # ============================================================================
 # PERIODIC UPDATE CHECKING

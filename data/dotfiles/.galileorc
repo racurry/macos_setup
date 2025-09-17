@@ -23,3 +23,6 @@ export ios=~/workspace/galileo/health-ios/
 export android=~/workspace/galileo/health-android/
 export core=~/workspace/galileo/api-django/
 
+# dbt
+alias dbt="python3 -m dbt.cli.main"
+
