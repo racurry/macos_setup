@@ -37,6 +37,11 @@ This is a sophisticated macOS setup automation system built with Ruby orchestrat
 - `pip install -r requirements.txt` (in data/) - Install pip packages from requirements.txt
 - `git pull --rebase` - Update to latest configuration (run automatically by setup)
 
+### Application Configuration Management
+
+- `bin/setup_app_configs --export` - Export settings from apps that don't support cloud sync
+- `bin/setup_app_configs --import` - Import settings into apps that don't support cloud sync
+
 ## Architecture
 
 ### Secure Password Management System
@@ -61,12 +66,15 @@ The system implements enterprise-grade password handling:
 ### Unified Package Management
 
 - **Single Brewfile**: `data/Brewfile` contains all packages (brew, cask, mas)
+- **Shell Apps**: `data/install_shell_apps.json` defines prerequisite tools (Xcode CLI, Homebrew, Oh My Zsh)
+- **Language Packages**: Separate files for npm (`package.json`), pip (`requirements.txt`), and Ruby gems (`Gemfile`)
+- **Version Management**: Uses asdf with `.tool-versions` for language runtime versions
 - **Transparent Sudo**: Sudo-requiring apps install without additional prompts
 - **Error Resilience**: Checks actual installation status even when bundle reports errors
 - **Application Categories**:
-  - Homebrew packages: CLI tools (git, gh, asdf, imagemagick)
-  - Homebrew casks: GUI apps (Alfred, Arc, Cursor, VS Code, Stream Deck)
-  - Mac App Store apps: Native apps (Things, CARROT Weather, Meeter)
+  - Homebrew packages: CLI tools (git, gh, asdf, imagemagick, bat, eza, fzf)
+  - Homebrew casks: GUI apps (Arc, Cursor, Caffeine, Cardhop, Stream Deck)
+  - Mac App Store apps: Native apps via `mas` CLI tool
 
 ### Execution Flow
 
@@ -84,11 +92,12 @@ The system implements enterprise-grade password handling:
 
 ### Configuration Management
 
-- **Dotfiles**: `data/dotfiles/` → symlinked to home directory
-- **System Settings**: Comprehensive macOS defaults in `setup_macos`
-- **Application Lists**: JSON-driven shell app installation
+- **Dotfiles**: `data/dotfiles/` → symlinked to home directory with conflict resolution
+- **System Settings**: Comprehensive macOS defaults in `bin/setup_macos`
+- **Application Lists**: JSON-driven shell app installation via `data/install_shell_apps.json`
 - **Global Packages**: Standard package manager files (`data/package.json`, `data/Gemfile`, `data/requirements.txt`)
-- **Manual Tasks**: Persistent checklist with completion tracking
+- **Manual Tasks**: Persistent checklist with completion tracking in `data/manual_todos.txt`
+- **App Configurations**: iCloud Drive sync for application settings that don't support cloud sync
 
 ### Terminal Interface
 
@@ -115,12 +124,12 @@ Uses `lib/terminal_helpers.rb` for consistent UX:
 - Implement idempotent operations that can run repeatedly safely
 - Provide both verbose and quiet execution modes
 
-### Brewfile Management
+### Package Management
 
-- Keep packages alphabetically sorted within categories
+- Keep Brewfile packages alphabetically sorted within categories
 - Test installations on clean systems before committing changes
 - Handle Rosetta/ARM compatibility issues gracefully
-- Separate sudo-requiring apps only when necessary for UX
+- Add new packages to appropriate data files: `data/Brewfile` for Homebrew packages, `data/package.json` for npm globals, `data/Gemfile` for Ruby gems, `data/requirements.txt` for Python packages
 
 ### Error Handling
 
@@ -131,8 +140,27 @@ Uses `lib/terminal_helpers.rb` for consistent UX:
 
 ### File Structure
 
-- `macos_setup` - Main entry point with password handling
+- `macos_setup` - Main entry point with Ruby version detection and password handling
 - `bin/` - Executable scripts and helpers
+  - `full_setup` - Main orchestrator with smart execution tracking
+  - `sudo_helper` - SUDO_ASKPASS helper for passwordless sudo operations
+  - `setup_macos` - macOS system preferences configuration
+  - `sync_dotfiles` - Dotfile synchronization with conflict resolution
+  - `install_apps` - Shell apps and Brewfile package installation
+  - `manage_packages` - asdf/npm/pip/gem package management
+  - `hygiene` - System maintenance and updates
+  - `setup_app_configs` - Application settings sync via iCloud Drive
+  - `manual_todos` - Interactive manual task checklist
+  - `create_folders` - Standard directory structure creation
 - `data/` - Configuration files, package lists, and state tracking
-- `lib/` - Ruby helper modules for terminal formatting
-- Tracking state stored in `data/.meta/` (git-ignored)
+  - `Brewfile` - All Homebrew packages (brew/cask/mas)
+  - `install_shell_apps.json` - Shell prerequisites (Xcode CLI, Homebrew, Oh My Zsh)
+  - `package.json` - Global npm packages
+  - `Gemfile` - Ruby gems
+  - `requirements.txt` - Python pip packages
+  - `manual_todos.txt` - Manual configuration checklist
+  - `dotfiles/` - Configuration files to symlink to home directory
+  - `.meta/` - Execution tracking and backups (git-ignored)
+- `lib/` - Ruby helper modules
+  - `terminal_helpers.rb` - Colored output and 80-column formatting
+  - `sudo_manager.rb` - Secure password handling system

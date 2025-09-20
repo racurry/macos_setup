@@ -65,6 +65,10 @@ export EDITOR='code'
 # Keep less from paginating unless it needs to
 export LESS="-FRXK"
 
+# Hug the face
+export HF_HOME="$HOME/.cache/huggingface"
+
+# Secrets go in here
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # ============================================================================
@@ -203,7 +207,6 @@ export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH #
 export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$workspace/infra/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
 
-
 # Remove duplicates from PATH
 typeset -U PATH
 
@@ -306,3 +309,5 @@ fi
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
 fi 
+
+

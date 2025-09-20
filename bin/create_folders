@@ -4,7 +4,7 @@ require_relative '../lib/terminal_helpers'
 
 # Path constants
 DOCUMENTS_PATH = "~/Documents"
-SCREEN_SHOTS_PATH = "~/screenshots"
+SCREEN_SHOTS_PATH = "~/Screenshots"
 ICLOUD_SYMLINK_PATH = "~/iCloud"
 ICLOUD_SOURCE_PATH = "~/Library/Mobile Documents/com~apple~CloudDocs"
 
