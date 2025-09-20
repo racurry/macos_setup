@@ -102,7 +102,7 @@ do_dock_setup() {
   # Autohide the dock
   defaults write com.apple.dock autohide -bool true
   # Put it on the left
-  defaults write com.apple.Dock orientation -string "left"
+  defaults write com.apple.dock orientation -string "left"
 
   # Hot corners
   # Possible values:
@@ -153,12 +153,6 @@ do_trackpad_setup() {
   defaults write NSGlobalDomain com.apple.trackpad.forceClick -bool true
   defaults write com.apple.AppleMultitouchTrackpad ForceSuppressed -bool false
 
-  # Sequoia has trackpad issues - refresh Bluetooth trackpad connections if needed
-  if system_profiler SPBluetoothDataType | grep -q "Trackpad"; then
-    # Only restart Bluetooth if a Bluetooth trackpad is detected
-    sudo killall -HUP bluetoothd 2>/dev/null || true
-  fi
-
   print_finished ${#ITEM}
 }
 
@@ -198,8 +192,6 @@ do_finder_setup() {
   defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
   # Disable the warning before emptying the Trash
   defaults write com.apple.finder WarnOnEmptyTrash -bool false
-  # Empty Trash securely by default
-  defaults write com.apple.finder EmptyTrashSecurely -bool true
   # Set Desktop as the default location for new Finder windows
   defaults write com.apple.finder NewWindowTarget -string "PfDe"
   defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/"

@@ -43,6 +43,11 @@ source_brew_plugin "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"  
 
 unset -f source_brew_plugin
 
+# Initialize direnv if available
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
+
 # ============================================================================
 # SHELL APPEARANCE & BEHAVIOR
 # ============================================================================
@@ -308,6 +313,4 @@ fi
 # Grab any galileo-specific aliases & configs
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
-fi 
-
-
+fi
