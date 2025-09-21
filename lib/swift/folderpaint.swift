@@ -239,30 +239,6 @@ func setIcon(_ image: NSImage?, for path: String) {
   if !ok { fail("Failed to set icon for \(path)") }
 }
 
-// ---------- FDA preflight & helpers
-
-@discardableResult
-func tryXattrWriteOnFolder(_ path: String) -> (ok: Bool, err: Int32, msg: String) {
-  let name = "com.aaron.folderpaint.test"
-  var value: UInt8 = 1
-  errno = 0
-  let rv = setxattr(path, name, &value, 1, 0, 0)
-  let e = errno
-  if rv == 0 {
-    _ = removexattr(path, name, 0)
-    return (true, 0, "OK")
-  } else {
-    return (false, e, String(cString: strerror(e)))
-  }
-}
-
-func lastErrnoIsPermissionDenied(_ e: Int32) -> Bool { e == EACCES || e == EPERM }
-
-func openFullDiskAccessPane() {
-  if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_FullDiskAccess") {
-    NSWorkspace.shared.open(url)
-  }
-}
 
 // ---------- Arg parsing
 
@@ -277,8 +253,6 @@ struct Options {
   var overlayOpacity: CGFloat = Constants.defaultOverlayOpacity
   var overlayColorHex: String? = nil  // defaults to white for symbols, black for text
   var baseSize: CGFloat = Constants.defaultBaseSize
-  var noOpenSettings: Bool = false
-  var debug: Bool = false
 
   var panelTop: CGFloat = Constants.defaultPanelTop
   var panelBottom: CGFloat = Constants.defaultPanelBottom
@@ -308,8 +282,6 @@ func printUsageAndExit() -> Never {
     --overlayScale <0..1>    Overlay scale (default 0.55)
     --overlayOpacity <0..1>  Overlay opacity (default 1.0)
     --baseSize <px>          Render size (default 512)
-    --no-open-settings       Don’t auto-open Full Disk Access pane
-    --debug                  Print permission diagnostics
     --panelTop <0..0.5>      Fractional inset from top of icon (default 0.22)
     --panelBottom <0..0.5>   Fractional inset from bottom (default 0.10)
     --panelLeft <0..0.5>     Fractional inset from left  (default 0.08)
@@ -346,8 +318,6 @@ func parseArgs() -> Options {
       case "--overlayScale":   opt.overlayScale = parseFloat(popValue("--overlayScale"), name: "--overlayScale", min: Constants.minOverlayScale, max: Constants.maxOverlayScale)
       case "--overlayOpacity": opt.overlayOpacity = parseFloat(popValue("--overlayOpacity"), name: "--overlayOpacity", min: Constants.minOverlayOpacity, max: Constants.maxOverlayOpacity)
       case "--baseSize":      opt.baseSize = parseFloat(popValue("--baseSize"), name: "--baseSize", min: Constants.minBaseSize, max: Constants.maxBaseSize)
-      case "--no-open-settings": opt.noOpenSettings = true
-      case "--debug":         opt.debug = true
       case "--panelTop":    opt.panelTop    = parseFloat(popValue("--panelTop"),    name: "--panelTop",    min: Constants.minPanelInset, max: Constants.maxPanelInset)
       case "--panelBottom": opt.panelBottom = parseFloat(popValue("--panelBottom"), name: "--panelBottom", min: Constants.minPanelInset, max: Constants.maxPanelInset)
       case "--panelLeft":   opt.panelLeft   = parseFloat(popValue("--panelLeft"),   name: "--panelLeft",   min: Constants.minPanelInset, max: Constants.maxPanelInset)
@@ -370,22 +340,6 @@ case .clear:
 case .set:
   guard let folder = opt.folder else { fail("--folder is required") }
   guard let colorHex = opt.colorHex else { fail("--color is required") }
-
-  // FDA preflight
-  let dirProbe = tryXattrWriteOnFolder(folder)
-  if opt.debug {
-    fputs("[DEBUG] folder: \(folder)\n[DEBUG] dir xattr: ok=\(dirProbe.ok) errno=\(dirProbe.err) (\(dirProbe.msg))\n\n", stderr)
-  }
-  if !dirProbe.ok && lastErrnoIsPermissionDenied(dirProbe.err) {
-    fputs("""
-    folderpaint: Missing permission to modify “\(folder)”.
-    (errno \(dirProbe.err): \(dirProbe.msg))
-
-    This typically means Full Disk Access / Files & Folders is not granted to your shell or to ‘folderpaint’.
-    """, stderr)
-    if !opt.noOpenSettings { openFullDiskAccessPane(); fputs("Opening Full Disk Access settings…\n", stderr) }
-    exit(3)
-  }
 
   // Build base artwork
   let tint = parseHexColor(colorHex)
