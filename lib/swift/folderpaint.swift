@@ -6,12 +6,11 @@
 //   folderpaint set --folder "$HOME/Documents/thing" --color "#34C759" --symbol "doc.text.fill"
 //   folderpaint set --folder "$HOME/Documents/999_Meta" --color "#FF9500"
 //   folderpaint clear --folder "$HOME/Documents/thing"
-//   folderpaint refresh-finder
 
 import AppKit
 import Foundation
 import CoreImage
-import Darwin.C
+import Darwin
 import UniformTypeIdentifiers
 
 // ---------- Utilities
@@ -195,11 +194,6 @@ func compositeInPanel(base: NSImage, overlay: NSImage?, scale: CGFloat, opacity:
   return out
 }
 
-// Back-compat wrapper: defaults roughly fit the generic folder artwork.
-func composite(base: NSImage, overlay: NSImage?, scale: CGFloat, opacity: CGFloat) -> NSImage {
-  let defaults = PanelInsets(top: 0.22, bottom: 0.10, left: 0.08, right: 0.06)
-  return compositeInPanel(base: base, overlay: overlay, scale: scale, opacity: opacity, insets: defaults)
-}
 
 func setIcon(_ image: NSImage?, for path: String) {
   let ok = NSWorkspace.shared.setIcon(image, forFile: path, options: [])
@@ -234,7 +228,7 @@ func openFullDiskAccessPane() {
 // ---------- Arg parsing
 
 struct Options {
-  enum Command { case set, clear, refreshFinder }
+  enum Command { case set, clear }
   var cmd: Command
   var folder: String?
   var colorHex: String?
@@ -260,7 +254,6 @@ func printUsageAndExit() -> Never {
   Commands:
     set              Set a tinted folder icon, optional overlay
     clear            Remove any custom icon from the folder
-    refresh-finder   Ask Finder to reload icons (optional)
 
   Examples:
     folderpaint set --folder "$HOME/Documents/thing" --color "#34C759" --symbol "doc.text.fill"
@@ -293,10 +286,9 @@ func parseArgs() -> Options {
 
   var opt = Options(cmd: .set)
   switch sub {
-    case "set":            opt.cmd = .set
-    case "clear":          opt.cmd = .clear
-    case "refresh-finder": opt.cmd = .refreshFinder
-    default:               printUsageAndExit()
+    case "set":   opt.cmd = .set
+    case "clear": opt.cmd = .clear
+    default:      printUsageAndExit()
   }
 
   func popValue(_ name: String) -> String {
@@ -332,9 +324,6 @@ func parseArgs() -> Options {
 let opt = parseArgs()
 
 switch opt.cmd {
-case .refreshFinder:
-  _ = shell("killall", "Finder"); exit(0)
-
 case .clear:
   guard let folder = opt.folder else { fail("--folder is required for clear") }
   setIcon(nil, for: folder); exit(0)
@@ -380,14 +369,3 @@ case .set:
   exit(0)
 }
 
-// ---------- Minimal shell helper
-
-@discardableResult
-func shell(_ cmd: String, _ args: String...) -> Int32 {
-  let task = Process()
-  task.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-  task.arguments = [cmd] + args
-  try? task.run()
-  task.waitUntilExit()
-  return task.terminationStatus
-}
