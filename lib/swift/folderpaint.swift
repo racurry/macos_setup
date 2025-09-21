@@ -13,6 +13,40 @@ import CoreImage
 import Darwin
 import UniformTypeIdentifiers
 
+// ---------- Constants
+
+struct Constants {
+  // Overlay sizing
+  static let symbolPointSizeRatio: CGFloat = 0.52
+  static let textPointSizeRatio: CGFloat = 0.58
+  static let symbolConfigRatio: CGFloat = 0.9
+
+  // Default panel insets for overlay positioning
+  static let defaultPanelTop: CGFloat = 0.22
+  static let defaultPanelBottom: CGFloat = 0.10
+  static let defaultPanelLeft: CGFloat = 0.08
+  static let defaultPanelRight: CGFloat = 0.06
+
+  // Default overlay settings
+  static let defaultOverlayScale: CGFloat = 0.55
+  static let defaultOverlayOpacity: CGFloat = 1.0
+  static let defaultBaseSize: CGFloat = 512.0
+
+  // Parameter limits
+  static let minOverlayScale: CGFloat = 0.05
+  static let maxOverlayScale: CGFloat = 0.95
+  static let minOverlayOpacity: CGFloat = 0.05
+  static let maxOverlayOpacity: CGFloat = 1.0
+  static let minBaseSize: CGFloat = 128
+  static let maxBaseSize: CGFloat = 2048
+  static let minPanelInset: CGFloat = 0.0
+  static let maxPanelInset: CGFloat = 0.5
+
+  // Core Image filter settings
+  static let saturationBoost: CGFloat = 1.10
+  static let monochromeIntensity: CGFloat = 1.0
+}
+
 // ---------- Utilities
 
 func fail(_ msg: String, code: Int32 = 2) -> Never {
@@ -37,6 +71,11 @@ func parseFloat(_ s: String, name: String, min: CGFloat = 0, max: CGFloat = 1) -
   let g = CGFloat(f)
   if g < min || g > max { fail("\(name) must be between \(min) and \(max)") }
   return g
+}
+
+func parseColorOrDefault(_ colorHex: String?, defaultColor: NSColor) -> NSColor {
+  guard let hex = colorHex else { return defaultColor }
+  return parseHexColor(hex)
 }
 
 // ---------- Image building
@@ -80,13 +119,13 @@ func drawSystemFolderBase(size: CGFloat, tint: NSColor) -> NSImage {
   guard let mono = CIFilter(name: "CIColorMonochrome") else { return base }
   mono.setValue(grayCI, forKey: kCIInputImageKey)
   mono.setValue(ciTint, forKey: kCIInputColorKey)
-  mono.setValue(1.0,    forKey: kCIInputIntensityKey)
+  mono.setValue(Constants.monochromeIntensity, forKey: kCIInputIntensityKey)
   let tinted = mono.outputImage ?? grayCI
 
   // 3) Optional slight saturation boost to match Tahoe's vivid look
   if let sat = CIFilter(name: "CIColorControls") {
     sat.setValue(tinted, forKey: kCIInputImageKey)
-    sat.setValue(1.10,   forKey: kCIInputSaturationKey)
+    sat.setValue(Constants.saturationBoost, forKey: kCIInputSaturationKey)
     sat.setValue(0.0,    forKey: kCIInputBrightnessKey)
     sat.setValue(1.0,    forKey: kCIInputContrastKey)
     let out = (sat.outputImage ?? tinted).cropped(to: baseCI.extent)
@@ -109,7 +148,7 @@ func loadSystemSymbol(_ name: String, pointSize: CGFloat, color: NSColor = .whit
     color.set()
 
     // Draw the symbol directly in the desired color
-    let config = NSImage.SymbolConfiguration(pointSize: pointSize * 0.9, weight: .medium)
+    let config = NSImage.SymbolConfiguration(pointSize: pointSize * Constants.symbolConfigRatio, weight: .medium)
     let coloredImg = img.withSymbolConfiguration(config)
     coloredImg?.isTemplate = false
 
@@ -131,7 +170,7 @@ func renderText(_ text: String, pointSize: CGFloat, color: NSColor = .black) -> 
   let para = NSMutableParagraphStyle()
   para.alignment = .center
   let attrs: [NSAttributedString.Key: Any] = [
-    .font: NSFont.systemFont(ofSize: pointSize * 0.9, weight: .semibold),
+    .font: NSFont.systemFont(ofSize: pointSize * Constants.symbolConfigRatio, weight: .semibold),
     .paragraphStyle: para,
     .foregroundColor: color
   ]
@@ -234,17 +273,17 @@ struct Options {
   var colorHex: String?
   var symbolName: String?
   var text: String?
-  var symbolScale: CGFloat = 0.55  // slightly larger by default
-  var symbolOpacity: CGFloat = 1.0
-  var symbolColorHex: String? = nil  // defaults to white for symbols, black for text
-  var baseSize: CGFloat = 512.0
+  var overlayScale: CGFloat = Constants.defaultOverlayScale
+  var overlayOpacity: CGFloat = Constants.defaultOverlayOpacity
+  var overlayColorHex: String? = nil  // defaults to white for symbols, black for text
+  var baseSize: CGFloat = Constants.defaultBaseSize
   var noOpenSettings: Bool = false
   var debug: Bool = false
 
-  var panelTop: CGFloat = 0.22
-  var panelBottom: CGFloat = 0.10
-  var panelLeft: CGFloat = 0.08
-  var panelRight: CGFloat = 0.06
+  var panelTop: CGFloat = Constants.defaultPanelTop
+  var panelBottom: CGFloat = Constants.defaultPanelBottom
+  var panelLeft: CGFloat = Constants.defaultPanelLeft
+  var panelRight: CGFloat = Constants.defaultPanelRight
 }
 
 func printUsageAndExit() -> Never {
@@ -265,9 +304,9 @@ func printUsageAndExit() -> Never {
     --color  <#RRGGBB>       Tint color (required)
     --symbol <SFName>        Optional SF Symbol overlay
     --text   <string>        Optional text/emoji overlay
-    --symbolColor <#RRGGBB>  Overlay color (default: white for symbols, black for text)
-    --symbolScale <0..1>     Overlay scale (default 0.55)
-    --symbolOpacity <0..1>   Overlay opacity (default 1.0)
+    --overlayColor <#RRGGBB> Overlay color (default: white for symbols, black for text)
+    --overlayScale <0..1>    Overlay scale (default 0.55)
+    --overlayOpacity <0..1>  Overlay opacity (default 1.0)
     --baseSize <px>          Render size (default 512)
     --no-open-settings       Don’t auto-open Full Disk Access pane
     --debug                  Print permission diagnostics
@@ -303,16 +342,16 @@ func parseArgs() -> Options {
       case "--color":         opt.colorHex = popValue("--color")
       case "--symbol":        opt.symbolName = popValue("--symbol")
       case "--text":          opt.text = popValue("--text")
-      case "--symbolColor":   opt.symbolColorHex = popValue("--symbolColor")
-      case "--symbolScale":   opt.symbolScale = parseFloat(popValue("--symbolScale"), name: "--symbolScale", min: 0.05, max: 0.95)
-      case "--symbolOpacity": opt.symbolOpacity = parseFloat(popValue("--symbolOpacity"), name: "--symbolOpacity", min: 0.05, max: 1.0)
-      case "--baseSize":      opt.baseSize = parseFloat(popValue("--baseSize"), name: "--baseSize", min: 128, max: 2048)
+      case "--overlayColor":   opt.overlayColorHex = popValue("--overlayColor")
+      case "--overlayScale":   opt.overlayScale = parseFloat(popValue("--overlayScale"), name: "--overlayScale", min: Constants.minOverlayScale, max: Constants.maxOverlayScale)
+      case "--overlayOpacity": opt.overlayOpacity = parseFloat(popValue("--overlayOpacity"), name: "--overlayOpacity", min: Constants.minOverlayOpacity, max: Constants.maxOverlayOpacity)
+      case "--baseSize":      opt.baseSize = parseFloat(popValue("--baseSize"), name: "--baseSize", min: Constants.minBaseSize, max: Constants.maxBaseSize)
       case "--no-open-settings": opt.noOpenSettings = true
       case "--debug":         opt.debug = true
-      case "--panelTop":    opt.panelTop    = parseFloat(popValue("--panelTop"),    name: "--panelTop",    min: 0.0, max: 0.5)
-      case "--panelBottom": opt.panelBottom = parseFloat(popValue("--panelBottom"), name: "--panelBottom", min: 0.0, max: 0.5)
-      case "--panelLeft":   opt.panelLeft   = parseFloat(popValue("--panelLeft"),   name: "--panelLeft",   min: 0.0, max: 0.5)
-      case "--panelRight":  opt.panelRight  = parseFloat(popValue("--panelRight"),  name: "--panelRight",  min: 0.0, max: 0.5)
+      case "--panelTop":    opt.panelTop    = parseFloat(popValue("--panelTop"),    name: "--panelTop",    min: Constants.minPanelInset, max: Constants.maxPanelInset)
+      case "--panelBottom": opt.panelBottom = parseFloat(popValue("--panelBottom"), name: "--panelBottom", min: Constants.minPanelInset, max: Constants.maxPanelInset)
+      case "--panelLeft":   opt.panelLeft   = parseFloat(popValue("--panelLeft"),   name: "--panelLeft",   min: Constants.minPanelInset, max: Constants.maxPanelInset)
+      case "--panelRight":  opt.panelRight  = parseFloat(popValue("--panelRight"),  name: "--panelRight",  min: Constants.minPanelInset, max: Constants.maxPanelInset)
       default: fail("Unknown option '\(a)'")
     }
   }
@@ -355,16 +394,16 @@ case .set:
   // Optional overlay
   var overlay: NSImage? = nil
   if let symbol = opt.symbolName {
-    let symbolColor = opt.symbolColorHex.map(parseHexColor) ?? .white
-    overlay = loadSystemSymbol(symbol, pointSize: opt.baseSize * 0.52, color: symbolColor)
+    let symbolColor = parseColorOrDefault(opt.overlayColorHex, defaultColor: .white)
+    overlay = loadSystemSymbol(symbol, pointSize: opt.baseSize * Constants.symbolPointSizeRatio, color: symbolColor)
     if overlay == nil { fail("Unknown SF Symbol '\(symbol)'. Requires macOS 11+ and a valid symbol name.") }
   } else if let text = opt.text, !text.isEmpty {
-    let textColor = opt.symbolColorHex.map(parseHexColor) ?? .black
-    overlay = renderText(text, pointSize: opt.baseSize * 0.58, color: textColor)
+    let textColor = parseColorOrDefault(opt.overlayColorHex, defaultColor: .black)
+    overlay = renderText(text, pointSize: opt.baseSize * Constants.textPointSizeRatio, color: textColor)
   }
 
   let insets = PanelInsets(top: opt.panelTop, bottom: opt.panelBottom, left: opt.panelLeft, right: opt.panelRight)
-  let final = compositeInPanel(base: base, overlay: overlay, scale: opt.symbolScale, opacity: opt.symbolOpacity, insets: insets)
+  let final = compositeInPanel(base: base, overlay: overlay, scale: opt.overlayScale, opacity: opt.overlayOpacity, insets: insets)
   setIcon(final, for: folder)
   exit(0)
 }
