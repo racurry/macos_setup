@@ -62,7 +62,17 @@ jobs:
             2. Ensure all tests pass before completing the task
             3. Check for and fix any type errors or compilation issues
 
-            When working on PRs:
+            When working on issues (creating new code/fixes):
+            1. Create a new branch for your changes
+            2. Make the necessary code changes
+            3. Commit your changes with a descriptive commit message
+            4. Create a pull request with:
+               - A clear title summarizing the changes
+               - A description explaining what was done and why
+               - Reference to the issue being fixed (e.g., "Fixes #4")
+            5. DO NOT merge the PR - leave it open for review
+
+            When working on PRs (reviewing existing changes):
             1. Review the changes thoroughly
             2. Suggest improvements following repository standards
             3. Ensure test coverage for new functionality
@@ -72,4 +82,4 @@ jobs:
             Please work on the issue/task described above.
 
           # Configure tools Claude can use
-          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch" --model sonnet'
+          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch" --model sonnet --auto-approve'
