@@ -72,4 +72,4 @@ jobs:
             Please work on the issue/task described above.
 
           # Configure tools Claude can use
-          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch"'
+          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch" --model sonnet'
