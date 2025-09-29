@@ -1,9 +1,5 @@
 #!/usr/bin/env bats
 
-# Skip all tests in CI environment (these are macOS-specific)
-if [[ "${CI:-}" == "true" ]]; then
-  skip "Skipping macOS-specific tests in CI environment"
-fi
 
 load '../helpers/common_test_helper.bash'
 

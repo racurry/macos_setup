@@ -16,6 +16,7 @@ teardown() {
     skip "curl command not available"
   fi
 
+
   # Create mock brew command that reports it's already installed
   mkdir -p "${TEST_TMPDIR}/bin"
   ln -s "$(command -v true)" "${TEST_TMPDIR}/bin/brew"
@@ -41,6 +42,7 @@ teardown() {
 }
 
 @test "brew.sh bundle requires brew command" {
+
   # Remove brew from PATH if it exists
   export PATH="$(echo "$PATH" | tr ':' '\n' | grep -v brew | tr '\n' ':')"
 
