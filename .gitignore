@@ -1,4 +1,4 @@
 .DS_Store
 .todone
 .meta
-.claude/
+.claude/settings.local.json

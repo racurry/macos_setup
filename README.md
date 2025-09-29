@@ -1,24 +1,16 @@
-# Setup a new OS X machine
+# macOS Setup
 
-## Set up a new machine
+## Set up a new Mac
 
-Or just update a current one.  These scripts should be idempotent.
-
-Things that happen
-
-1. Install a bunch of software
-2. Set a bunch of settings
-3. Sync up some dotfiles
-4. Remind you about some manual setup steps
-
-### Step 0: Clone this repo
+**Step 1:**
 
 1. Generate a new ssh key:
 `ssh-keygen -t rsa`
 2. Copy it to your clipboard:
 `pbcopy < ~/.ssh/id_rsa.pub`
 3. Add it here: [github settings](https://github.com/settings/keys)
-4. Clone the repo:
+
+**Step 2:**
 
 ```bash
 mkdir ~/workspace
@@ -26,53 +18,47 @@ cd ~/workspace
 git clone git@github.com:racurry/osx_setup.git
 ```
 
-### Step 1: Run the setup
+**Step 3:**
+
+This will run the full setup process.  Sometimes, it might need manual intervention; do what it says and run it again. It is idempotent, run it til its done.
 
 ```bash
-cd osx_setup
-./macos_setup
+./setup.sh
 ```
 
-There are some bits that require human intervention.
+## What's in here?
 
-To force a complete re-run (ignoring previous execution tracking):
+## Stuff that is managed
 
-```bash
-./macos_setup --force
-```
+- App management via [Homebrew](https://brew.sh/) and [mas](https://github.com/mas-cli/mas) using the [Brewfile](./dotfiles/Brewfile)
+- Environment management via [asdf](https://asdf-vm.com/) using [.tool-versions](./dotfiles/.tool-versions), and global packages for [`nodejs`](./dotfiles/.default-npm-packages), [`ruby`](./dotfiles/.default-gems), and [`python`](./dotfiles/.default-python-packages)
+- Dotfiles in [dotfiles](./dotfiles) symlinked to `~/.dotfiles`, including [zsh config](./dotfiles/.zshrc), [git config](./dotfiles/.gitconfig), and more.
 
-To run system hygiene (update packages, plugins, and configurations):
+## Resources
 
-```bash
-./macos_setup --update
-```
-
-## This adds a command to your path
-
-You can rerun the setup any time with `macoscfg`.
-
-## Extra stuff
-
-```bash
-    ./bin/setup_app_configs --export # Export settings from apps that don't support cloud sync
-    ./bin/setup_app_configs --import # Import settings into apps that don't support cloud sync 
-```
-
-## Adding new stuff
-
-Dump it into the relevant file in `/data`.
-
-## References
-
-### macOS settings
+Things that can help manage or tweak macOS settings
 
 - <http://www.bresink.com/osx/TinkerTool.html>
-
-### Cask lists
-
 - <https://formulae.brew.sh/>
 
-## Fixes
+## Structure
 
-- [ ] Create a generic folder action for copy path in finder
-- [ ] Auto install things from .tool-versions.  Install known packages, like claude code
+- [bin](./bin) - Standalone binaries that can be run manually
+- [lib](./lib) - Shared library functions
+- [scripts/bash](./scripts/bash) - Scripts, separated by language
+- [dotfiles](./dotfiles) - Dotfiles to be symlinked to the home directory
+- [docs](./docs) - Todos, manual steps, notes, etc.
+- [tests](./tests) - Tests, separated by type
+
+## Testing
+
+Some tests are here.
+
+```bash
+./tests/lint.sh     # ShellCheck on all bash sources
+./tests/unit.sh     # BATS unit tests (adds more over time)
+```
+
+## More to do
+
+[We're never really done](./docs/TODO.md)

@@ -1,0 +1,72 @@
+# Homebrew packages (brew)
+brew "asdf"
+brew "bat"
+brew "bats-core"
+brew "diff-so-fancy"
+brew "direnv"
+brew "eza"
+brew "ffmpeg"
+brew "gifsicle"
+brew "fzf"
+brew "gh"
+brew "git"
+brew "hub"
+brew "imagemagick"
+brew "shellcheck"
+brew "mas"  # Required for Mac App Store apps
+brew "pure"
+brew "thefuck"
+brew "uv"
+brew "wget"
+brew "yarn"
+brew "zsh"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "zsh-you-should-use"
+
+# Homebrew casks
+cask "1password-cli"
+cask "arc"
+cask "caffeine"
+cask "cardhop"
+cask "cursor"
+cask "dropbox"
+cask "docker-desktop"
+cask "elgato-stream-deck"
+cask "flux-app"
+cask "google-drive"
+cask "hazel"
+cask "iterm2"
+cask "jordanbaird-ice"
+cask "keyboard-maestro"
+cask "lm-studio"
+cask "mutedeck"
+cask "mos"
+cask "obsidian"
+cask "raycast"
+cask "renamer"
+cask "sf-symbols"
+cask "shottr"
+cask "spotify"
+cask "superhuman"
+cask "textbuddy"
+cask "utm"
+cask "visual-studio-code"
+
+# Mac App Store apps
+mas "Actions For Obsidian", id: 1659667937
+mas "Amphetamine", id: 937984704
+mas "CARROTweather", id: 993487541
+mas "Goodnotes", id: 1444383602
+mas "Meeter", id: 1510445899
+mas "PocketTube", id: 1533703891
+mas "Rapidmg", id: 6451349778
+mas "The Unarchiver", id: 425424353
+mas "Things", id: 904280696
+mas "Toolkit for YNAB", id: 1592912837 
+mas "Xcode", id: 497799835
+
+# Let's try to not use these, see if Raycast is worth it
+# cask "moom"
+# cask "karabiner-elements"
+# cask "alfred"
