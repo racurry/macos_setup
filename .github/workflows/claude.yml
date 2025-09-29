@@ -63,7 +63,7 @@ jobs:
 
             Always be thorough and follow best practices.
 
-            Now proceed with the original request: {{ github.event.comment.body || github.event.issue.body || github.event.review.body }}
+            Now proceed with the original request: ${{ github.event.comment.body || github.event.issue.body || github.event.review.body }}
 
           # Configure tools Claude can use
-          claude_args: '--allowed-tools "Bash(npm run:*),Bash(yarn:*),Bash(pnpm:*),Bash(make:*),Bash(pytest:*),Bash(cargo test:*),Bash(go test:*),Bash(mvn test:*),Bash(gradle test:*),Bash(gh pr:*),Bash(gh issue:*),Read(**),Edit(**),Glob(**),Grep(**)"'
+          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch"'

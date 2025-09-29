@@ -29,36 +29,25 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
-            COMMIT SHA: ${{ github.event.pull_request.head.sha }}
 
-            Please review this pull request and provide inline feedback on specific lines. For each issue you find:
+            Please review this pull request following these steps:
 
-            1. First use `gh pr diff` to see the changes
-            2. Create inline comments on specific lines using the GitHub API with curl:
-               ```bash
-               curl -X POST \
-                 -H "Authorization: Bearer $GITHUB_TOKEN" \
-                 -H "Accept: application/vnd.github.v3+json" \
-                 https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments \
-                 -d '{
-                   "body": "Your detailed feedback here",
-                   "commit_id": "${{ github.event.pull_request.head.sha }}",
-                   "path": "path/to/file.js",
-                   "line": 42,
-                   "side": "RIGHT"
-                 }'
-               ```
+            1. Read CLAUDE.md and @AGENTS.md for repository guidelines
+            2. Use `gh pr diff` to see what changed
+            3. Read the changed files to understand the context
+            4. Use `gh pr comment` to provide feedback directly on specific lines
+            5. Run tests if appropriate to verify the changes work
 
             Focus your review on:
+            - Following repository conventions from AGENTS.md
             - Code quality and best practices
             - Potential bugs or issues
             - Security concerns
             - Test coverage
+            - Adherence to the project's bash scripting standards
 
-            Use the repository's CLAUDE.md for guidance on style and conventions. Be constructive and helpful in your feedback.
-
-            Keep output brief and to the point.
+            Be constructive and helpful in your feedback. Keep output brief and to the point.
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
-          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr review:*),Bash(curl:*)"'
+          claude_args: '--allowed-tools "Bash(gh *),Bash(./tests/*),Read(**),Glob(**),Grep(**),TodoWrite"'
