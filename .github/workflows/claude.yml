@@ -19,7 +19,7 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
       id-token: write
@@ -82,4 +82,4 @@ jobs:
             Please work on the issue/task described above.
 
           # Configure tools Claude can use
-          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch" --model sonnet --auto-approve'
+          claude_args: '--allowed-tools "Bash(*),Read(**),Edit(**),Glob(**),Grep(**),Write(**),MultiEdit(**),TodoWrite,Task,WebFetch,WebSearch" --model sonnet'
