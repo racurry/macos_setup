@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
+      issues: write
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
@@ -33,18 +33,37 @@ jobs:
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          
+
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
 
-          # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
-          # prompt: 'Update the pull request description to include a summary of changes.'
+          # Custom prompt to ensure Claude follows standards and runs tests
+          prompt: |
+            REPO: ${{ github.repository }}
 
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
-          # claude_args: '--model claude-opus-4-1-20250805 --allowed-tools Bash(gh pr:*)'
+            Before starting any task:
+            1. ALWAYS read and follow the guidance in CLAUDE.md
+            2. Read @AGENTS.md for any additional context and instructions
+            3. Follow all coding standards and conventions found in the repository
 
+            For any code changes:
+            1. Run appropriate tests after making changes
+            2. Ensure all tests pass before completing the task
+            3. Check for and fix any type errors or compilation issues
+
+            When working on PRs:
+            1. Review the changes thoroughly
+            2. Suggest improvements following repository standards
+            3. Ensure test coverage for new functionality
+
+            Always be thorough and follow best practices.
+
+            Now proceed with the original request: {{ github.event.comment.body || github.event.issue.body || github.event.review.body }}
+
+          # Configure tools Claude can use
+          claude_args: '--allowed-tools "Bash(npm run:*),Bash(yarn:*),Bash(pnpm:*),Bash(make:*),Bash(pytest:*),Bash(cargo test:*),Bash(go test:*),Bash(mvn test:*),Bash(gradle test:*),Bash(gh pr:*),Bash(gh issue:*),Read(**),Edit(**),Glob(**),Grep(**)"'
