@@ -14,6 +14,8 @@ Stuff to add to this setup
 - [ ] Consolidate 'magic' file and folder locations to one place. Should some single script just export them as env vars?
 - [ ] Give every script a help option
 - [ ] Give every script a "skip sudo" option
+- [ ] Add a script to pull the latest changes from the remote repository
+- [ ] Create a script for updates; brew cleanup, brew update, brew upgrade, mas upgrade, get latest asdf versions, clear old dotfiles backups
 
 ## Bigger picture things; needs more thought
 

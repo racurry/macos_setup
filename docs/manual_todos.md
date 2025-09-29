@@ -5,7 +5,7 @@
 - [ ] Configure Ice
 - [ ] Set up Obsidian
 - [ ] Sync VS Code
-- [ ] Set up [Shottr](./apps/setup_shottr.md)
+- [ ] Set up [Shottr](./apps/shottr.md)
 - [ ] Set up App Settings syncs using Gdrive
   - [ ] Alfred
   - [ ] Hazel rules
