@@ -13,10 +13,15 @@ Manage Homebrew installation and package management.
 
 Commands:
     install     Install Homebrew if not already installed
-    bundle      Install packages from Brewfile
+    bundle      Install packages from Brewfile(s)
     --help      Show this help message
 
 If no command is specified, both install and bundle will be processed.
+
+Environment Variables:
+    SETUP_MODE  Set to 'work' or 'personal' to install mode-specific packages
+                from dotfiles/Brewfile.work or dotfiles/Brewfile.personal
+                in addition to the main dotfiles/Brewfile
 EOF
 }
 
@@ -56,21 +61,42 @@ install_bundle() {
 
     require_command brew
 
-    manifest="${REPO_ROOT}/dotfiles/Brewfile"
-    [[ -f "${manifest}" ]] || fail "Missing Brewfile at ${manifest}"
+    # Always install the main Brewfile first
+    main_manifest="${REPO_ROOT}/dotfiles/Brewfile"
+    [[ -f "${main_manifest}" ]] || fail "Missing main Brewfile at ${main_manifest}"
 
-    log_info "Running brew bundle install"
+    log_info "Installing common packages from main Brewfile"
+    install_brewfile "${main_manifest}"
+
+    # Install mode-specific packages if SETUP_MODE is set
+    if [[ -n "${SETUP_MODE:-}" ]]; then
+        mode_manifest="${REPO_ROOT}/dotfiles/Brewfile.${SETUP_MODE}"
+        if [[ -f "${mode_manifest}" ]]; then
+            log_info "Installing ${SETUP_MODE}-specific packages from ${mode_manifest}"
+            install_brewfile "${mode_manifest}"
+        else
+            log_warn "No ${SETUP_MODE}-specific Brewfile found at ${mode_manifest}"
+        fi
+    else
+        log_warn "SETUP_MODE not set, skipping mode-specific packages"
+    fi
+}
+
+install_brewfile() {
+    local manifest="$1"
+
+    log_info "Running brew bundle install for ${manifest}"
     set +e
     brew bundle install --file="${manifest}"
     bundle_status=$?
     set -e
 
     if [[ ${bundle_status} -eq 0 ]]; then
-        log_info "Brew bundle succeeded"
+        log_info "Brew bundle succeeded for ${manifest}"
         return 0
     fi
 
-    log_warn "brew bundle reported errors"
+    log_warn "brew bundle reported errors for ${manifest}"
 
     # If mas apps failed because the Mac App Store isn't signed in, pause the run.
     if command -v mas >/dev/null 2>&1 && ! mas account >/dev/null 2>&1; then
@@ -78,11 +104,11 @@ install_bundle() {
         exit 2
     fi
 
-    log_warn "Running brew bundle check"
+    log_warn "Running brew bundle check for ${manifest}"
     if brew bundle check --file="${manifest}" >/dev/null 2>&1; then
-        log_warn "brew bundle check reports all items installed"
+        log_warn "brew bundle check reports all items installed for ${manifest}"
     else
-        fail "brew bundle check indicates missing items"
+        fail "brew bundle check indicates missing items for ${manifest}"
     fi
 }
 
