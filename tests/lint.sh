@@ -19,4 +19,6 @@ if [ ${#bash_sources[@]} -eq 0 ]; then
   exit 0
 fi
 
+echo "Running shellcheck on ${#bash_sources[@]} bash files..."
 shellcheck "${bash_sources[@]}"
+echo "✓ All bash files passed shellcheck"
