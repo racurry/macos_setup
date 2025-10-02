@@ -67,5 +67,4 @@ setup() {
     run "$SCRIPT_PATH" --help
     [ "$status" -eq 0 ]
     [[ "$output" =~ "sudo" ]]
-    [[ "$output" =~ "sudo_keepalive.sh" ]]
 }

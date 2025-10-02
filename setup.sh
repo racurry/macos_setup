@@ -7,7 +7,6 @@ source "${SCRIPT_DIR}/lib/bash/common.sh"
 
 STEPS=(
   "mvp_system_reqs_check.sh"
-  "sudo_keepalive.sh"
   "brew.sh install"
   "folders.sh"
   "icloud.sh"
@@ -46,4 +45,3 @@ if [[ -f "${manual_file}" ]]; then
   echo
   log_info "Manual checklist: review ${manual_file} for remaining tasks"
 fi
-
