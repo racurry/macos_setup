@@ -1,0 +1,133 @@
+{
+	// Superhuman-enhanced keybindings for MailMate
+	// Legend: 
+	// [SH] = Superhuman
+	// [GM] = Gmail
+	// [MM] = MailMate default, 
+	// [Custom] = This config
+
+	// ========================================
+	// SEND
+	// ========================================
+	"@\U000A" = "send:"; // ⌘+return - [GM/SH] Send message
+	"@\U000D" = "send:"; // ⌘+enter - [GM/SH] Send message
+	"@$\U000D" = ( "send:", "archive:" ); // ⌘+shift+enter - [SH] Send & Archive
+
+	// ========================================
+	// COMPOSE
+	// ========================================
+	"c" = "newMessage:"; // [GM/SH] Compose new message
+	"r" = "replySenderOrAsk:"; // [GM/SH] Reply (to sender or ask)
+	"a" = "replyAll:"; // [GM] Reply all
+	"\U000D" = "replyAll:"; // enter - [SH] Reply all (Superhuman's default)
+	"f" = "forwardMessage:"; // [GM/SH] Forward message
+	"^s" = "saveDocument:"; // [MM] Save draft
+
+	// ========================================
+	// NAVIGATION - Messages
+	// ========================================
+	"/" = "searchAllMessages:"; // [GM/SH] Search
+	"n" = "nextMessage:"; // [GM] Next message in thread
+	"p" = "previousMessage:"; // [GM] Previous message in thread
+	"j" = "nextThread:"; // [GM/SH] Next conversation
+	"k" = "previousThread:"; // [GM/SH] Previous conversation
+	"N" = "moveDownAndModifySelection:"; // [SH] Shift+J - Extend selection down
+	"P" = "moveUpAndModifySelection:"; // [SH] Shift+K - Extend selection up
+	"J" = "moveDownAndModifySelection:"; // [SH] Shift+J - Extend selection down
+	"K" = "moveUpAndModifySelection:"; // [SH] Shift+K - Extend selection up
+
+	// ========================================
+	// NAVIGATION - Scrolling & Jumping
+	// ========================================
+	" " = "scrollPageDown:"; // space - [SH] Scroll down
+	"$" = "scrollPageUp:"; // shift+space - [SH] Scroll up
+	"@\Uf700" = "makeFirstResponder:"; // ⌘+↑ - [SH] Jump to top
+	"@\Uf701" = "scrollToEndOfDocument:"; // ⌘+↓ - [SH] Jump to bottom
+
+	// ========================================
+	// ACTIONS - Archive, Star, Delete
+	// ========================================
+	"e" = "archive:"; // [GM/SH] Archive 
+	"s" = "toggleFlag:"; // [GM/SH] Toggle star/flag
+	"!" = "moveToJunk:"; // [GM/SH] Mark as spam
+	"#" = "deleteMessage:"; // [GM/SH] Move to trash
+	"m" = ( "toggleMuteState:", "archive:" ); // [GM] Mute thread and archive
+	"z" = "undo:"; // [GM/SH] Undo last action
+
+	// ========================================
+	// MESSAGE VIEW
+	// ========================================
+	"o" = "openMessages:"; // [GM/SH] Expand/open message
+
+	// ========================================
+	// LABELS & MAILBOXES
+	// ========================================
+	"v" = "moveToMailbox:"; // [GM] Move to mailbox (opens chooser)
+	"l" = "selectTag:"; // [SH] L - Add/remove label (opens tag selector)
+	"y" = "removeCurrentMailboxFromMessages:"; // [GM/SH] Y - Remove from current view
+	
+	// Label navigation with movement
+	"[" = ( "removeCurrentMailboxFromMessages:", "previousThread:" ); // [SH] Remove label, go to previous
+	"]" = ( "removeCurrentMailboxFromMessages:", "nextThread:" ); // [SH] Remove label, go to next
+
+	// ========================================
+	// READ/UNREAD STATE
+	// ========================================
+	"u" = "toggleReadState:"; // [SH] U - Toggle read/unread
+	"I" = ( "setTag:", "\\Seen", "nextMessage:" ); // [GM] Mark read and move to next
+	"U" = ( "removeTag:", "\\Seen" ); // [GM] Mark unread (for backwards compatibility)
+
+	// ========================================
+	// SELECTION
+	// ========================================
+	"x" = "toggleSelectionOfCurrentMessage:"; // [GM/SH] X - Toggle selection of conversation
+
+	// ========================================
+	// COMBO KEYS - Go to mailbox (g + key)
+	// ========================================
+	"g" = {
+		"a" = ( "goToMailbox:", "ALL_MESSAGES" ); // [GM] Go to All Mail
+		"i" = ( "goToMailbox:", "INBOX" ); // [GM/SH] Go to Inbox
+		"s" = ( "goToMailbox:", "FLAGGED" ); // [GM/SH] Go to Starred
+		"d" = ( "goToMailbox:", "DRAFTS" ); // [GM/SH] Go to Drafts
+		"t" = ( "goToMailbox:", "SENT" ); // [GM/SH] Go to Sent
+		"l" = "goToMailbox:"; // [GM] Opens mailbox chooser
+	};
+
+	// ========================================
+	// COMBO KEYS - Selection (* + key)
+	// ========================================
+	"*" = {
+		"a" = "selectAll:"; // [GM] Select all
+		"n" = "deselectAll:"; // [GM] Deselect all (none)
+		"r" = ( "selectWithFilter:", "#flags.flag = '\\Seen'"); // [GM] Select all read
+		"u" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Seen'"); // [GM] Select all unread
+		"s" = ( "selectWithFilter:", "#flags.flag = '\\Flagged'"); // [GM] Select all starred
+		"t" = ( "selectWithFilter:", "#flags.flag !=[x] '\\Flagged'"); // [GM] Select all unstarred
+	};
+}
+
+// ========================================
+// NOTES ON MISSING SUPERHUMAN FEATURES
+// ========================================
+// - ⌘+K (Command Center) - Not available in MailMate (no command palette system)
+// - H (Snooze/Remind) - Not available in MailMate without bundle extensions
+// - ⌘+O (Open links) - MailMate handles link interaction differently
+// - Calendar shortcuts (0, -, =) - MailMate is email-only, no calendar integration
+// - ⌘+; (Snippets) - Use TextExpander, aText, or Keyboard Maestro instead
+// - ⌘+U (Unsubscribe) - No native one-click unsubscribe support
+// - ? (Show shortcuts) - ⌘+? opens MailMate help menu instead
+// - Z (Undo) - MailMate's undo is limited (text editing only, not comprehensive like Superhuman)
+
+
+// ========================================
+// SUPERHUMAN FEATURES SUCCESSFULLY ADDED
+// ========================================
+// ✓ enter - Reply All (Superhuman's default instead of just R)
+// ✓ space/shift+space - Scroll down/up through messages
+// ✓ u - Toggle read/unread with single key - might not work
+// ✓ [ and ] - Remove label with navigation
+// ✓ y - Remove from current view (context-aware)
+// ✓ ⌘+shift+enter - Send & Archive in one action
+// ✓ shift+J/K - Extend selection (mapped as J/K uppercase)
+// ✓ ⌘+↑/↓ - Jump to top/bottom of message list

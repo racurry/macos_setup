@@ -57,13 +57,10 @@ cask "visual-studio-code"
 mas "Actions For Obsidian", id: 1659667937
 mas "Amphetamine", id: 937984704
 mas "CARROTweather", id: 993487541
-mas "Goodnotes", id: 1444383602
 mas "Meeter", id: 1510445899
-mas "PocketTube", id: 1533703891
 mas "Rapidmg", id: 6451349778
 mas "The Unarchiver", id: 425424353
 mas "Things", id: 904280696
-mas "Toolkit for YNAB", id: 1592912837 
 mas "Xcode", id: 497799835
 
 # Let's try to not use these, see if Raycast is worth it

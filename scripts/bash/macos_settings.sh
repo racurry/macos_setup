@@ -5,6 +5,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+ensure_sudo_cached() {
+  require_command sudo
+
+  if sudo -n true 2>/dev/null; then
+    return 0
+  fi
+
+  log_info "Refreshing sudo credentials"
+  if sudo -v; then
+    return 0
+  fi
+
+  fail "sudo authentication failed"
+}
+
 show_help() {
   cat << EOF
 Usage: $(basename "$0") [OPTIONS] COMMAND
@@ -27,8 +42,7 @@ EXAMPLES:
   $(basename "$0") dock             # Apply only dock settings
   $(basename "$0") all              # Apply all settings
 
-NOTE: Some commands require sudo credentials to be cached.
-Run scripts/bash/sudo_keepalive.sh first if needed.
+NOTE: Commands that modify system-wide settings will prompt for sudo.
 EOF
 }
 
@@ -37,9 +51,7 @@ apply_global_settings() {
 
   require_command defaults
 
-  if ! sudo -n true 2>/dev/null; then
-    fail "sudo credentials not cached; run scripts/bash/sudo_keepalive.sh first"
-  fi
+  ensure_sudo_cached
 
   log_info "Always show scrollbars"
   defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
@@ -190,9 +202,7 @@ apply_misc_settings() {
 
   require_command defaults
 
-  if ! sudo -n true 2>/dev/null; then
-    fail "sudo credentials not cached; run scripts/bash/sudo_keepalive.sh first"
-  fi
+  ensure_sudo_cached
 
   log_info "Ensure Screenshots directory exists"
   mkdir -p "${HOME}/Screenshots"

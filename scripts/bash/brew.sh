@@ -98,13 +98,7 @@ install_brewfile() {
 
     log_warn "brew bundle reported errors for ${manifest}"
 
-    # If mas apps failed because the Mac App Store isn't signed in, pause the run.
-    if command -v mas >/dev/null 2>&1 && ! mas account >/dev/null 2>&1; then
-        log_warn "Mac App Store authentication required. Sign in (mas signin) and rerun setup."
-        exit 2
-    fi
-
-    log_warn "Running brew bundle check for ${manifest}"
+    log_warn "Running brew bundle check"
     if brew bundle check --file="${manifest}" >/dev/null 2>&1; then
         log_warn "brew bundle check reports all items installed for ${manifest}"
     else

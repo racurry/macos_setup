@@ -43,7 +43,6 @@ prompt_setup_mode
 
 STEPS=(
   "mvp_system_reqs_check.sh"
-  "sudo_keepalive.sh"
   "brew.sh install"
   "folders.sh"
   "icloud.sh"
@@ -57,6 +56,7 @@ STEPS=(
   "asdf.sh plugins"
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
+  "ssh.sh"
 )
 
 for step in "${STEPS[@]}"; do
@@ -82,4 +82,3 @@ if [[ -f "${manual_file}" ]]; then
   echo
   log_info "Manual checklist: review ${manual_file} for remaining tasks"
 fi
-

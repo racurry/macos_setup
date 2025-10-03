@@ -1,0 +1,6 @@
+# 1Password SSH Agent Configuration
+# Must be copied or symlinked to ~/.config/1Password/ssh/agent.toml
+# See https://developer.1password.com/docs/ssh/agent/config
+
+[[ssh-keys]]
+item = vusx65kxj234sajwo62vobroxe
