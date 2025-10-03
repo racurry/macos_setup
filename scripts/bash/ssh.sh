@@ -5,19 +5,23 @@ set -e
 # SSH keys: parallel arrays for key_type and 1password_item_id
 WORK_KEY_TYPES=("github")
 WORK_KEY_IDS=("3dn2nyl7mqefnd46fmmheph75a")
+WORK_EMAIL="acurry@galileo.io"
 
 PERSONAL_KEY_TYPES=("github")
 PERSONAL_KEY_IDS=("vusx65kxj234sajwo62vobroxe")
+PERSONAL_EMAIL="aaroncurry@gmail.com"
 
 # Select keys based on SETUP_MODE
 if [[ "${SETUP_MODE}" == "work" ]]; then
   KEY_TYPES=("${WORK_KEY_TYPES[@]}")
   KEY_IDS=("${WORK_KEY_IDS[@]}")
+  EMAIL="${WORK_EMAIL}"
   mode="work"
   echo "Using work SSH keys"
 else
   KEY_TYPES=("${PERSONAL_KEY_TYPES[@]}")
   KEY_IDS=("${PERSONAL_KEY_IDS[@]}")
+  EMAIL="${PERSONAL_EMAIL}"
   mode="personal"
   echo "Using personal SSH keys"
 fi
@@ -31,8 +35,10 @@ mkdir -p ~/.ssh/backups
 backup_if_exists() {
   local file=$1
   if [[ -f "$file" ]]; then
-    local timestamp=$(date +%Y%m%d_%H%M%S)
-    local basename=$(basename "$file")
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
+    local basename
+    basename=$(basename "$file")
     local backup_path=~/.ssh/backups/${timestamp}_${basename}
     mv "$file" "$backup_path"
     echo "Backed up existing $file to $backup_path"
@@ -73,6 +79,30 @@ for i in "${!KEY_TYPES[@]}"; do
 done
 
 echo "SSH key export complete"
+
+# Update allowed_signers for GitHub keys
+echo "Updating ~/.ssh/allowed_signers"
+for i in "${!KEY_TYPES[@]}"; do
+  key_type="${KEY_TYPES[$i]}"
+
+  if [[ "${key_type}" == "github" ]]; then
+    key_name="id_${mode}_${key_type}"
+    public_key_content=$(cat ~/.ssh/"${key_name}.pub")
+
+    # Create or update allowed_signers
+    allowed_signers=~/.ssh/allowed_signers
+
+    # Remove any existing entries for this email
+    if [[ -f "${allowed_signers}" ]]; then
+      grep -v "^${EMAIL}" "${allowed_signers}" > "${allowed_signers}.tmp" || true
+      mv "${allowed_signers}.tmp" "${allowed_signers}"
+    fi
+
+    # Add new entry
+    echo "${EMAIL} ${public_key_content}" >> "${allowed_signers}"
+    echo "Added ${EMAIL} to allowed_signers"
+  fi
+done
 
 # Update SSH config
 if [[ -f ~/.ssh/config ]]; then
