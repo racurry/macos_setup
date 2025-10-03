@@ -4,7 +4,7 @@ set -e
 
 # SSH keys: parallel arrays for key_type and 1password_item_id
 WORK_KEY_TYPES=("github")
-WORK_KEY_IDS=("3dn2nyl7mqefnd46fmmheph75a")
+WORK_KEY_IDS=("4nqynmwddwpx7dq5rjvwi7r2l4")
 WORK_EMAIL="acurry@galileo.io"
 
 PERSONAL_KEY_TYPES=("github")
@@ -16,12 +16,16 @@ if [[ "${SETUP_MODE}" == "work" ]]; then
   KEY_TYPES=("${WORK_KEY_TYPES[@]}")
   KEY_IDS=("${WORK_KEY_IDS[@]}")
   EMAIL="${WORK_EMAIL}"
+  VAULT="Employee"
+  ACCOUNT="galileo.1password.com"
   mode="work"
   echo "Using work SSH keys"
 else
   KEY_TYPES=("${PERSONAL_KEY_TYPES[@]}")
   KEY_IDS=("${PERSONAL_KEY_IDS[@]}")
   EMAIL="${PERSONAL_EMAIL}"
+  VAULT="Private"
+  ACCOUNT="my.1password.com"
   mode="personal"
   echo "Using personal SSH keys"
 fi
@@ -58,14 +62,13 @@ for i in "${!KEY_TYPES[@]}"; do
   backup_if_exists ~/.ssh/"${key_name}.pub"
 
   # Export private key
-  op document get "${key_id}" --output ~/.ssh/"${key_name}" 2>/dev/null || \
-    op item get "${key_id}" --fields "private key" > ~/.ssh/"${key_name}"
+  op item get "${key_id}" --account "${ACCOUNT}" --vault "${VAULT}" --fields "private key" --reveal | sed 's/^"//;s/"$//' | sed '/^$/d' > ~/.ssh/"${key_name}"
 
   chmod 600 ~/.ssh/"${key_name}"
   echo "Exported private key to ~/.ssh/${key_name}"
 
   # Export public key
-  op item get "${key_id}" --fields "public key" > ~/.ssh/"${key_name}.pub" 2>/dev/null || true
+  op item get "${key_id}" --account "${ACCOUNT}" --vault "${VAULT}" --fields "public key" > ~/.ssh/"${key_name}.pub" 2>/dev/null || true
 
   if [[ -f ~/.ssh/"${key_name}.pub" ]]; then
     chmod 644 ~/.ssh/"${key_name}.pub"

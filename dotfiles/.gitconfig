@@ -1,7 +1,7 @@
 [user]
   email = aaroncurry@gmail.com
 	name = Aaron Curry
-	signingkey = /Users/aaron/.ssh/id_personal_github.pub
+	signingkey = ~/.ssh/id_personal_github.pub
 
 [includeIf "gitdir:~/workspace/galileo/"]
   path = ~/.gitconfig_galileo
@@ -118,4 +118,4 @@
 [commit]
 	gpgsign = true
 [gpg "ssh"]
-	allowedSignersFile = /Users/aaron/.ssh/allowed_signers
+	allowedSignersFile = ~/.ssh/allowed_signers
