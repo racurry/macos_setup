@@ -20,6 +20,7 @@ STEPS=(
   "asdf.sh plugins"
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
+  "1password.sh"
 )
 
 for step in "${STEPS[@]}"; do
