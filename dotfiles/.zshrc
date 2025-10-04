@@ -271,6 +271,7 @@ alias gpub='git pub'
 alias greup='git reup'
 alias gco='git checkout'
 alias gcb='git checkout -b'
+alias gcob='git checkout -b'
 alias gdff='git diff'
 alias grbp='git rebase-and-push'
 
