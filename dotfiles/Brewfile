@@ -53,6 +53,35 @@ cask "textbuddy"
 cask "utm"
 cask "visual-studio-code"
 
+# VSCode extensions
+vscode "anthropic.claude-code"
+vscode "github.copilot"
+vscode "github.copilot-chat"
+vscode "openai.chatgpt"
+vscode "ms-python.python"
+vscode "ms-python.black-formatter"
+vscode "ms-python.flake8"
+vscode "ms-python.isort"
+vscode "ms-python.pylint"
+vscode "mikoz.autoflake-extension"
+vscode "batisteo.vscode-django"
+vscode "jetmartin.bats"
+vscode "swiftlang.swift-vscode"
+vscode "llvm-vs-code-extensions.lldb-dap"
+vscode "dbaeumer.vscode-eslint"
+vscode "esbenp.prettier-vscode"
+vscode "davidanson.vscode-markdownlint"
+vscode "formulahendry.auto-rename-tag"
+vscode "waderyan.gitblame"
+vscode "wmaurer.change-case"
+vscode "mechatroner.rainbow-csv"
+vscode "mikestead.dotenv"
+vscode "tomoki1207.pdf"
+vscode "github.vscode-github-actions"
+vscode "gamunu.vscode-yarn"
+vscode "teabyii.ayu"
+vscode "ms-vscode.sublime-keybindings"
+
 # Mac App Store apps
 mas "Actions For Obsidian", id: 1659667937
 mas "Amphetamine", id: 937984704
@@ -62,8 +91,3 @@ mas "Rapidmg", id: 6451349778
 mas "The Unarchiver", id: 425424353
 mas "Things", id: 904280696
 mas "Xcode", id: 497799835
-
-# Let's try to not use these, see if Raycast is worth it
-# cask "moom"
-# cask "karabiner-elements"
-# cask "alfred"
