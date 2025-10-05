@@ -5,6 +5,7 @@ import subprocess
 import pathlib
 import re
 import shutil
+import argparse
 from datetime import datetime
 
 
@@ -80,6 +81,24 @@ def format_items(items, formatter):
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description='Audit installed applications against Brewfile manifests.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+This script compares installed packages (brew formulas, casks, and Mac App Store apps)
+against the declared packages in Brewfile manifests. It generates a markdown report at
+docs/APP_AUDIT.md with the following information:
+
+  - Installed packages not tracked in any Brewfile (consider adding or uninstalling)
+  - Declared packages not installed (install or remove from Brewfile)
+  - Status of optional Brewfile entries (Brewfile.work, Brewfile.personal)
+
+Required commands: brew, mas
+        '''
+    )
+    parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
+    parser.parse_args()
+
     check_dependencies()
 
     repo_root = get_repo_root()
