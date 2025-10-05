@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require 'shellwords'
+
+HELP_TEXT = <<~HELP
+  Usage: unfolderify [OPTIONS]
+
+  Move all files from subdirectories into the current directory.
+
+  OPTIONS:
+    -h, --help  Show this help message
+
+  DESCRIPTION:
+    Recursively moves all files from subdirectories into the current directory.
+    This is the reverse operation of folderify.
+    Subdirectories are not removed.
+HELP
+
+if ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+system(Shellwords.escape("mv ./*/**/*(.D) ."))
+# system(Shellwords.escape("rm -rf ./*/"))

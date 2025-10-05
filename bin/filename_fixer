@@ -1,0 +1,100 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+HELP_TEXT = <<~HELP
+  Usage: filename_fixer DIRECTORY [OPTIONS]
+
+  Clean up and standardize filenames in a directory.
+
+  ARGUMENTS:
+    DIRECTORY   Directory containing files to rename
+
+  OPTIONS:
+    -h, --help      Show this help message
+    dedot           Replace dots with spaces in filenames
+    strip_digits    Remove all numeric characters from filenames
+
+  DESCRIPTION:
+    Cleans up filenames by applying various transformations:
+    - Always removes extra whitespace
+    - Optionally replaces dots with spaces (dedot)
+    - Optionally removes digits (strip_digits)
+    File extensions are preserved.
+
+  EXAMPLES:
+    filename_fixer /path/to/dir dedot
+    filename_fixer /path/to/dir strip_digits dedot
+HELP
+
+# def folderify_one_file(file, directory_name)
+#   filename_parts = file.split('.')
+#   file_name_no_extension = filename_parts.take(filename_parts.size - 1).join
+#   old_path = "#{directory_name}/#{file}"
+#   new_path = "#{directory_name}/#{file_name_no_extension}/#{file}"
+#   FileUtils.mkdir_p("#{directory_name}/#{file_name_no_extension}/")
+#   FileUtils.mv(old_path, new_path)}
+#   puts "    #{file_name_no_extension}/#{file}"
+# end
+
+def strip_digits(filename_no_extension)
+  filename_no_extension.delete('0-9')
+end
+
+def dedot(filename_without_extension)
+  retval = filename_without_extension.gsub(/\./, ' ')
+end
+
+def clean_up_spaces(filename_without_extension)
+  filename_without_extension.squeeze(' ').strip
+end
+
+def fix_filenames(directory_name, options)
+  puts directory_name
+
+  all_files = Dir.entries(directory_name)
+  good_files = all_files - IGNORED_FILES
+
+  filename_hash = good_files.each_with_object({}) do |filename, hash|
+
+    filename_parts = filename.split('.')
+    file_extension = filename_parts.last
+    filename_no_extension = filename_parts.take(filename_parts.size - 1).join('.')
+
+    hash[filename] = filename_no_extension
+    hash[filename] = dedot(hash[filename]) if options.include?('dedot')
+    hash[filename] = strip_digits(hash[filename]) if options.include?('strip_digits')
+
+    hash[filename] = clean_up_spaces(hash[filename])
+
+    hash[filename] = "#{hash[filename]}.#{file_extension}"
+    hash
+  end
+
+  filename_hash.each do |old_name, new_name|
+    puts "Renaming #{old_name} to #{new_name}"
+    old_path = "#{directory_name}/#{old_name}"
+    new_path = "#{directory_name}/#{new_name}"
+    FileUtils.mv(old_path, new_path)
+  end
+
+  # options.each do |option|
+  # end
+
+
+  # puts "Folderifying #{good_files.count} files inside of #{directory_name}"
+  # good_files.each do |file|
+  #   folderify_one_file(file, directory_name)
+  # end
+end
+
+
+if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+dir = ARGV.slice!(0)
+fix_filenames(dir, ARGV)

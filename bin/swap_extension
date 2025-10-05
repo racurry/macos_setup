@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+HELP_TEXT = <<~HELP
+  Usage: swap_extension CURRENT_EXT NEW_EXT
+
+  Change file extensions in the current directory.
+
+  ARGUMENTS:
+    CURRENT_EXT   Current file extension (without dot)
+    NEW_EXT       New file extension (without dot)
+
+  OPTIONS:
+    -h, --help   Show this help message
+
+  DESCRIPTION:
+    Renames all files with CURRENT_EXT to have NEW_EXT instead.
+    Only operates on files in the current directory.
+
+  EXAMPLE:
+    swap_extension txt md
+HELP
+
+def change_file_extensions(current_extension, new_extension)
+  unless current_extension && new_extension
+    puts "Nope.  You gotta gimme the current and new extensions"
+    return
+  end
+
+  matching_files = Dir["./*.#{current_extension}"]
+
+  if matching_files.empty?
+    puts "Nuh uh.  There aren't any #{current_extension} files in this directory"
+    return
+  end
+
+  command = "for file in *.#{current_extension}; do mv \"$file\" \"${file%.#{current_extension}}.#{new_extension}\"; done"
+  system(command)
+  puts "Done.  Converted #{matching_files.count} files"
+end
+
+if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+current_extension, new_extension = *ARGV
+change_file_extensions(current_extension, new_extension)

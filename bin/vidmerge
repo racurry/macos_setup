@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+TEMPFILE='temp'
+
+HELP_TEXT = <<~HELP
+  Usage: vidmerge [OPTIONS] FILE1 FILE2 ... OUTPUT_NAME
+         vidmerge [OPTIONS] DIRECTORY OUTPUT_NAME
+
+  Merge multiple video files into a single MP4.
+
+  ARGUMENTS:
+    FILE1 FILE2...   Video files to merge
+    DIRECTORY        Directory containing video files to merge
+    OUTPUT_NAME      Name for the output file (without extension)
+
+  OPTIONS:
+    -h, --help      Show this help message
+    --delete-originals  Delete original files after merging
+
+  DESCRIPTION:
+    Concatenates video files using ffmpeg and outputs a single MP4 file.
+    When given a directory, merges all video files in alphabetical order.
+
+  EXAMPLES:
+    vidmerge video1.mp4 video2.mp4 merged
+    vidmerge -d /path/to/videos merged
+HELP
+
+def merge(filepaths, outputfile, delete_originals=false)
+
+  # Figure out if we have a directory, or a bunch of file names
+  if File.directory?(filepaths.first)
+    puts "Looks like we're combining a directory.  I hope the files are in order."
+    filenames = (Dir.entries(filepaths.first) - IGNORED_FILES).map { |x| "#{filepaths.first}/#{x}"}
+  else
+    filenames = filepaths
+  end
+
+  temp_filename = Shellwords.escape("#{TEMPFILE}#{File.extname(filepaths.first)}")
+  file_list = filenames.sort.map{ |x| Shellwords.escape(x) }.join(' ')
+  puts "Here we go, merging #{file_list}"
+  system("cat #{file_list} > #{temp_filename}")
+  system("ffmpeg -i #{temp_filename} -vcodec copy -acodec copy #{Shellwords.escape(outputfile)}.mp4")
+  system("rm #{temp_filename}")
+
+  if delete_originals
+    filepaths.each do |x|
+      system("rm -rf #{Shellwords.escape(x)}")
+    end
+  end
+end
+
+if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+all_args = ARGV
+delete_originals_param = all_args.delete('-d') || all_args.delete('--delete-originals')
+outputfile = all_args.pop
+merge(all_args, outputfile, !delete_originals_param.nil?)

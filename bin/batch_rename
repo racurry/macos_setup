@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+TEMPFILE='temp'
+
+HELP_TEXT = <<~HELP
+  Usage: batch_rename DIRECTORY BASE_NAME
+
+  Rename all files in a directory with a sequential numbering scheme.
+
+  ARGUMENTS:
+    DIRECTORY   Directory containing files to rename
+    BASE_NAME   Base name for renamed files (will be appended with numbers)
+
+  OPTIONS:
+    -h, --help  Show this help message
+
+  DESCRIPTION:
+    Renames all files in the specified directory to BASE_NAME1.ext, BASE_NAME2.ext, etc.
+    File extensions are preserved.
+HELP
+
+def rename(directory, desired_filename)
+
+  unless File.directory?(directory)
+    puts "Fuck off, this isn't a directory name"
+    return
+  end
+
+  filenames = (Dir.entries(directory) - IGNORED_FILES).map { |file| "#{directory}/#{file}"}
+  filenames.each_with_index do |existing_file, index|
+    file_extension = existing_file.split('.').last
+    new_file_name = "#{directory}/#{desired_filename}#{index+1}.#{file_extension}"
+    puts "Renaming #{existing_file} to #{new_file_name}"
+    system("mv #{Shellwords.escape(existing_file)} #{Shellwords.escape(new_file_name)}")
+  end
+end
+
+if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+directory, desired_filename = ARGV
+rename(directory, desired_filename)

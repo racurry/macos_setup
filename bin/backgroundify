@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+FUZZ = "25%"
+
+HELP_TEXT = <<~HELP
+  Usage: backgroundify SOURCE_DIR TARGET_DIR COLOR
+
+  Add a solid color background to transparent images.
+
+  ARGUMENTS:
+    SOURCE_DIR   Directory containing source images
+    TARGET_DIR   Directory where processed images will be saved
+    COLOR        Background color (e.g., 'white', '#FFFFFF', 'rgb(255,255,255)')
+
+  OPTIONS:
+    -h, --help  Show this help message
+
+  DESCRIPTION:
+    Uses ImageMagick's convert command to add a solid color background to
+    transparent images, replacing transparent pixels with the specified color.
+HELP
+
+def add_background(source_dir, target_dir, color)
+  if source_dir == target_dir
+    puts "Hey fuckwit, you're gonna overwrite your source images"
+  end
+
+  # Make sure the target_dir exists target_dir
+  FileUtils.mkdir_p target_dir
+
+  all_files = Dir.entries(source_dir)
+  images = all_files - IGNORED_FILES
+
+  puts "Adding #{color} background to"
+  images.each do |image_file|
+    puts "    #{image_file}"
+    image_path = Shellwords.escape("#{source_dir}/#{image_file}")
+    destination_image = Shellwords.escape("#{target_dir}/#{image_file}")
+    command = "convert #{image_path} -fill '#{color}' -fuzz #{FUZZ} -opaque none #{destination_image}"
+    system(command)
+  end
+end
+
+if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+source_dir, target_dir, color = *ARGV
+add_background(source_dir, target_dir, color)

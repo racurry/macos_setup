@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+HELP_TEXT = <<~HELP
+  Usage: mkvtomp4 FILE_OR_DIRECTORY
+
+  Convert MKV files to MP4 format using ffmpeg.
+
+  ARGUMENTS:
+    FILE_OR_DIRECTORY   Path to an MKV file or directory containing MKV files
+
+  OPTIONS:
+    -h, --help         Show this help message
+
+  DESCRIPTION:
+    Converts MKV video files to MP4 format using ffmpeg with codec copy (no re-encoding).
+    If given a directory, converts all MKV files in that directory.
+HELP
+
+def convert_file(file)
+  file_name_with_no_extension = file.split('.')[0...-1].join
+
+  if File.exists?("#{file_name_with_no_extension}.mkv")
+    puts "Converting #{file}"
+    escaped_file_name = Shellwords.escape(file_name_with_no_extension)
+    command = "ffmpeg -i #{escaped_file_name}.mkv -codec copy #{escaped_file_name}.mp4"
+    system(command)
+  else
+    puts "I couldn't find an mkv file called #{file}"
+  end
+end
+
+def convert_file_or_folder_of_files(file_or_folder_name)
+
+  unless File.exists?(file_or_folder_name)
+    puts "No such file or folder, dweebus"
+    return
+  end
+
+  is_directory = File.directory?(file_or_folder_name)
+
+  files_to_convert = if is_directory
+                        all_files = Dir.entries(file_or_folder_name)
+                        good_files = all_files - IGNORED_FILES
+                        good_files.map{ |x| "#{file_or_folder_name}/#{x}"}
+                      else
+                        [file_or_folder_name]
+                      end
+
+  files_to_convert.each do |file|
+    convert_file(File.realpath(file))
+  end
+end
+
+file_or_folder_name = *ARGV
+
+if file_or_folder_name.empty? || ['-h', '--help'].include?(file_or_folder_name.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+convert_file_or_folder_of_files(file_or_folder_name.first)
