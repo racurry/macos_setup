@@ -57,6 +57,7 @@ STEPS=(
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
   "ssh.sh"
+  "claude_code.sh"
 )
 
 for step in "${STEPS[@]}"; do

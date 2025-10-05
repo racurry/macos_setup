@@ -10,18 +10,21 @@ This is a collection of scripts and tools to enable the user to use consistent a
 
 When renaming or moving files:
 
-- ALWAYS search the codebases for references to those files and update them accordingly.
-- ALWAYS ensure that @tests/run.sh continues to pass
+- ALWAYS search the codebase for references to those files and update them accordingly
+- ALWAYS run @tests/run.sh after changes to verify nothing broke
 
-When writing scripts
+When writing scripts:
 
-- ALWAYS choose a language that offers the most utility; eg, a bash script that just generates python code should just be python.
-- ALWAYS include a "help" option that describes the script's purpose and usage.
+- ALWAYS choose the most appropriate language (e.g., write Python directly instead of bash that generates Python)
+- ALWAYS include a --help flag that describes purpose and usage
 
 When writing tests:
 
-- ALWAYS make sure tests are actually testing something useful
-- NEVER use mocking; our tests are lightweight smoke tests
+- ALWAYS run tests immediately after creating them to verify they pass
+- ALWAYS test end-to-end workflows that users depend on, not isolated implementation details
+- ALWAYS ensure a test failure indicates something meaningful is broken
+- NEVER write tests that only verify current implementation (e.g., testing exact log formats, internal variable names)
+- NEVER use mocking; write lightweight smoke tests only
 
 ## Key Commands
 
@@ -31,15 +34,9 @@ When writing tests:
 
 # Run all tests
 ./tests/run.sh
-```
 
-### Manual Execution of Individual Scripts
-
-```bash
-# Test individual setup steps
-./scripts/bash/preflight.sh
-./scripts/bash/brew_bundle.sh
-# ... etc for any script in scripts/bash/
+# Run a specific script
+./scripts/bash/{script_name}.sh
 ```
 
 ## Core Structure
