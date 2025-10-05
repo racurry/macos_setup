@@ -5,6 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+# Global flag
+SKIP_SUDO=false
+
 show_help() {
   cat << EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -12,12 +15,14 @@ Usage: $(basename "$0") [OPTIONS]
 Performs system requirements checks for macOS setup.
 
 OPTIONS:
+  --skip-sudo   Skip sudo availability check
   -h, --help    Show this help message and exit
 
 CHECKS PERFORMED:
   - Verifies script is not running as root
   - Validates working directory is repository root
-  - Checks required commands (defaults, sudo, xcode-select)
+  - Checks required commands (defaults, xcode-select)
+  - Checks sudo command availability (unless --skip-sudo)
   - Verifies Xcode Command Line Tools are installed
 
 EXIT CODES:
@@ -31,12 +36,16 @@ EOF
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
+    --skip-sudo)
+      SKIP_SUDO=true
+      shift
+      ;;
     -h|--help)
       show_help
       exit 0
       ;;
     *)
-      echo "Unknown option: $1" >&2
+      echo "Error: Unknown option '$1'" >&2
       show_help
       exit 1
       ;;
@@ -62,7 +71,13 @@ log_info "Repository root resolved to ${REPO_ROOT}"
 log_info "Bash version ${BASH_VERSION}"
 
 require_command defaults
-require_command sudo
+
+# Conditional sudo check
+if [[ "${SKIP_SUDO}" == "false" ]]; then
+  require_command sudo
+else
+  log_warn "Skipping sudo availability check (--skip-sudo flag set)"
+fi
 
 log_info "Preflight checks passed"
 
