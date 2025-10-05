@@ -6,16 +6,23 @@ Stuff to add to this setup
 ## Straightforward todos
 
 - [ ] Add VSCode extensions to the Brewfile(s)
-- [ ] Update the manual todo list with mini-guides for all the apps
-- [ ] Add output to lint.sh
-- [ ] Add claude code to repo w/ a claude code gh action for PRs etc
-- [ ] Make setup set a work/personal flag.  Make sure it is used for the Brewfile selection
-- [ ] Update folder creator to take a parent folder location
-- [ ] Consolidate 'magic' file and folder locations to one place. Should some single script just export them as env vars?
-- [ ] Give every script a help option
-- [ ] Give every script a "skip sudo" option
-- [ ] Add a script to pull the latest changes from the remote repository
+  - **Clarifying questions needed:**
+  - Should ALL 50 currently installed extensions be added, or only a curated subset?
+  - How should extensions be distributed across Brewfile/Brewfile.personal/Brewfile.work?
+  - Is VSCode Settings Sync currently being used? Does this conflict with Brewfile-based extension management?
+  - Which extensions are work-specific vs personal?
 - [ ] Create a script for updates; brew cleanup, brew update, brew upgrade, mas upgrade, get latest asdf versions, clear old dotfiles backups
+  - **Clarifying questions needed:**
+  - Standalone executable in /bin/ or bash script in /scripts/bash/?
+  - Should homebrew operations run on all Brewfiles or just installed packages?
+  - Should mas upgrade all apps or only those in Brewfile?
+  - For "get latest asdf versions": update plugins, update .tool-versions, or update to latest available versions?
+  - What defines "old" dotfiles backups? (keep N most recent, keep from last X days, prompt user?)
+  - Should it also clean ~/.ssh/backups/ or only ~/.dotfiles_backup/?
+  - Fully automated or interactive (ask for confirmation)?
+  - How to handle errors? (fail fast or continue and report at end?)
+- [ ] Update @scipts/python/audit_apps.py to write to ./tmp instead of /docs.  Add ./tmp to .gitignore
+- [ ] Update @scipts/python/audit_apps.py to document currently installed VS Code extensions
 
 ## Bigger picture things; needs more thought
 

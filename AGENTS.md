@@ -17,6 +17,10 @@ When writing scripts:
 
 - ALWAYS choose the most appropriate language (e.g., write Python directly instead of bash that generates Python)
 - ALWAYS include a --help flag that describes purpose and usage
+- ALWAYS use consistent flag formats:
+  - Help flag: `-h|--help` (both short and long forms)
+  - Boolean flags: `--flag-name` (long form only, use hyphens not underscores)
+  - Positional arguments for main parameters (e.g., parent directory, file path)
 
 When writing tests:
 
