@@ -38,12 +38,12 @@ done
 
 print_heading "Configure AI Coding Agents"
 
-AI_AGENTS_DIR="${HOME}/.ai_agents"
+CLAUDE_DIR="${SETUP_PATH_CLAUDE}"
 SRC="${REPO_ROOT}/apps/ai_coding/AGENTS.md"
-DEST="${AI_AGENTS_DIR}/AGENTS.md"
+DEST="${CLAUDE_DIR}/AGENTS.md"
 
 require_file "${SRC}"
-mkdir -p "${AI_AGENTS_DIR}"
+mkdir -p "${CLAUDE_DIR}"
 
 if [[ -L "${DEST}" ]]; then
   current_target="$(readlink "${DEST}")"

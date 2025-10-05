@@ -30,7 +30,7 @@ install_homebrew() {
 
     require_command curl
 
-    brew_path="/opt/homebrew/bin/brew"
+    brew_path="${SETUP_PATH_HOMEBREW_BIN}"
     if [[ -x "${brew_path}" ]]; then
         # Homebrew is already installed; but is it sourced?
         if command -v brew >/dev/null 2>&1; then
