@@ -3,12 +3,12 @@
 
 # Determine repo root relative to this file.
 COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# COMMON_DIR is lib/bash, so bubble up two levels to reach the repo root.
+REPO_ROOT="$(cd "${COMMON_DIR}/../.." && pwd)"
 
 # Source paths for centralized path definitions
 # shellcheck source=lib/bash/paths.sh
 source "${COMMON_DIR}/paths.sh"
-
-REPO_ROOT="${PATHS_REPO_ROOT}"
 LOG_TAG="setup"
 
 # Color codes for readability.
