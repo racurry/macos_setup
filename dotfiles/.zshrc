@@ -42,7 +42,6 @@ source_brew_plugin() {
 source_brew_plugin "opt/fzf/shell/completion.zsh"
 source_brew_plugin "opt/fzf/shell/key-bindings.zsh"
 source_brew_plugin "share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-source_brew_plugin "share/zsh-you-should-use/you-should-use.plugin.zsh"
 source_brew_plugin "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"  # Must be last
 
 unset -f source_brew_plugin
