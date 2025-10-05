@@ -79,9 +79,13 @@ jobs:
             4. Create a pull request with:
                - A clear title summarizing the changes
                - A description explaining what was done and why
-               - Reference to the issue being fixed (e.g., "Fixes #4")
-            5. DO NOT merge the PR - leave it open for review
-            6. If you cannot create a PR for any reason (permissions, errors, etc.):
+               - IMPORTANT: Include "Fixes #${{ github.event.issue.number }}" in the PR body to link it to this issue
+            5. After successfully creating the PR:
+               - Comment on the issue with a link to the PR
+               - Include a brief summary of what was implemented
+               - Use format: "I've created PR #<number> to address this issue. <brief summary>"
+            6. DO NOT merge the PR - leave it open for review
+            7. If you cannot create a PR for any reason (permissions, errors, etc.):
                - Add a comment to the issue explaining what you accomplished
                - Include details about what changes were made
                - Explain why a PR could not be created
