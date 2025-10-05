@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] [DIRECTORY]
+
+Move all files from subdirectories to the parent directory (reverse of folderify).
+
+ARGUMENTS:
+  DIRECTORY    Directory to process (defaults to current directory)
+
+OPTIONS:
+  -h, --help   Show this help message and exit
+
+DESCRIPTION:
+  This script moves all files from subdirectories up to the parent directory,
+  effectively flattening the directory structure. It's the reverse operation
+  of folderify.
+
+EXAMPLES:
+  #{File.basename($0)}           # Process current directory
+  #{File.basename($0)} ~/Downloads/
+
+WARNING:
+  This operation may overwrite files with the same name. Use with caution.
+
+EOF
+end
+
+def unfolderify_directory(target_dir)
+  unless File.directory?(target_dir)
+    puts "Error: '#{target_dir}' is not a valid directory"
+    exit 1
+  end
+
+  puts "Flattening directory structure in #{target_dir}..."
+  moved_count = 0
+
+  Dir.entries(target_dir).each do |entry|
+    next if entry == '.' || entry == '..' || entry == '.DS_Store'
+    
+    entry_path = File.join(target_dir, entry)
+    next unless File.directory?(entry_path)
+    
+    # Move all files from this subdirectory to parent
+    Dir.entries(entry_path).each do |file|
+      next if file == '.' || file == '..' || file == '.DS_Store'
+      
+      source_path = File.join(entry_path, file)
+      next if File.directory?(source_path)  # Skip nested directories
+      
+      dest_path = File.join(target_dir, file)
+      
+      # Check for name conflicts
+      if File.exists?(dest_path)
+        puts "  Warning: Skipping #{file} - already exists in target directory"
+        next
+      end
+      
+      FileUtils.mv(source_path, dest_path)
+      puts "  #{entry}/#{file} -> #{file}"
+      moved_count += 1
+    end
+    
+    # Remove empty directory
+    if Dir.entries(entry_path).reject { |f| f == '.' || f == '..' || f == '.DS_Store' }.empty?
+      FileUtils.rmdir(entry_path)
+      puts "  Removed empty directory: #{entry}/"
+    else
+      puts "  Warning: Directory #{entry}/ not empty, keeping it"
+    end
+  end
+  
+  puts "Moved #{moved_count} files to parent directory"
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+target_directory = ARGV[0] || Dir.pwd
+unfolderify_directory(target_directory)

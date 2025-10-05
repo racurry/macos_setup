@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+FUZZ = "25%"
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] SOURCE_DIR TARGET_DIR COLOR
+
+Add a background color to transparent PNG images.
+
+ARGUMENTS:
+  SOURCE_DIR    Directory containing source images
+  TARGET_DIR    Directory where processed images will be saved
+  COLOR         Background color (e.g., '#555555', 'white', 'red')
+
+OPTIONS:
+  -h, --help    Show this help message and exit
+
+DESCRIPTION:
+  This script processes all images in the source directory, adding the specified
+  background color to transparent areas. The processed images are saved to the
+  target directory with the same filenames.
+
+  Requires ImageMagick (convert command).
+
+EXAMPLES:
+  #{File.basename($0)} ./source ./output '#555555'
+  #{File.basename($0)} ~/images ~/processed white
+
+EOF
+end
+
+def add_background(source_dir, target_dir, color)
+  if source_dir == target_dir
+    puts "Error: Source and target directories cannot be the same (would overwrite source images)"
+    exit 1
+  end
+
+  unless File.directory?(source_dir)
+    puts "Error: Source directory '#{source_dir}' does not exist"
+    exit 1
+  end
+
+  # Make sure the target_dir exists
+  FileUtils.mkdir_p target_dir
+
+  all_files = Dir.entries(source_dir)
+  images = all_files - IGNORED_FILES
+
+  if images.empty?
+    puts "No images found in source directory"
+    return
+  end
+
+  puts "Adding #{color} background to #{images.length} images..."
+  images.each do |image_file|
+    puts "  Processing: #{image_file}"
+    image_path = Shellwords.escape("#{source_dir}/#{image_file}")
+    destination_image = Shellwords.escape("#{target_dir}/#{image_file}")
+    command = "convert #{image_path} -fill '#{color}' -fuzz #{FUZZ} -opaque none #{destination_image}"
+    unless system(command)
+      puts "Warning: Failed to process #{image_file}"
+    end
+  end
+  puts "Background processing complete"
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+if ARGV.length != 3
+  puts "Error: Wrong number of arguments"
+  puts ""
+  show_help
+  exit 1
+end
+
+source_dir, target_dir, color = ARGV
+add_background(source_dir, target_dir, color)

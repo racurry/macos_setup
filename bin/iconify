@@ -1,0 +1,92 @@
+#!/bin/bash
+set -euo pipefail
+
+show_help() {
+  cat << EOF
+Usage: $(basename "$0") [OPTIONS] SOURCE_IMAGE
+
+Generate macOS icon (.icns) file from a source image.
+
+ARGUMENTS:
+  SOURCE_IMAGE    Source image file (PNG, JPG, etc.)
+
+OPTIONS:
+  -h, --help      Show this help message and exit
+
+DESCRIPTION:
+  This script creates a macOS .icns icon file from a source image by
+  generating all required icon sizes (16x16 to 1024x1024) and creating
+  an iconset bundle.
+
+  Requires ImageMagick (convert command) and iconutil (macOS built-in).
+
+EXAMPLES:
+  $(basename "$0") logo.png
+  $(basename "$0") ~/Pictures/app-icon.jpg
+
+OUTPUT:
+  Creates icon.icns in the current directory
+
+EOF
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      SOURCE="$1"
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "${SOURCE:-}" ]]; then
+  echo "Error: No source image specified"
+  echo ""
+  show_help
+  exit 1
+fi
+
+if [[ ! -f "$SOURCE" ]]; then
+  echo "Error: Source image '$SOURCE' does not exist"
+  exit 1
+fi
+
+# Check for required commands
+if ! command -v convert >/dev/null 2>&1; then
+  echo "Error: ImageMagick 'convert' command not found. Please install ImageMagick."
+  exit 1
+fi
+
+if ! command -v iconutil >/dev/null 2>&1; then
+  echo "Error: 'iconutil' command not found. This script requires macOS."
+  exit 1
+fi
+
+ICONSET="icon.iconset"
+
+echo "Creating iconset from $SOURCE..."
+
+# Clean up any existing iconset
+rm -rf "$ICONSET"
+mkdir -p "$ICONSET"
+
+# Generate all required icon sizes
+sizes=(16 32 128 256 512)
+for size in "${sizes[@]}"; do
+  echo "  Generating ${size}x${size} icons..."
+  convert "$SOURCE" -resize "${size}x${size}" "$ICONSET/icon_${size}x${size}.png"
+  convert "$SOURCE" -resize "$((size * 2))x$((size * 2))" "$ICONSET/icon_${size}x${size}@2x.png"
+done
+
+echo "Creating .icns file..."
+iconutil -c icns "$ICONSET"
+
+# Clean up iconset directory
+rm -rf "$ICONSET"
+
+echo "Icon created: icon.icns"

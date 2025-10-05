@@ -1,0 +1,129 @@
+#!/usr/bin/env ruby
+require 'open3'
+require 'shellwords'
+require 'fileutils'
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] IMAGE_FILE
+
+Perform OCR (Optical Character Recognition) on an image file.
+
+ARGUMENTS:
+  IMAGE_FILE      Image file to process (PDF, PNG, JPG, etc.)
+
+OPTIONS:
+  -h, --help      Show this help message and exit
+
+DESCRIPTION:
+  This script converts an image or PDF file to a searchable PDF using OCR.
+  It first converts the input to an optimized TIFF format, then uses
+  Tesseract OCR to create a searchable PDF.
+
+  Requires ImageMagick (convert command) and Tesseract OCR.
+
+EXAMPLES:
+  #{File.basename($0)} document.pdf
+  #{File.basename($0)} scanned-page.jpg
+
+OUTPUT:
+  Creates a searchable PDF with suffix "-ocred.pdf"
+
+EOF
+end
+
+def ocrify_file(filename)
+  unless File.exists?(filename)
+    puts "Error: File '#{filename}' does not exist"
+    exit 1
+  end
+
+  filename_parts = filename.split('.')
+  file_extension = filename_parts.last
+  filename_no_extension = filename_parts.take(filename_parts.size - 1).join('.')
+
+  tiff_file = "#{filename_no_extension}.tif"
+  output_base = "#{filename_no_extension}-ocred"
+  output_file = "#{output_base}.pdf"
+
+  if File.exists?(output_file)
+    puts "Output file #{output_file} already exists"
+    exit 1
+  end
+
+  # Check for required commands
+  unless system('which convert > /dev/null 2>&1')
+    puts "Error: ImageMagick 'convert' command not found. Please install ImageMagick."
+    exit 1
+  end
+
+  unless system('which tesseract > /dev/null 2>&1')
+    puts "Error: Tesseract OCR not found. Please install tesseract."
+    exit 1
+  end
+
+  puts "Processing: #{filename}"
+
+  # Convert to optimized TIFF for OCR
+  convert_cmd = [
+    'convert',
+    '-density', '300',
+    Shellwords.escape(filename),
+    '-type', 'Grayscale',
+    '-compress', 'lzw',
+    '-background', 'white',
+    '-flatten',
+    '+matte',
+    '-depth', '32',
+    Shellwords.escape(tiff_file)
+  ].join(' ')
+
+  puts "Converting to TIFF for OCR..."
+  success = system(convert_cmd)
+  unless success
+    puts "Error: Failed to convert image to TIFF format"
+    exit 1
+  end
+
+  # Run OCR with Tesseract
+  tesseract_cmd = [
+    'tesseract',
+    Shellwords.escape(tiff_file),
+    Shellwords.escape(output_base),
+    '-l', 'eng',
+    'pdf'
+  ].join(' ')
+
+  puts "Running OCR..."
+  success = system(tesseract_cmd)
+  
+  # Clean up temporary TIFF file
+  FileUtils.rm(tiff_file) if File.exists?(tiff_file)
+
+  unless success
+    puts "Error: OCR processing failed"
+    exit 1
+  end
+
+  if File.exists?(output_file)
+    puts "OCR completed successfully: #{output_file}"
+  else
+    puts "Error: Expected output file was not created"
+    exit 1
+  end
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+if ARGV.empty?
+  puts "Error: No file specified"
+  puts ""
+  show_help
+  exit 1
+end
+
+ocrify_file(ARGV.first)

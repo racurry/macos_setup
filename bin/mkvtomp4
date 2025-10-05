@@ -1,0 +1,109 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] FILE_OR_DIRECTORY
+
+Convert MKV files to MP4 format using ffmpeg.
+
+ARGUMENTS:
+  FILE_OR_DIRECTORY    Single MKV file or directory containing MKV files
+
+OPTIONS:
+  -h, --help          Show this help message and exit
+
+DESCRIPTION:
+  This script converts MKV video files to MP4 format using ffmpeg with
+  codec copy (no re-encoding). It can process a single file or all MKV
+  files in a directory.
+
+  Requires ffmpeg.
+
+EXAMPLES:
+  #{File.basename($0)} video.mkv
+  #{File.basename($0)} ~/Videos/
+
+EOF
+end
+
+def convert_file(file)
+  file_name_with_no_extension = file.split('.')[0...-1].join('.')
+
+  mkv_file = "#{file_name_with_no_extension}.mkv"
+  mp4_file = "#{file_name_with_no_extension}.mp4"
+
+  unless File.exists?(mkv_file)
+    puts "Error: Could not find MKV file: #{mkv_file}"
+    return false
+  end
+
+  if File.exists?(mp4_file)
+    puts "Skipping #{File.basename(mkv_file)} - MP4 already exists"
+    return true
+  end
+
+  puts "Converting #{File.basename(mkv_file)}..."
+  escaped_mkv = Shellwords.escape(mkv_file)
+  escaped_mp4 = Shellwords.escape(mp4_file)
+  command = "ffmpeg -i #{escaped_mkv} -codec copy #{escaped_mp4}"
+  
+  success = system(command)
+  unless success
+    puts "Error: Failed to convert #{File.basename(mkv_file)}"
+  end
+  
+  success
+end
+
+def convert_file_or_folder_of_files(file_or_folder_name)
+  unless File.exists?(file_or_folder_name)
+    puts "Error: No such file or directory: #{file_or_folder_name}"
+    exit 1
+  end
+
+  is_directory = File.directory?(file_or_folder_name)
+
+  files_to_convert = if is_directory
+                        all_files = Dir.entries(file_or_folder_name)
+                        good_files = all_files - IGNORED_FILES
+                        mkv_files = good_files.select { |f| f.downcase.end_with?('.mkv') }
+                        mkv_files.map { |x| "#{file_or_folder_name}/#{x}" }
+                      else
+                        [file_or_folder_name]
+                      end
+
+  if files_to_convert.empty?
+    puts "No MKV files found to convert"
+    return
+  end
+
+  puts "Found #{files_to_convert.length} MKV file(s) to convert"
+  success_count = 0
+  
+  files_to_convert.each do |file|
+    if convert_file(File.realpath(file))
+      success_count += 1
+    end
+  end
+  
+  puts "Successfully converted #{success_count}/#{files_to_convert.length} files"
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+if ARGV.empty?
+  puts "Error: No file or directory specified"
+  puts ""
+  show_help
+  exit 1
+end
+
+convert_file_or_folder_of_files(ARGV.first)

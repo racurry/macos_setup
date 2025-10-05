@@ -1,0 +1,144 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+require 'tempfile'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] VIDEO1 [VIDEO2 ...] OUTPUT_NAME
+
+Combine multiple video files into one MP4.
+
+ARGUMENTS:
+  VIDEO1, VIDEO2...    Video files to merge (or a directory containing videos)
+  OUTPUT_NAME         Name for the output file (without .mp4 extension)
+
+OPTIONS:
+  -d, --delete        Delete original files after successful merge
+  -h, --help          Show this help message and exit
+
+DESCRIPTION:
+  This script combines multiple video files into a single MP4 file using ffmpeg.
+  Videos are merged in the order specified (or alphabetical order if a directory
+  is provided).
+
+  Requires ffmpeg.
+
+EXAMPLES:
+  #{File.basename($0)} video1.mp4 video2.mp4 video3.mp4 combined
+  #{File.basename($0)} -d part1.mp4 part2.mp4 final_video
+  #{File.basename($0)} ~/video_parts/ complete_movie
+
+EOF
+end
+
+def merge_videos(filepaths, outputfile, delete_originals = false)
+  if filepaths.empty?
+    puts "Error: No input files specified"
+    exit 1
+  end
+
+  # Figure out if we have a directory, or a bunch of file names
+  if filepaths.length == 1 && File.directory?(filepaths.first)
+    puts "Processing directory: #{filepaths.first}"
+    all_files = Dir.entries(filepaths.first) - IGNORED_FILES
+    video_extensions = %w[.mp4 .mov .avi .mkv .m4v .flv .wmv]
+    video_files = all_files.select { |f| video_extensions.include?(File.extname(f).downcase) }
+    
+    if video_files.empty?
+      puts "No video files found in directory"
+      exit 1
+    end
+    
+    filenames = video_files.sort.map { |x| File.join(filepaths.first, x) }
+  else
+    filenames = filepaths
+  end
+
+  # Validate input files
+  filenames.each do |file|
+    unless File.exists?(file)
+      puts "Error: File not found: #{file}"
+      exit 1
+    end
+  end
+
+  output_file = "#{outputfile}.mp4"
+  
+  if File.exists?(output_file)
+    puts "Error: Output file #{output_file} already exists"
+    exit 1
+  end
+
+  puts "Merging #{filenames.length} video files:"
+  filenames.each_with_index do |file, index|
+    puts "  #{index + 1}. #{File.basename(file)}"
+  end
+
+  # Create a temporary file list for ffmpeg concat
+  temp_list = Tempfile.new(['vidmerge_list', '.txt'])
+  
+  begin
+    filenames.each do |file|
+      temp_list.puts("file '#{file}'")
+    end
+    temp_list.close
+
+    # Use ffmpeg concat demuxer for better quality
+    command = "ffmpeg -f concat -safe 0 -i #{Shellwords.escape(temp_list.path)} -c copy #{Shellwords.escape(output_file)}"
+    
+    puts "Running ffmpeg..."
+    success = system(command)
+    
+    unless success
+      puts "Error: ffmpeg failed to merge videos"
+      exit 1
+    end
+
+    puts "Successfully created: #{output_file}"
+
+    if delete_originals
+      puts "Deleting original files..."
+      filenames.each do |file|
+        begin
+          FileUtils.rm(file)
+          puts "  Deleted: #{File.basename(file)}"
+        rescue => e
+          puts "  Warning: Could not delete #{file}: #{e.message}"
+        end
+      end
+    end
+
+  ensure
+    temp_list.unlink if temp_list
+  end
+end
+
+# Parse command line arguments
+delete_originals = false
+args = ARGV.dup
+
+if args.include?('-h') || args.include?('--help')
+  show_help
+  exit 0
+end
+
+if args.include?('-d') || args.include?('--delete')
+  delete_originals = true
+  args.delete('-d')
+  args.delete('--delete')
+end
+
+if args.length < 2
+  puts "Error: Not enough arguments"
+  puts ""
+  show_help
+  exit 1
+end
+
+outputfile = args.pop
+input_files = args
+
+merge_videos(input_files, outputfile, delete_originals)

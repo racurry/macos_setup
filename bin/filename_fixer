@@ -1,0 +1,143 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] DIRECTORY [ACTIONS...]
+
+Fix problematic filenames in a directory by applying various cleanup actions.
+
+ARGUMENTS:
+  DIRECTORY       Directory containing files to rename
+
+ACTIONS:
+  dedot          Replace dots with spaces in filenames
+  strip_digits   Remove all digits from filenames
+
+OPTIONS:
+  -h, --help     Show this help message and exit
+
+DESCRIPTION:
+  This script cleans up filenames by applying the specified actions. It will
+  always clean up multiple spaces and trim whitespace from filenames.
+
+EXAMPLES:
+  #{File.basename($0)} ~/Downloads/ dedot
+  #{File.basename($0)} ~/Documents/ dedot strip_digits
+
+EOF
+end
+
+def strip_digits(filename_no_extension)
+  filename_no_extension.delete('0-9')
+end
+
+def dedot(filename_without_extension)
+  filename_without_extension.gsub(/\./, ' ')
+end
+
+def clean_up_spaces(filename_without_extension)
+  filename_without_extension.squeeze(' ').strip
+end
+
+def fix_filenames(directory_name, options)
+  unless File.directory?(directory_name)
+    puts "Error: '#{directory_name}' is not a valid directory"
+    exit 1
+  end
+
+  puts "Processing files in: #{directory_name}"
+
+  all_files = Dir.entries(directory_name)
+  good_files = all_files - IGNORED_FILES
+  
+  # Only process actual files, not directories
+  actual_files = good_files.select { |f| File.file?(File.join(directory_name, f)) }
+
+  if actual_files.empty?
+    puts "No files found to process"
+    return
+  end
+
+  puts "Found #{actual_files.length} files to process with options: #{options.join(', ')}"
+
+  filename_hash = actual_files.each_with_object({}) do |filename, hash|
+    filename_parts = filename.split('.')
+    file_extension = filename_parts.last
+    filename_no_extension = filename_parts.take(filename_parts.size - 1).join('.')
+
+    new_name = filename_no_extension
+    new_name = dedot(new_name) if options.include?('dedot')
+    new_name = strip_digits(new_name) if options.include?('strip_digits')
+    new_name = clean_up_spaces(new_name)
+
+    # Skip if filename didn't change
+    new_filename = "#{new_name}.#{file_extension}"
+    hash[filename] = new_filename unless filename == new_filename
+  end
+
+  if filename_hash.empty?
+    puts "No files need renaming"
+    return
+  end
+
+  puts "Renaming #{filename_hash.length} files:"
+  success_count = 0
+
+  filename_hash.each do |old_name, new_name|
+    old_path = File.join(directory_name, old_name)
+    new_path = File.join(directory_name, new_name)
+
+    if File.exists?(new_path)
+      puts "  Skipping #{old_name} -> #{new_name} (target exists)"
+      next
+    end
+
+    begin
+      FileUtils.mv(old_path, new_path)
+      puts "  #{old_name} -> #{new_name}"
+      success_count += 1
+    rescue => e
+      puts "  Error renaming #{old_name}: #{e.message}"
+    end
+  end
+
+  puts "Successfully renamed #{success_count}/#{filename_hash.length} files"
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+if ARGV.empty?
+  puts "Error: No directory specified"
+  puts ""
+  show_help
+  exit 1
+end
+
+directory = ARGV.shift
+options = ARGV
+
+if options.empty?
+  puts "No actions specified. Available actions: dedot, strip_digits"
+  puts "Use -h for help."
+  exit 1
+end
+
+# Validate options
+valid_options = %w[dedot strip_digits]
+invalid_options = options - valid_options
+
+unless invalid_options.empty?
+  puts "Error: Invalid actions: #{invalid_options.join(', ')}"
+  puts "Valid actions: #{valid_options.join(', ')}"
+  exit 1
+end
+
+fix_filenames(directory, options)

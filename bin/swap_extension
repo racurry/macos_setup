@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] OLD_EXTENSION NEW_EXTENSION
+
+Change file extensions in the current directory.
+
+ARGUMENTS:
+  OLD_EXTENSION    Current file extension (without dot)
+  NEW_EXTENSION    New file extension (without dot)
+
+OPTIONS:
+  -h, --help       Show this help message and exit
+
+DESCRIPTION:
+  This script renames all files with the specified extension in the current
+  directory to use the new extension. Only the extension is changed; the
+  filename remains the same.
+
+EXAMPLES:
+  #{File.basename($0)} txt md      # Changes all .txt files to .md
+  #{File.basename($0)} jpeg jpg    # Changes all .jpeg files to .jpg
+
+EOF
+end
+
+def change_file_extensions(current_extension, new_extension)
+  unless current_extension && new_extension
+    puts "Error: Both current and new extensions must be specified"
+    exit 1
+  end
+
+  # Remove leading dots if provided
+  current_extension = current_extension.sub(/^\./, '')
+  new_extension = new_extension.sub(/^\./, '')
+
+  matching_files = Dir["./*.#{current_extension}"]
+
+  if matching_files.empty?
+    puts "No .#{current_extension} files found in current directory"
+    return
+  end
+
+  puts "Found #{matching_files.count} .#{current_extension} files to rename:"
+  
+  success_count = 0
+  matching_files.each do |file|
+    basename = File.basename(file, ".#{current_extension}")
+    new_filename = "#{basename}.#{new_extension}"
+    
+    if File.exists?(new_filename)
+      puts "  Skipping #{file} - #{new_filename} already exists"
+      next
+    end
+    
+    begin
+      FileUtils.mv(file, new_filename)
+      puts "  #{File.basename(file)} -> #{new_filename}"
+      success_count += 1
+    rescue => e
+      puts "  Error renaming #{file}: #{e.message}"
+    end
+  end
+  
+  puts "Successfully renamed #{success_count}/#{matching_files.count} files"
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+if ARGV.length != 2
+  puts "Error: Wrong number of arguments"
+  puts ""
+  show_help
+  exit 1
+end
+
+current_extension, new_extension = ARGV
+change_file_extensions(current_extension, new_extension)

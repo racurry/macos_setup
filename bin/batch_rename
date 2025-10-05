@@ -1,0 +1,81 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+def show_help
+  puts <<~EOF
+Usage: #{File.basename($0)} [OPTIONS] DIRECTORY PREFIX
+
+Rename all files in a directory with a common prefix and sequential numbers.
+
+ARGUMENTS:
+  DIRECTORY     Directory containing files to rename
+  PREFIX        Common prefix for all renamed files
+
+OPTIONS:
+  -h, --help    Show this help message and exit
+
+DESCRIPTION:
+  This script renames all files in the specified directory, giving them all
+  the same prefix followed by a sequential number (starting from 1) and
+  preserving the original file extension.
+
+EXAMPLES:
+  #{File.basename($0)} ~/Downloads "Vacation Photo"
+  # Renames files to: "Vacation Photo1.jpg", "Vacation Photo2.jpg", etc.
+
+  #{File.basename($0)} ./documents "Report"
+  # Renames files to: "Report1.pdf", "Report2.docx", etc.
+
+EOF
+end
+
+def rename_files(directory, desired_filename)
+  unless File.directory?(directory)
+    puts "Error: '#{directory}' is not a valid directory"
+    exit 1
+  end
+
+  filenames = (Dir.entries(directory) - IGNORED_FILES).map { |file| "#{directory}/#{file}"}
+  
+  if filenames.empty?
+    puts "No files found in directory"
+    return
+  end
+
+  puts "Renaming #{filenames.length} files with prefix '#{desired_filename}'..."
+  
+  filenames.each_with_index do |existing_file, index|
+    # Skip if it's a directory
+    next if File.directory?(existing_file)
+    
+    file_extension = existing_file.split('.').last
+    new_file_name = "#{directory}/#{desired_filename}#{index+1}.#{file_extension}"
+    
+    puts "  #{File.basename(existing_file)} -> #{File.basename(new_file_name)}"
+    
+    unless system("mv #{Shellwords.escape(existing_file)} #{Shellwords.escape(new_file_name)}")
+      puts "Warning: Failed to rename #{existing_file}"
+    end
+  end
+  
+  puts "Batch rename complete"
+end
+
+# Parse command line arguments
+if ARGV.include?('-h') || ARGV.include?('--help')
+  show_help
+  exit 0
+end
+
+if ARGV.length != 2
+  puts "Error: Wrong number of arguments"
+  puts ""
+  show_help
+  exit 1
+end
+
+directory, desired_filename = ARGV
+rename_files(directory, desired_filename)
