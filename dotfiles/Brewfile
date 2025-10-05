@@ -52,6 +52,7 @@ cask "superhuman"
 cask "textbuddy"
 cask "utm"
 cask "visual-studio-code"
+vscode "anthropic.claude-code"
 
 # Mac App Store apps
 mas "Actions For Obsidian", id: 1659667937

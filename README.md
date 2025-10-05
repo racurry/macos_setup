@@ -28,6 +28,17 @@ This will run the full setup process.  Sometimes, it might need manual intervent
 
 ## What's in here?
 
+## AI Automation
+
+This repository uses [Claude Code](https://docs.anthropic.com/claude/docs/claude-code) for automated development assistance:
+
+- **GitHub Actions Integration**: Trigger Claude by mentioning `@claude` in issues, PRs, or comments
+- **Automated Code Reviews**: Claude reviews all pull requests automatically
+- **Issue Triage**: Automated labeling and categorization of issues
+- **Local CLI & VSCode Extension**: Use Claude directly in your development environment
+
+See the [Claude Code setup guide](./apps/claude_code/setup.md) for configuration details and OAuth token setup.
+
 ## Stuff that is managed
 
 - App management via [Homebrew](https://brew.sh/) and [mas](https://github.com/mas-cli/mas) using the [Brewfile](./dotfiles/Brewfile)
