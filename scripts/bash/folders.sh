@@ -7,17 +7,14 @@ source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
   cat << EOF
-Usage: $(basename "$0") [OPTIONS]
+Usage: $(basename "$0") [PARENT_DIR]
 
-Create a standard set of organizational folders in the Documents directory.
+Create organizational folder structure in the specified parent directory.
 
-OPTIONS:
-  -h, --help    Show this help message and exit
+Arguments:
+  PARENT_DIR    Parent directory for folders (default: ~/Documents)
 
-DESCRIPTION:
-  This script creates a predefined set of folders in ~/Documents for organizing
-  documents and projects. The folders created include:
-
+Folders created:
   - @auto (automated/scripted content)
   - 000_Inbox (incoming items to be processed)
   - 100_Life (personal life organization)
@@ -28,29 +25,40 @@ DESCRIPTION:
   - 800_Posterity (long-term archival)
   - 999_Meta (meta information about the system)
 
-  If a folder already exists, it will be left unchanged.
+Options:
+  -h, --help    Show this help message
+
+Examples:
+  $(basename "$0")                           # Create in ~/Documents (default)
+  $(basename "$0") ~/iCloud/Documents        # Create in iCloud
+  $(basename "$0") "/path/to/DevonThink"    # Create in DevonThink
 
 EOF
 }
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      show_help
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      show_help
-      exit 1
-      ;;
-  esac
-done
+# Parse arguments
+case ${1:-} in
+  -h|--help)
+    show_help
+    exit 0
+    ;;
+esac
+
+# Set parent directory (default to ~/Documents)
+DOCS_DIR="${1:-${HOME}/Documents}"
+
+# Expand tilde if present
+DOCS_DIR="${DOCS_DIR/#\~/${HOME}}"
 
 print_heading "Make folders how I like em"
 
-DOCS_DIR="${HOME}/Documents"
+log_info "Parent directory: ${DOCS_DIR}"
+
+# Ensure parent directory exists
+if [[ ! -d "${DOCS_DIR}" ]]; then
+  log_error "Parent directory does not exist: ${DOCS_DIR}"
+  exit 1
+fi
 
 folders=(
   "@auto"
@@ -63,9 +71,6 @@ folders=(
   "800_Posterity"
   "999_Meta"
 )
-
-log_info "Checking the docs dir ${DOCS_DIR}"
-mkdir -p "${DOCS_DIR}"
 
 for folder in "${folders[@]}"; do
   target="${DOCS_DIR}/${folder}"

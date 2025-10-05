@@ -106,7 +106,7 @@ prompt_setup_mode
 STEPS=(
   "mvp_system_reqs_check.sh"
   "brew.sh install"
-  "folders.sh"
+  "folders.sh ${HOME}/Documents"
   "icloud.sh"
   "macos_settings.sh global"
   "macos_settings.sh input"
