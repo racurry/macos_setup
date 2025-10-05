@@ -8,7 +8,7 @@ jobs:
   claude-review:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: read
       id-token: write
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         id: claude-review
@@ -35,8 +35,11 @@ jobs:
             1. Read CLAUDE.md and @AGENTS.md for repository guidelines
             2. Use `gh pr diff` to see what changed
             3. Read the changed files to understand the context
-            4. Use `gh pr comment` to provide feedback directly on specific lines
-            5. Run tests if appropriate to verify the changes work
+            4. Fix issues directly when appropriate:
+               - Auto-fix: linting errors, formatting issues, simple bugs, typos
+               - Comment only: complex logic changes, architectural decisions, security concerns
+            5. Use `gh pr comment` to explain what you fixed or suggest manual changes
+            6. Run tests if appropriate to verify the changes work
 
             Focus your review on:
             - Following repository conventions from AGENTS.md
@@ -50,4 +53,6 @@ jobs:
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
-          claude_args: '--allowed-tools "Bash(gh *),Bash(./tests/*),Read(**),Glob(**),Grep(**),TodoWrite" --model sonnet'
+          claude_args: '--allowed-tools "Bash(gh *),Bash(./tests/*),Bash(git *),Read(**),Glob(**),Grep(**),Edit(**),Write(**),TodoWrite" --model sonnet'
+          track_progress: true
+          use_sticky_comment: true
