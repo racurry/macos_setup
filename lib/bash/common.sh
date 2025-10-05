@@ -8,7 +8,6 @@ COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/paths.sh
 source "${COMMON_DIR}/paths.sh"
 
-# Use PATHS_REPO_ROOT from paths.sh as REPO_ROOT for backward compatibility
 REPO_ROOT="${PATHS_REPO_ROOT}"
 LOG_TAG="setup"
 

@@ -8,8 +8,8 @@ setup() {
   export HOME="${TEST_TMPDIR}/home"
   mkdir -p "${HOME}"
   AI_AGENTS_SCRIPT="${REPO_ROOT}/scripts/bash/ai_agents.sh"
-  AI_AGENTS_DIR="${HOME}/.ai_agents"
-  DEST="${AI_AGENTS_DIR}/AGENTS.md"
+  CLAUDE_DIR="${HOME}/.claude"
+  DEST="${CLAUDE_DIR}/AGENTS.md"
   SRC="${REPO_ROOT}/apps/ai_coding/AGENTS.md"
 }
 
@@ -30,7 +30,7 @@ teardown() {
 }
 
 @test "ai_agents.sh leaves existing symlink pointing correctly" {
-  mkdir -p "${AI_AGENTS_DIR}"
+  mkdir -p "${CLAUDE_DIR}"
   ln -s "${SRC}" "${DEST}"
   run env HOME="${HOME}" "${AI_AGENTS_SCRIPT}"
   [ "$status" -eq 0 ]
@@ -40,7 +40,7 @@ teardown() {
 }
 
 @test "ai_agents.sh replaces incorrect symlink" {
-  mkdir -p "${AI_AGENTS_DIR}"
+  mkdir -p "${CLAUDE_DIR}"
   ln -s "/tmp/wrong_target" "${DEST}"
   run env HOME="${HOME}" "${AI_AGENTS_SCRIPT}"
   [ "$status" -eq 0 ]
@@ -50,7 +50,7 @@ teardown() {
 }
 
 @test "ai_agents.sh replaces existing file" {
-  mkdir -p "${AI_AGENTS_DIR}"
+  mkdir -p "${CLAUDE_DIR}"
   echo "old content" > "${DEST}"
   run env HOME="${HOME}" "${AI_AGENTS_SCRIPT}"
   [ "$status" -eq 0 ]
