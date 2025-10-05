@@ -233,12 +233,7 @@ alias checkdots="check-dotfiles"
 alias syncdots="\"$workspace\"/infra/osx_setup/bin/sync_dotfiles"
 
 # macOS setup shortcuts
-alias macos_setup="\"$workspace\"/infra/osx_setup/macos_setup"
-
-# System hygiene with automatic directory handling
-machygiene() {
-  (cd "$workspace/infra/osx_setup" && bin/hygiene)
-}
+alias macos_setup="\"$workspace\"/infra/macos_setup"
 
 # Enhanced & tool overwrites
 command -v bat >/dev/null 2>&1 && alias cat='bat'
@@ -274,43 +269,6 @@ alias gcb='git checkout -b'
 alias gcob='git checkout -b'
 alias gdff='git diff'
 alias grbp='git rebase-and-push'
-
-# ============================================================================
-# PERIODIC UPDATE CHECKING
-# ============================================================================
-
-# Check if it's time to suggest running system hygiene
-_check_osx_setup_update() {
-  local last_update_file="$workspace/infra/osx_setup/data/.meta/last_hygiene_check"
-  local current_time=$(date +%s)
-  local update_interval=$((7 * 24 * 60 * 60))  # 7 days in seconds
-  
-  # Create meta directory if it doesn't exist
-  mkdir -p "$(dirname "$last_update_file")" 2>/dev/null
-  
-  # Create file if it doesn't exist
-  if [[ ! -f "$last_update_file" ]]; then
-    echo "$current_time" > "$last_update_file" 2>/dev/null
-    return
-  fi
-  
-  local last_update=$(cat "$last_update_file" 2>/dev/null || echo 0)
-  local time_diff=$((current_time - last_update))
-  
-  if (( time_diff > update_interval )); then
-    echo ""
-    echo "🧹 It's been a while since you ran system hygiene!"
-    echo "   Run 'machygiene' to update your development environment"
-    echo "   (You can disable this by setting DISABLE_OSX_SETUP_UPDATE_PROMPT=true)"
-    echo ""
-    echo "$current_time" > "$last_update_file" 2>/dev/null
-  fi
-}
-
-# Only run the check if not disabled
-if [[ -z "$DISABLE_OSX_SETUP_UPDATE_PROMPT" ]]; then
-  _check_osx_setup_update
-fi
 
 # ============================================================================
 # Work laptop overrides
