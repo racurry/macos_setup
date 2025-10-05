@@ -9,14 +9,14 @@ show_help() {
   cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Create a symlink to the Claude Code configuration file.
+Create a symlink to the AI coding agents configuration file.
 
 OPTIONS:
   -h, --help    Show this help message and exit
 
 DESCRIPTION:
-  This script creates a symbolic link from ~/.claude/CLAUDE.md to the
-  Claude Code configuration file in apps/claude_code/CLAUDE.md.
+  This script creates a symbolic link from ~/.ai_agents/AGENTS.md to the
+  configuration file in apps/ai_coding/AGENTS.md.
 
 EOF
 }
@@ -36,14 +36,14 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-print_heading "Configure Claude Code"
+print_heading "Configure AI Coding Agents"
 
-CLAUDE_DIR="${HOME}/.claude"
-SRC="${REPO_ROOT}/apps/claude_code/CLAUDE.md"
-DEST="${CLAUDE_DIR}/CLAUDE.md"
+AI_AGENTS_DIR="${HOME}/.ai_agents"
+SRC="${REPO_ROOT}/apps/ai_coding/AGENTS.md"
+DEST="${AI_AGENTS_DIR}/AGENTS.md"
 
 require_file "${SRC}"
-mkdir -p "${CLAUDE_DIR}"
+mkdir -p "${AI_AGENTS_DIR}"
 
 if [[ -L "${DEST}" ]]; then
   current_target="$(readlink "${DEST}")"
@@ -61,4 +61,4 @@ fi
 log_info "Linking ${DEST} -> ${SRC}"
 ln -s "${SRC}" "${DEST}"
 
-log_info "Claude Code configured"
+log_info "AI coding agents configured"
