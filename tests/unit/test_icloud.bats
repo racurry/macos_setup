@@ -1,16 +1,13 @@
 #!/usr/bin/env bats
 
-# shellcheck source=lib/bash/paths.sh
-source "${BATS_TEST_DIRNAME}/../../lib/bash/paths.sh"
-
 setup() {
   TEST_TMPDIR="$(mktemp -d)"
   ORIGINAL_HOME="${HOME:-}"
   export HOME="${TEST_TMPDIR}/home"
   mkdir -p "${HOME}"
   SCRIPT_PATH="${BATS_TEST_DIRNAME}/../../scripts/bash/icloud.sh"
-  ICLOUD_SOURCE="${SETUP_PATH_ICLOUD_MOBILE_DOCUMENTS}"
-  TARGET_LINK="${SETUP_PATH_ICLOUD}"
+  ICLOUD_SOURCE="${HOME}/Library/Mobile Documents/com~apple~CloudDocs"
+  TARGET_LINK="${HOME}/iCloud"
 }
 
 teardown() {
