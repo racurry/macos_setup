@@ -1,0 +1,3 @@
+# Obsidian Setup
+
+tbd
