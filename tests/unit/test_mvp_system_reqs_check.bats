@@ -45,3 +45,23 @@ teardown() {
     [[ "$output" == *"Required command"* && "$output" == *"not found"* ]]
   fi
 }
+
+@test "help flag displays usage information" {
+  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --help
+  [ "$status" -eq 0 ]
+  [[ "$output" =~ "Usage:" ]]
+  [[ "$output" =~ "--skip-sudo" ]]
+}
+
+@test "--skip-sudo flag is accepted" {
+  cd "${REPO_ROOT}"
+  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --skip-sudo
+  # Should not fail with "unknown option" error
+  [[ ! "$output" =~ "Error: Unknown option" ]]
+}
+
+@test "--skip-sudo skips sudo check" {
+  cd "${REPO_ROOT}"
+  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --skip-sudo
+  [[ "$output" =~ "Skipping sudo availability check" ]]
+}
