@@ -14,14 +14,13 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 
 ## Ready
 
-- [ ] Update @scipts/python/audit_apps.py to write to ./tmp instead of /docs.  Add ./tmp to .gitignore
-- [ ] Update @scipts/python/audit_apps.py to document currently installed VS Code extensions
 - [ ] Add all VS Code user settings to apps/vscode, create script to sync/symlink as needed
-- [ ] Add update command to scripts/bash/dotfiles.sh to prune ~/.dotfiles_backup entries older than 60 days
-- [ ] Add update command to scripts/bash/brew.sh for brew update/upgrade/cleanup
-- [ ] Add update command to scripts/bash/asdf.sh to refresh plugins and runtimes
-- [ ] Add update command to scripts/bash/oh_my_zsh.sh to run omz update safely
-- [ ] Add update command to scripts/bash/ssh.sh to prune ~/.ssh/backups entries older than 60 days
+  - **Clarifying questions needed:**
+    1. Where are the VS Code user settings currently located? Are they at the standard location (`~/Library/Application Support/Code/User/settings.json`), already synced somewhere, or should we copy them from a specific machine?
+    2. What should the sync/symlink strategy be? Should VS Code settings be symlinked (like dotfiles/ai_agents), copied (like MailMate keybindings), or something else?
+    3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
+    4. Should this script be integrated into the main setup.sh workflow or remain manual?
+    5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
 
 ## Icebox
 

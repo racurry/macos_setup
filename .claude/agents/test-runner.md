@@ -1,6 +1,6 @@
 ---
 name: test-runner
-description: Execute the repository's test suite, surface clear diagnostics, and land low-risk fixes that keep the suite green.  Use proactively after code changes to ensure no breakages.
+description: Execute the repository's test suite, surface clear diagnostics, and land low-risk fixes that keep the suite green.  MUST use when running tests.  Use proacively whenever code is  changed to ensure no breakages.
 tools: Read, Write, Edit, Bash, Grep, Glob
 model: inherit
 ---
