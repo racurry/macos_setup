@@ -42,7 +42,7 @@ done
 print_heading "Set iCloud symlink"
 
 TARGET_LINK="${HOME}/iCloud"
-ICLOUD_SOURCE="${PATH_ICLOUD_MOBILE_DOCUMENTS}"
+ICLOUD_SOURCE="${SETUP_PATH_ICLOUD_MOBILE_DOCUMENTS}"
 
 if [[ ! -d "${ICLOUD_SOURCE}" ]]; then
   log_warn "iCloud Drive not found at ${ICLOUD_SOURCE}; skipping symlink"

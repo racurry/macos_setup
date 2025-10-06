@@ -98,10 +98,10 @@ configure_mode() {
 # Function to create SSH directories with proper permissions
 setup_directories() {
   echo "Setting up SSH directories..."
-  mkdir -p "${PATH_SSH_DIR}"
-  chmod 700 "${PATH_SSH_DIR}"
-  mkdir -p "${PATH_SSH_BACKUPS}"
-  echo "Created ${PATH_SSH_DIR} and ${PATH_SSH_BACKUPS} with proper permissions"
+  mkdir -p "${SETUP_PATH_SSH_DIR}"
+  chmod 700 "${SETUP_PATH_SSH_DIR}"
+  mkdir -p "${SETUP_PATH_SSH_BACKUPS}"
+  echo "Created ${SETUP_PATH_SSH_DIR} and ${SETUP_PATH_SSH_BACKUPS} with proper permissions"
 }
 
 # Function to backup existing file if it exists
@@ -112,7 +112,7 @@ backup_if_exists() {
     timestamp=$(date +%Y%m%d_%H%M%S)
     local basename
     basename=$(basename "$file")
-    local backup_path="${PATH_SSH_BACKUPS}/${timestamp}_${basename}"
+    local backup_path="${SETUP_PATH_SSH_BACKUPS}/${timestamp}_${basename}"
     mv "$file" "$backup_path"
     echo "Backed up existing $file to $backup_path"
   fi
@@ -130,26 +130,26 @@ export_single_ssh_key() {
   echo "Exporting GitHub SSH key (${key_id}) from ${vault} vault"
 
   # Backup existing keys if they exist
-  backup_if_exists "${PATH_SSH_DIR}/${key_name}"
-  backup_if_exists "${PATH_SSH_DIR}/${key_name}.pub"
+  backup_if_exists "${SETUP_PATH_SSH_DIR}/${key_name}"
+  backup_if_exists "${SETUP_PATH_SSH_DIR}/${key_name}.pub"
 
   # Export private key
-  op item get "${key_id}" --account "${account}" --vault "${vault}" --fields "private key" --reveal | sed 's/^"//;s/"$//' | sed '/^$/d' > "${PATH_SSH_DIR}/${key_name}"
+  op item get "${key_id}" --account "${account}" --vault "${vault}" --fields "private key" --reveal | sed 's/^"//;s/"$//' | sed '/^$/d' > "${SETUP_PATH_SSH_DIR}/${key_name}"
 
-  chmod 600 "${PATH_SSH_DIR}/${key_name}"
-  echo "Exported private key to ${PATH_SSH_DIR}/${key_name}"
+  chmod 600 "${SETUP_PATH_SSH_DIR}/${key_name}"
+  echo "Exported private key to ${SETUP_PATH_SSH_DIR}/${key_name}"
 
   # Export public key
-  op item get "${key_id}" --account "${account}" --vault "${vault}" --fields "public key" > "${PATH_SSH_DIR}/${key_name}.pub" 2>/dev/null || true
+  op item get "${key_id}" --account "${account}" --vault "${vault}" --fields "public key" > "${SETUP_PATH_SSH_DIR}/${key_name}.pub" 2>/dev/null || true
 
-  if [[ -f "${PATH_SSH_DIR}/${key_name}.pub" ]]; then
-    chmod 644 "${PATH_SSH_DIR}/${key_name}.pub"
-    echo "Exported public key to ${PATH_SSH_DIR}/${key_name}.pub"
+  if [[ -f "${SETUP_PATH_SSH_DIR}/${key_name}.pub" ]]; then
+    chmod 644 "${SETUP_PATH_SSH_DIR}/${key_name}.pub"
+    echo "Exported public key to ${SETUP_PATH_SSH_DIR}/${key_name}.pub"
   else
     echo "No public key found for ${key_id}, generating from private key..."
-    ssh-keygen -y -f "${PATH_SSH_DIR}/${key_name}" > "${PATH_SSH_DIR}/${key_name}.pub"
-    chmod 644 "${PATH_SSH_DIR}/${key_name}.pub"
-    echo "Generated public key at ${PATH_SSH_DIR}/${key_name}.pub"
+    ssh-keygen -y -f "${SETUP_PATH_SSH_DIR}/${key_name}" > "${SETUP_PATH_SSH_DIR}/${key_name}.pub"
+    chmod 644 "${SETUP_PATH_SSH_DIR}/${key_name}.pub"
+    echo "Generated public key at ${SETUP_PATH_SSH_DIR}/${key_name}.pub"
   fi
 }
 
@@ -174,15 +174,15 @@ configure_single_git_signing() {
 
   local key_name="id_${key_prefix}_github"
 
-  if [[ ! -f "${PATH_SSH_DIR}/${key_name}.pub" ]]; then
-    echo "Warning: Public key ${PATH_SSH_DIR}/${key_name}.pub not found, skipping signing config"
+  if [[ ! -f "${SETUP_PATH_SSH_DIR}/${key_name}.pub" ]]; then
+    echo "Warning: Public key ${SETUP_PATH_SSH_DIR}/${key_name}.pub not found, skipping signing config"
     return 0
   fi
 
-  public_key_content=$(cat "${PATH_SSH_DIR}/${key_name}.pub")
+  public_key_content=$(cat "${SETUP_PATH_SSH_DIR}/${key_name}.pub")
 
   # Create or update allowed_signers
-  allowed_signers="${PATH_SSH_DIR}/allowed_signers"
+  allowed_signers="${SETUP_PATH_SSH_DIR}/allowed_signers"
 
   # Remove any existing entries for this email
   if [[ -f "${allowed_signers}" ]]; then
@@ -213,8 +213,8 @@ configure_git_signing() {
 update_ssh_config() {
   echo "Updating SSH configuration..."
 
-  if [[ ! -f "${PATH_SSH_DIR}/config" ]]; then
-    echo "Warning: ${PATH_SSH_DIR}/config not found, skipping config update"
+  if [[ ! -f "${SETUP_PATH_SSH_DIR}/config" ]]; then
+    echo "Warning: ${SETUP_PATH_SSH_DIR}/config not found, skipping config update"
     return 0
   fi
 
@@ -230,15 +230,15 @@ update_ssh_config() {
   key_name="id_${key_prefix}_github"
 
   # Update IdentityFile for github.com
-  if grep -q "^Host github.com" "${PATH_SSH_DIR}/config"; then
-    sed -i.bak "/^Host github.com/,/^Host / s|IdentityFile.*|IdentityFile ${PATH_SSH_DIR}/${key_name}|" "${PATH_SSH_DIR}/config"
-    echo "Updated IdentityFile for github.com to ${PATH_SSH_DIR}/${key_name}"
+  if grep -q "^Host github.com" "${SETUP_PATH_SSH_DIR}/config"; then
+    sed -i.bak "/^Host github.com/,/^Host / s|IdentityFile.*|IdentityFile ${SETUP_PATH_SSH_DIR}/${key_name}|" "${SETUP_PATH_SSH_DIR}/config"
+    echo "Updated IdentityFile for github.com to ${SETUP_PATH_SSH_DIR}/${key_name}"
   else
-    echo "Warning: Host github.com not found in ${PATH_SSH_DIR}/config"
+    echo "Warning: Host github.com not found in ${SETUP_PATH_SSH_DIR}/config"
   fi
 
   # Remove backup file
-  rm -f "${PATH_SSH_DIR}/config.bak"
+  rm -f "${SETUP_PATH_SSH_DIR}/config.bak"
   echo "SSH configuration update complete"
 }
 

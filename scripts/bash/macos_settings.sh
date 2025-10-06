@@ -165,7 +165,7 @@ apply_finder_settings() {
 
   log_info "Set Finder new window target to Desktop"
   defaults write com.apple.finder NewWindowTarget -string "PfDe"
-  defaults write com.apple.finder NewWindowTargetPath -string "file://${PATH_DESKTOP}/"
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${SETUP_PATH_DESKTOP}/"
 
   log_info "Show hidden files"
   defaults write com.apple.finder AppleShowAllFiles -bool true
@@ -205,10 +205,10 @@ apply_misc_settings() {
   ensure_sudo_cached
 
   log_info "Ensure Screenshots directory exists"
-  mkdir -p "${PATH_SCREENSHOTS}"
+  mkdir -p "${SETUP_PATH_SCREENSHOTS}"
 
   log_info "Set screenshot location"
-  defaults write com.apple.screencapture location "${PATH_SCREENSHOTS}"
+  defaults write com.apple.screencapture location "${SETUP_PATH_SCREENSHOTS}"
 
   log_info "Disable screenshot thumbnails"
   defaults write com.apple.screencapture show-thumbnail -bool false

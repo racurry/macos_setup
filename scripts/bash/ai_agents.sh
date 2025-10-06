@@ -38,7 +38,7 @@ done
 
 print_heading "Configure AI Coding Agents"
 
-CLAUDE_DIR="${PATH_CLAUDE}"
+CLAUDE_DIR="${SETUP_PATH_CLAUDE}"
 SRC="${REPO_ROOT}/apps/ai_coding/AGENTS.md"
 DEST="${CLAUDE_DIR}/AGENTS.md"
 
