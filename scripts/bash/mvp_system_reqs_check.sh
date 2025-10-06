@@ -5,6 +5,44 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+show_help() {
+  cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Performs system requirements checks for macOS setup.
+
+OPTIONS:
+  -h, --help    Show this help message and exit
+
+CHECKS PERFORMED:
+  - Verifies script is not running as root
+  - Validates working directory is repository root
+  - Checks required commands (defaults, sudo, xcode-select)
+  - Verifies Xcode Command Line Tools are installed
+
+EXIT CODES:
+  0 - All checks passed
+  1 - Checks failed
+  2 - Manual follow-up required (e.g., Xcode CLT installation in progress)
+
+EOF
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
 print_heading "System Requirements Check (MVP)"
 
 # Preflight checks from preflight.sh
