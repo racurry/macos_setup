@@ -80,7 +80,6 @@ vscode "tomoki1207.pdf"
 vscode "github.vscode-github-actions"
 vscode "gamunu.vscode-yarn"
 vscode "teabyii.ayu"
-vscode "ms-vscode.sublime-keybindings"
 
 # Mac App Store apps
 mas "Actions For Obsidian", id: 1659667937
