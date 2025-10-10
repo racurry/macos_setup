@@ -114,43 +114,6 @@ export icloud=~/iCloud  # Both cases for convenience - prevents typos
 # CUSTOM FUNCTIONS
 # ============================================================================
 
-# Check dotfile sync status
-check-dotfiles() {
-  local dotfiles=()
-  local broken_files=()
-  
-  # List of dotfiles that should be symlinked
-  dotfiles=(
-    ".asdfrc"
-    ".galileorc"
-    ".gitconfig"
-    ".gitconfig_galileo"
-    ".gitignore_global"
-    ".irbrc"
-    ".tool-versions"
-    ".vimrc"
-    ".zshrc"
-  )
-  
-  for dotfile in "${dotfiles[@]}"; do
-    if [[ ! -L "$HOME/$dotfile" ]]; then
-      broken_files+=("$dotfile")
-    fi
-  done
-  
-  if (( ${#broken_files[@]} > 0 )); then
-    echo "⚠️  The following dotfiles are not synced:"
-    for file in "${broken_files[@]}"; do
-      echo "   • $file"
-    done
-    echo "   Run 'bin/sync_dotfiles' to fix this"
-    return 1
-  else
-    echo "✅ All dotfiles are properly synced"
-    return 0
-  fi
-}
-
 # Automatically ls after cd
 cd () {
   builtin cd "$@";
@@ -228,7 +191,6 @@ alias zshcfg="code -nw ~/workspace/infra/osx_setup/data/dotfiles/.zshrc"
 alias omzcfg="code -nw ~/.oh-my-zsh"
 
 # Dotfile sync monitoring
-alias checkdots="check-dotfiles"
 alias syncdots="\"$workspace\"/infra/osx_setup/bin/sync_dotfiles"
 
 # macOS setup shortcuts
@@ -254,6 +216,9 @@ alias dirs='dirs -v'
 
 # Say the magic word
 alias please='sudo $(fc -ln -1)'
+
+# Cleanup
+alias mdlint='markdownlint-cli2 --config ~/.markdownlint-cli2.jsonc'
 
 # ============================================================================
 # GIT SHORTHANDS

@@ -21,6 +21,7 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
     3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
     4. Should this script be integrated into the main setup.sh workflow or remain manual?
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
+- [ ] create a computer specific config file for this repo that lives in ~/.everythingscomputer. Everything should be moved in there that is mutable. For example, backup files, home versus work setting, etc.
 
 ## Icebox
 
