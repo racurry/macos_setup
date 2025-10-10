@@ -50,18 +50,18 @@ done
 
 print_heading "Make folders how I like em"
 
-DOCS_DIR="${SETUP_PATH_DOCUMENTS}"
+DOCS_DIR="${PATH_DOCUMENTS}"
 
 folders=(
-  "${SETUP_FOLDER_AUTO}"
-  "${SETUP_FOLDER_INBOX}"
-  "${SETUP_FOLDER_LIFE}"
-  "${SETUP_FOLDER_PROJECTS}"
-  "${SETUP_FOLDER_PEOPLE}"
-  "${SETUP_FOLDER_TOPICS}"
-  "${SETUP_FOLDER_LIBRARIES}"
-  "${SETUP_FOLDER_POSTERITY}"
-  "${SETUP_FOLDER_META}"
+  "@auto"
+  "000_Inbox"
+  "100_Life"
+  "150_Projects"
+  "200_People"
+  "400_Topics"
+  "700_Libraries"
+  "800_Posterity"
+  "999_Meta"
 )
 
 log_info "Checking the docs dir ${DOCS_DIR}"
