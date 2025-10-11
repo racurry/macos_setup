@@ -230,7 +230,7 @@ def main():
 
     command = sys.argv[1].lower()
 
-    if command in ['-h', '--help', 'help']:
+    if command in ['-h', '--help']:
         print(__doc__)
         return
     elif command == 'list':
