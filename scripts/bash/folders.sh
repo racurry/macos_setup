@@ -37,16 +37,27 @@ EOF
 }
 
 # Parse arguments
-case ${1:-} in
-  -h|--help)
-    show_help
-    exit 0
-    ;;
-esac
-
+PARENT_DIR=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      show_help
+      exit 1
+      ;;
+    *)
+      PARENT_DIR="$1"
+      ;;
+  esac
+  shift
+done
 
 # Set parent directory (default to ~/Documents)
-DOCS_DIR="${1:-${PATH_DOCUMENTS}}"
+DOCS_DIR="${PARENT_DIR:-${PATH_DOCUMENTS}}"
 
 print_heading "Make folders how I like em"
 

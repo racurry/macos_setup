@@ -58,7 +58,7 @@ teardown() {
   run "${SCRIPT_PATH}" --help
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
-  [[ "$output" == *"Create a standard set of organizational folders"* ]]
+  [[ "$output" == *"Create organizational folder structure"* ]]
   [[ "$output" == *"-h, --help"* ]]
 }
 
@@ -66,7 +66,7 @@ teardown() {
   run "${SCRIPT_PATH}" -h
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
-  [[ "$output" == *"Create a standard set of organizational folders"* ]]
+  [[ "$output" == *"Create organizational folder structure"* ]]
   [[ "$output" == *"-h, --help"* ]]
 }
 
