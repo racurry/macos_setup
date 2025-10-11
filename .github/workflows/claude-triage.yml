@@ -34,50 +34,36 @@ jobs:
             First, read @AGENTS.md and @CLAUDE.md to understand the repository structure and standards.
 
             You CAN auto-solve if:
-            - Simple bug fix in bash scripts
-            - Adding missing error handling
-            - Updating documentation
-            - Fixing typos or formatting
-            - Adding tests for existing code
-            - Small feature additions to existing scripts
-            - Script improvements following AGENTS.md standards
+            - The implementation plan is clear and requires no additional inforation
+            - Claude has access and permissions to use all the tools required to complete the task
 
             You CANNOT auto-solve if:
-            - Requires architectural decisions
             - Needs clarification from user (vague description, missing details)
             - Missing reproduction steps for bugs
             - Requires external system access you don't have
-            - Major refactoring or breaking changes
-            - Security-sensitive changes requiring review
-            - Involves system-level changes (macOS settings, homebrew formulas)
 
             Decision process:
             1. Read the issue carefully
             2. Search codebase with Grep/Glob to understand scope and affected files
             3. Determine confidence level:
                - HIGH: Clear requirements, straightforward implementation, low risk
-               - MEDIUM: Mostly clear but some unknowns
                - LOW: Vague, complex, or risky
 
-            If HIGH confidence (90%+ sure you can solve it completely):
+            If HIGH confidence (80%+ sure you can solve it completely):
             - Add "claude" label: gh issue edit ${{ github.event.issue.number }} --add-label "claude"
             - Comment: "I can handle this automatically. Starting work now..."
             - The claude label will trigger the main workflow to solve the issue
 
-            If MEDIUM/LOW confidence:
-            - Add appropriate category labels using gh issue edit:
+            If LOW confidence:
+            - Add appropriate category labels using gh issue edit.  Apply all appropriate labels:
               * "bug" - for bug reports
               * "enhancement" - for feature requests
               * "documentation" - for docs changes
-              * "question" - for questions
               * "needs-more-info" - if details are missing
             - Comment with:
               * Summary of what you understand
               * What information is missing (if applicable)
               * Suggested approach or next steps for human review
-
-            Be conservative: Only add "claude" label if you're highly confident.
-            Better to ask for clarification than create a bad PR.
 
             Keep your analysis brief and to the point.
 

@@ -1,0 +1,97 @@
+---
+name: Auto-Rebase PRs
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  auto-rebase:
+    name: Auto-rebase open PRs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get open PRs
+        id: get-prs
+        run: |
+          # Get all open PRs targeting main branch
+          prs=$(gh pr list --base main --state open \
+            --json number,headRefName \
+            --jq '.[] | "\(.number):\(.headRefName)"')
+          echo "prs<<EOF" >> $GITHUB_OUTPUT
+          echo "$prs" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebase PRs
+        run: |
+          if [ -z "${{ steps.get-prs.outputs.prs }}" ]; then
+            echo "No open PRs found targeting main branch"
+            exit 0
+          fi
+
+          echo "${{ steps.get-prs.outputs.prs }}" | while IFS=':' read -r pr_number branch_name; do
+            if [ -z "$pr_number" ] || [ -z "$branch_name" ]; then
+              continue
+            fi
+
+            echo "Processing PR #$pr_number"
+
+            # Fetch the latest changes
+            git fetch origin main
+            git fetch origin "$branch_name"
+
+            # Check if rebase is needed
+            merge_base=$(git merge-base origin/main "origin/$branch_name")
+            main_head=$(git rev-parse origin/main)
+
+            if [ "$merge_base" = "$main_head" ]; then
+              echo "PR #$pr_number is already up to date"
+              continue
+            fi
+
+            # Checkout the PR branch
+            git checkout -B "$branch_name" "origin/$branch_name"
+
+            # Attempt rebase
+            if git rebase origin/main; then
+              echo "Successfully rebased PR #$pr_number"
+
+              # Push the rebased branch
+              git push origin "$branch_name" --force-with-lease
+
+              # Add comment to PR about successful rebase
+              gh pr comment "$pr_number" \
+                --body "Automatically rebased onto latest main."
+
+            else
+              echo "Rebase failed for PR #$pr_number"
+
+              # Abort the rebase
+              git rebase --abort
+
+              # Add comment to trigger Claude for conflict resolution
+              gh pr comment "$pr_number" --body \
+                "@claude rebase this PR with main, resolving any conflicts as needed"
+            fi
+
+            # Return to main branch
+            git checkout main
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

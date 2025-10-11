@@ -1,6 +1,6 @@
 # App Audit
 
-_Generated on 2025-10-04T22:29:42_
+_Generated on 2025-10-05T11:00:28_
 
 Managed manifest: `dotfiles/Brewfile`
 
@@ -48,6 +48,24 @@ Managed manifest: `dotfiles/Brewfile`
 - [x] None
 
 _Note: Use `sudo mas uninstall <app_id>` to remove Mac App Store apps._
+
+## VSCode Extensions
+
+### Installed extensions not tracked (add to Brewfile or uninstall)
+- [ ] ms-python.debugpy
+- [ ] ms-python.vscode-pylance
+- [ ] ms-python.vscode-python-envs
+- [ ] ms-toolsai.jupyter
+- [ ] ms-toolsai.jupyter-keymap
+- [ ] ms-toolsai.jupyter-renderers
+- [ ] ms-toolsai.vscode-jupyter-cell-tags
+- [ ] ms-toolsai.vscode-jupyter-slideshow
+
+### Extensions declared but not installed
+- [x] None
+
+### Auto-installed dependencies (ignore - managed by parent extensions)
+- [ ] llvm-vs-code-extensions.lldb-dap
 
 ## Optional Brewfiles
 

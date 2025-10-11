@@ -50,7 +50,7 @@ done
 
 print_heading "Make folders how I like em"
 
-DOCS_DIR="${HOME}/Documents"
+DOCS_DIR="${PATH_DOCUMENTS}"
 
 folders=(
   "@auto"

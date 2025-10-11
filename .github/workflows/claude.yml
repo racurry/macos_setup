@@ -63,7 +63,8 @@ jobs:
                 "Bash(gh pr create:*)",
                 "Bash(gh pr view:*)",
                 "Bash(gh issue comment:*)",
-                "Bash(gh issue view:*)"
+                "Bash(gh issue view:*)",
+                "Bash(gh issue edit:*)"
               ]
             }
 
@@ -116,6 +117,17 @@ jobs:
                - Provide the commit SHA if changes were committed
 
             When working on PRs:
+            - PR review comments are the PRIMARY source of truth for implementation decisions
+            - The original issue is context only; PR feedback supersedes the issue description
+            - NEVER revert changes that were previously approved in earlier review rounds
+            - Before making changes, read ALL previous review comments to understand what has been approved
+            - If new feedback conflicts with earlier approved changes, the newer feedback takes precedence
+            - Once a reviewer approves a change (e.g., naming convention, file structure), that decision is final
+            - When you detect conflicts between the linked issue and approved PR changes:
+              1. Use 'gh issue edit <number> --body "<updated-body>"' to update the issue description
+              2. Preserve the original issue structure but update conflicting sections
+              3. Add a note at the top: "Note: Updated based on PR review feedback in #<pr-number>"
+              4. This keeps the issue as an accurate living spec
             - If reviewing code: Provide specific feedback on code quality, suggest improvements following repository standards, ensure test coverage
             - If responding to review comments: Address the feedback by making requested changes or explaining your approach
             - If the PR was just updated (synchronize event): Check if there are outstanding review comments to address
