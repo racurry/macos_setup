@@ -13,20 +13,20 @@ HELP_TEXT = <<~HELP
     DIRECTORY   Directory containing files to rename
 
   OPTIONS:
-    -h, --help      Show this help message
-    dedot           Replace dots with spaces in filenames
-    strip_digits    Remove all numeric characters from filenames
+    -h, --help         Show this help message
+    --dedot            Replace dots with spaces in filenames
+    --strip-digits     Remove all numeric characters from filenames
 
   DESCRIPTION:
     Cleans up filenames by applying various transformations:
     - Always removes extra whitespace
-    - Optionally replaces dots with spaces (dedot)
-    - Optionally removes digits (strip_digits)
+    - Optionally replaces dots with spaces (--dedot)
+    - Optionally removes digits (--strip-digits)
     File extensions are preserved.
 
   EXAMPLES:
-    filename_fixer /path/to/dir dedot
-    filename_fixer /path/to/dir strip_digits dedot
+    filename_fixer /path/to/dir --dedot
+    filename_fixer /path/to/dir --strip-digits --dedot
 HELP
 
 def strip_digits(filename_no_extension)
@@ -54,8 +54,8 @@ def fix_filenames(directory_name, options)
     filename_no_extension = filename_parts.take(filename_parts.size - 1).join('.')
 
     hash[filename] = filename_no_extension
-    hash[filename] = dedot(hash[filename]) if options.include?('dedot')
-    hash[filename] = strip_digits(hash[filename]) if options.include?('strip_digits')
+    hash[filename] = dedot(hash[filename]) if options.include?('--dedot')
+    hash[filename] = strip_digits(hash[filename]) if options.include?('--strip-digits')
 
     hash[filename] = clean_up_spaces(hash[filename])
 

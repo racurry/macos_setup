@@ -138,8 +138,8 @@ filename_fixer DIRECTORY [OPTIONS]
 ```
 
 Options:
-- `dedot` - Replace dots with spaces
-- `strip_digits` - Remove all numeric characters
+- `--dedot` - Replace dots with spaces
+- `--strip-digits` - Remove all numeric characters
 
 Features:
 - Always removes extra whitespace
@@ -148,7 +148,7 @@ Features:
 
 Example:
 ```bash
-filename_fixer /path/to/dir dedot strip_digits
+filename_fixer /path/to/dir --dedot --strip-digits
 ```
 
 ### swap_extension
