@@ -44,11 +44,9 @@ case ${1:-} in
     ;;
 esac
 
-# Set parent directory (default to ~/Documents)
-DOCS_DIR="${1:-${HOME}/Documents}"
 
-# Expand tilde if present
-DOCS_DIR="${DOCS_DIR/#\~/${HOME}}"
+# Set parent directory (default to ~/Documents)
+DOCS_DIR="${1:-${PATH_DOCUMENTS}}"
 
 print_heading "Make folders how I like em"
 
