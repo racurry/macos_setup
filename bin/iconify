@@ -26,12 +26,12 @@ fi
 
 SOURCE=$1
 ICONSET="icon.iconset"
-mkdir -p $ICONSET
+mkdir -p "$ICONSET"
 
 sizes=(16 32 128 256 512)
 for size in "${sizes[@]}"; do
-  convert "$SOURCE" -resize ${size}x${size} "$ICONSET/icon_${size}x${size}.png"
-  convert "$SOURCE" -resize $(($size * 2))x$(($size * 2)) "$ICONSET/icon_${size}x${size}@2x.png"
+  convert "$SOURCE" -resize "${size}x${size}" "$ICONSET/icon_${size}x${size}.png"
+  convert "$SOURCE" -resize "$(($size * 2))x$(($size * 2))" "$ICONSET/icon_${size}x${size}@2x.png"
 done
 
-iconutil -c icns $ICONSET
+iconutil -c icns "$ICONSET"
