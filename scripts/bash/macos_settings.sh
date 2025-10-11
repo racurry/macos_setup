@@ -163,9 +163,9 @@ apply_finder_settings() {
   log_info "Show all filename extensions"
   defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
-  log_info "Set Finder new window target to Desktop"
+  log_info "Set Finder new window target to Documents"
   defaults write com.apple.finder NewWindowTarget -string "PfDe"
-  defaults write com.apple.finder NewWindowTargetPath -string "file://${PATH_DESKTOP}/"
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${PATH_DOCUMENTS}/"
 
   log_info "Show hidden files"
   defaults write com.apple.finder AppleShowAllFiles -bool true

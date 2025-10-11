@@ -18,12 +18,12 @@
 export PATH_DOCUMENTS="${HOME}/Documents"
 export PATH_SCREENSHOTS="${HOME}/Screenshots"
 export PATH_DESKTOP="${HOME}/Desktop"
+export PATH_DOWNLOADS="${HOME}/Downloads"
 
 # Application data paths
 export PATH_SSH_DIR="${HOME}/.ssh"
 export PATH_SSH_BACKUPS="${HOME}/.ssh/backups"
 export PATH_DOTFILES_BACKUP="${HOME}/.dotfiles_backup"
-export PATH_AI_AGENTS="${HOME}/.ai_agents"
 
 # iCloud paths
 export PATH_ICLOUD="${HOME}/iCloud"

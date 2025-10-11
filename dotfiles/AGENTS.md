@@ -1,4 +1,4 @@
-# Rules for Claude
+# Rules for Coding Agents
 
 - **Runtime management**: Use `asdf` for runtime version management (never install runtimes via apt/brew/etc)
 - **Package management**: For asdf-managed runtimes (node/python/ruby/etc), install packages locally to the project; never install globally

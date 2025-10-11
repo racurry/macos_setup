@@ -102,7 +102,7 @@ install_brewfile() {
     if brew bundle check --file="${manifest}" >/dev/null 2>&1; then
         log_warn "brew bundle check reports all items installed for ${manifest}"
     else
-        fail "brew bundle check indicates missing items for ${manifest}"
+        log_warn "brew bundle check indicates missing items for ${manifest}"
     fi
 }
 

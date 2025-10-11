@@ -119,7 +119,6 @@ STEPS=(
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
   "ssh.sh"
-  "ai_agents.sh"
 )
 
 for step in "${STEPS[@]}"; do
