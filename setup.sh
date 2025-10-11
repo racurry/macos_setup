@@ -13,13 +13,15 @@ Automated macOS setup script that installs and configures development tools,
 applications, and system settings.
 
 OPTIONS:
-  -h, --help    Show this help message and exit
+  -h, --help       Show this help message and exit
+  --reset-mode     Reset saved setup mode and prompt for new selection
+  --mode=MODE      Set mode directly (work/personal) without prompting
 
 ENVIRONMENT VARIABLES:
   SETUP_MODE    Set to 'work' or 'personal' to install mode-specific packages
                 from dotfiles/Brewfile.work or dotfiles/Brewfile.personal
                 in addition to the main dotfiles/Brewfile.
-                If not set, the script will prompt for selection.
+                If not set, the script will check for a saved mode or prompt.
 
 SETUP STEPS:
   1. System requirements check (Xcode CLT, bash version, etc.)
@@ -40,14 +42,20 @@ EXIT CODES:
   2 - Manual follow-up required (rerun after completing the action)
 
 EXAMPLES:
-  # Run setup interactively (will prompt for mode)
+  # Run setup interactively (will prompt for mode on first run)
   ./setup.sh
 
   # Run setup for work environment
-  SETUP_MODE=work ./setup.sh
+  ./setup.sh --mode=work
 
   # Run setup for personal environment
-  SETUP_MODE=personal ./setup.sh
+  ./setup.sh --mode=personal
+
+  # Reset saved mode and prompt again
+  ./setup.sh --reset-mode
+
+  # Set mode via environment variable
+  SETUP_MODE=work ./setup.sh
 
 EOF
 }
@@ -58,6 +66,18 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       show_help
       exit 0
+      ;;
+    --reset-mode)
+      rm -f "${SETUP_MODE_FILE}"
+      log_info "Setup mode reset - will prompt for new selection"
+      shift
+      ;;
+    --mode=*)
+      export SETUP_MODE="${1#*=}"
+      if [[ "${SETUP_MODE}" != "work" && "${SETUP_MODE}" != "personal" ]]; then
+        fail "Invalid mode: ${SETUP_MODE}. Must be 'work' or 'personal'"
+      fi
+      shift
       ;;
     *)
       echo "Unknown option: $1" >&2
@@ -120,36 +140,6 @@ prompt_setup_mode() {
     log_info "Updated SETUP_MODE in ${ZSHRC_LOCAL}"
   fi
 }
-
-# Parse command-line arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --reset-mode)
-      rm -f "${SETUP_MODE_FILE}"
-      log_info "Setup mode reset - will prompt for new selection"
-      shift
-      ;;
-    --mode=*)
-      export SETUP_MODE="${1#*=}"
-      if [[ "${SETUP_MODE}" != "work" && "${SETUP_MODE}" != "personal" ]]; then
-        fail "Invalid mode: ${SETUP_MODE}. Must be 'work' or 'personal'"
-      fi
-      shift
-      ;;
-    --help|-h)
-      echo "Usage: $0 [OPTIONS]"
-      echo ""
-      echo "Options:"
-      echo "  --reset-mode     Reset saved setup mode"
-      echo "  --mode=MODE      Set mode directly (work/personal)"
-      echo "  --help, -h       Show this help"
-      exit 0
-      ;;
-    *)
-      fail "Unknown option: $1. Use --help for usage"
-      ;;
-  esac
-done
 
 # Prompt for setup mode before starting
 prompt_setup_mode
