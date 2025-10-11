@@ -59,13 +59,16 @@ done
 # Set parent directory (default to ~/Documents)
 DOCS_DIR="${PARENT_DIR:-${PATH_DOCUMENTS}}"
 
+# Expand tilde if present
+DOCS_DIR="${DOCS_DIR/#\~/$HOME}"
+
 print_heading "Make folders how I like em"
 
 log_info "Parent directory: ${DOCS_DIR}"
 
 # If using default location, create it if needed (backward compatible)
 # If custom directory specified, validate it exists
-if [[ -z "${PARENT_DIR}" ]]; then
+if [[ "${DOCS_DIR}" == "${PATH_DOCUMENTS}" ]]; then
   log_info "Using default location, creating if needed: ${DOCS_DIR}"
   mkdir -p "${DOCS_DIR}"
 elif [[ ! -d "${DOCS_DIR}" ]]; then
