@@ -63,8 +63,12 @@ print_heading "Make folders how I like em"
 
 log_info "Parent directory: ${DOCS_DIR}"
 
-# Ensure parent directory exists
-if [[ ! -d "${DOCS_DIR}" ]]; then
+# If using default location, create it if needed (backward compatible)
+# If custom directory specified, validate it exists
+if [[ -z "${PARENT_DIR}" ]]; then
+  log_info "Using default location, creating if needed: ${DOCS_DIR}"
+  mkdir -p "${DOCS_DIR}"
+elif [[ ! -d "${DOCS_DIR}" ]]; then
   log_error "Parent directory does not exist: ${DOCS_DIR}"
   exit 1
 fi
