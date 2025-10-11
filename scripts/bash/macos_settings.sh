@@ -5,7 +5,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+# Global flag
+SKIP_SUDO=false
+
 ensure_sudo_cached() {
+  if [[ "${SKIP_SUDO}" == "true" ]]; then
+    log_warn "Skipping sudo operations (--skip-sudo flag set)"
+    return 0
+  fi
+
   require_command sudo
 
   if sudo -n true 2>/dev/null; then
@@ -35,14 +43,16 @@ COMMANDS:
   all          Apply all settings (equivalent to running all commands above)
 
 OPTIONS:
+  --skip-sudo  Skip operations requiring sudo
   -h, --help   Show this help message and exit
 
 EXAMPLES:
   $(basename "$0") global           # Apply only global settings
   $(basename "$0") dock             # Apply only dock settings
   $(basename "$0") all              # Apply all settings
+  $(basename "$0") global --skip-sudo  # Apply global settings, skip sudo operations
 
-NOTE: Commands that modify system-wide settings will prompt for sudo.
+NOTE: Commands that modify system-wide settings will prompt for sudo unless --skip-sudo is specified.
 EOF
 }
 
@@ -67,8 +77,12 @@ apply_global_settings() {
   log_info "Automatically quit printer app when jobs complete"
   defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-  log_info "Disable automatic display brightness adjustment"
-  sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
+  if [[ "${SKIP_SUDO}" == "false" ]]; then
+    log_info "Disable automatic display brightness adjustment"
+    sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
+  else
+    log_warn "Skipped: Disable automatic display brightness adjustment (requires sudo)"
+  fi
 
   log_info "Disable close-windows-on-quit"
   defaults write NSGlobalDomain NSQuitAlwaysKeepsWindows -bool true
@@ -247,7 +261,44 @@ apply_all_settings() {
 }
 
 # Parse command line arguments
-case "${1:-}" in
+COMMAND=""
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --skip-sudo)
+      SKIP_SUDO=true
+      shift
+      ;;
+    -h|--help|help)
+      show_help
+      exit 0
+      ;;
+    global|input|dock|finder|misc|all)
+      COMMAND="$1"
+      shift
+      ;;
+    *)
+      # If it starts with -, it's an unknown option
+      if [[ "$1" == -* ]]; then
+        echo "Error: Unknown option '$1'" >&2
+        echo "Run '$(basename "$0") --help' for usage information." >&2
+        exit 1
+      fi
+      # Otherwise, treat it as a command (will be validated later)
+      COMMAND="$1"
+      shift
+      ;;
+  esac
+done
+
+# Validate command was provided
+if [[ -z "${COMMAND}" ]]; then
+  echo "Error: No command specified." >&2
+  echo "Run '$(basename "$0") --help' for usage information." >&2
+  exit 1
+fi
+
+# Execute command
+case "${COMMAND}" in
   global)
     apply_global_settings
     ;;
@@ -266,17 +317,8 @@ case "${1:-}" in
   all)
     apply_all_settings
     ;;
-  -h|--help|help)
-    show_help
-    exit 0
-    ;;
-  "")
-    echo "Error: No command specified." >&2
-    echo "Run '$(basename "$0") --help' for usage information." >&2
-    exit 1
-    ;;
   *)
-    echo "Error: Unknown command '$1'" >&2
+    echo "Error: Unknown command '${COMMAND}'" >&2
     echo "Run '$(basename "$0") --help' for usage information." >&2
     exit 1
     ;;

@@ -5,6 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/lib/bash/common.sh"
 
+# Global flag
+SKIP_SUDO=false
+
 show_help() {
   cat << EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -13,7 +16,10 @@ Automated macOS setup script that installs and configures development tools,
 applications, and system settings.
 
 OPTIONS:
-  -h, --help    Show this help message and exit
+  --skip-sudo      Skip operations requiring sudo
+  --reset-mode     Reset saved work/personal mode
+  --mode=MODE      Set mode directly (work or personal)
+  -h, --help       Show this help message and exit
 
 ENVIRONMENT VARIABLES:
   SETUP_MODE    Set to 'work' or 'personal' to install mode-specific packages
@@ -32,7 +38,7 @@ SETUP STEPS:
   8. Install asdf plugins and runtimes
   9. Install Oh My Zsh
   10. Configure SSH keys
-  11. Install Claude Code CLI
+  11. Install AI agent tooling
 
 EXIT CODES:
   0 - Success
@@ -49,20 +55,37 @@ EXAMPLES:
   # Run setup for personal environment
   SETUP_MODE=personal ./setup.sh
 
+  # Non-interactive setup (skip sudo operations)
+  ./setup.sh --skip-sudo
+
+  # Set mode via command line flag
+  ./setup.sh --mode=work
+
 EOF
 }
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
+    --skip-sudo)
+      SKIP_SUDO=true
+      shift
+      ;;
+    --reset-mode)
+      # Reset mode will be handled in prompt_setup_mode
+      RESET_MODE=true
+      shift
+      ;;
+    --mode=*)
+      export SETUP_MODE="${1#*=}"
+      shift
+      ;;
     -h|--help)
       show_help
       exit 0
       ;;
     *)
-      echo "Unknown option: $1" >&2
-      show_help
-      exit 1
+      fail "Unknown option: $1. Use --help for usage information"
       ;;
   esac
 done
@@ -103,16 +126,22 @@ prompt_setup_mode() {
 # Prompt for setup mode before starting
 prompt_setup_mode
 
+# Build sudo flag for scripts
+SUDO_FLAG=""
+if [[ "${SKIP_SUDO}" == "true" ]]; then
+  SUDO_FLAG="--skip-sudo"
+fi
+
 STEPS=(
-  "mvp_system_reqs_check.sh"
+  "mvp_system_reqs_check.sh ${SUDO_FLAG}"
   "brew.sh install"
   "folders.sh ${PATH_DOCUMENTS}"
   "icloud.sh"
-  "macos_settings.sh global"
-  "macos_settings.sh input"
-  "macos_settings.sh dock"
-  "macos_settings.sh finder"
-  "macos_settings.sh misc"
+  "macos_settings.sh global ${SUDO_FLAG}"
+  "macos_settings.sh input ${SUDO_FLAG}"
+  "macos_settings.sh dock ${SUDO_FLAG}"
+  "macos_settings.sh finder ${SUDO_FLAG}"
+  "macos_settings.sh misc ${SUDO_FLAG}"
   "dotfiles.sh"
   "brew.sh bundle"
   "asdf.sh plugins"
