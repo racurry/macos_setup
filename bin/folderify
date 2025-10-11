@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+require 'shellwords'
+
+IGNORED_FILES = %w{.DS_Store .. .}
+
+HELP_TEXT = <<~HELP
+  Usage: folderify DIRECTORY
+
+  Move each file in a directory into its own subdirectory.
+
+  ARGUMENTS:
+    DIRECTORY   Directory containing files to organize
+
+  OPTIONS:
+    -h, --help  Show this help message
+
+  DESCRIPTION:
+    Creates a subdirectory for each file (based on filename without extension)
+    and moves the file into that subdirectory.
+
+    Example: file.txt becomes file/file.txt
+HELP
+
+def folderify_one_file(file, directory_name)
+  filename_parts = file.split('.')
+  file_name_no_extension = filename_parts.take(filename_parts.size - 1).join('.')
+  old_path = "#{directory_name}/#{file}"
+  new_path = "#{directory_name}/#{file_name_no_extension}/#{file}"
+  FileUtils.mkdir_p("#{directory_name}/#{file_name_no_extension}/")
+  FileUtils.mv(old_path, new_path)
+  puts "    #{file_name_no_extension}/#{file}"
+end
+
+def folderify_files(directory_name)
+  all_files = Dir.entries(directory_name)
+  good_files = all_files - IGNORED_FILES
+
+  puts "Folderifying #{good_files.count} files inside of #{directory_name}"
+  good_files.each do |file|
+    folderify_one_file(file, directory_name)
+  end
+end
+
+
+
+if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
+  puts HELP_TEXT
+  exit 0
+end
+
+folderify_files(ARGV[0])

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+show_help() {
+  cat << EOF
+Usage: iconify SOURCE_IMAGE
+
+Create a macOS .icns icon file from a source image.
+
+ARGUMENTS:
+  SOURCE_IMAGE   Path to source image file
+
+OPTIONS:
+  -h, --help    Show this help message
+
+DESCRIPTION:
+  Converts a source image into a macOS .icns icon file by generating
+  all required icon sizes using ImageMagick and iconutil.
+  Generates sizes: 16x16, 32x32, 128x128, 256x256, 512x512 (and @2x versions)
+EOF
+}
+
+if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]] || [[ -z "$1" ]]; then
+  show_help
+  exit 0
+fi
+
+SOURCE=$1
+ICONSET="icon.iconset"
+mkdir -p "$ICONSET"
+
+sizes=(16 32 128 256 512)
+for size in "${sizes[@]}"; do
+  convert "$SOURCE" -resize "${size}x${size}" "$ICONSET/icon_${size}x${size}.png"
+  convert "$SOURCE" -resize "$(($size * 2))x$(($size * 2))" "$ICONSET/icon_${size}x${size}@2x.png"
+done
+
+iconutil -c icns "$ICONSET"

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
@@ -62,8 +63,10 @@ git fetch origin
 
 # Check if remote has updates
 LOCAL_COMMIT="$(git rev-parse @)"
-REMOTE_COMMIT="$(git rev-parse @{u})"
-BASE_COMMIT="$(git merge-base @ @{u})"
+# shellcheck disable=SC1083
+REMOTE_COMMIT="$(git rev-parse '@{u}')"
+# shellcheck disable=SC1083
+BASE_COMMIT="$(git merge-base @ '@{u}')"
 
 if [[ "${LOCAL_COMMIT}" == "${REMOTE_COMMIT}" ]]; then
   log_info "Already up to date"

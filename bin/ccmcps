@@ -1,0 +1,258 @@
+#!/usr/bin/env python3
+"""
+Claude MCP Server Toggle Script
+
+This script helps you quickly enable/disable MCP servers for Claude Code CLI
+to save context when you don't need them all active.
+
+Usage:
+    ccmcps                         # Show enabled/disabled status (default)
+    ccmcps status                  # Show enabled/disabled status
+    ccmcps list                    # Show current MCP servers
+    ccmcps disable [server_name]   # Disable all or specific server
+    ccmcps enable [server_name]    # Enable all or specific server
+"""
+
+import subprocess
+import json
+import os
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional
+
+class ClaudeMCPManager:
+    def __init__(self):
+        self.backup_file = Path.home() / '.claude_mcp_backup.json'
+
+    def run_claude_command(self, args: List[str]) -> subprocess.CompletedProcess:
+        """Run a claude CLI command and return the result."""
+        try:
+            result = subprocess.run(['claude'] + args, capture_output=True, text=True, check=True)
+            return result
+        except subprocess.CalledProcessError as e:
+            print(f"Error running claude command: {e}")
+            print(f"Command output: {e.stdout}")
+            print(f"Command error: {e.stderr}")
+            raise
+
+    def get_active_servers(self) -> Dict[str, Dict]:
+        """Get currently active MCP servers from Claude CLI."""
+        try:
+            result = self.run_claude_command(['mcp', 'list'])
+            servers = {}
+
+            lines = result.stdout.strip().split('\n')
+            for line in lines:
+                if ':' in line and ('✓' in line or '✗' in line):
+                    # Parse server info from the list output
+                    parts = line.split(':')
+                    server_name = parts[0].strip()
+                    server_info = ':'.join(parts[1:]).strip()
+
+                    # Extract connection info and status
+                    status = '✓ Connected' in line
+                    servers[server_name] = {
+                        'info': server_info,
+                        'status': status
+                    }
+
+            return servers
+        except Exception as e:
+            print(f"Error getting active servers: {e}")
+            return {}
+
+    def get_server_details(self, server_name: str) -> Optional[Dict]:
+        """Get detailed configuration for a specific server."""
+        try:
+            result = self.run_claude_command(['mcp', 'get', server_name])
+            # Parse the output to extract server configuration
+            # This would need to be adapted based on actual output format
+            return {'raw_output': result.stdout}
+        except Exception as e:
+            print(f"Error getting server details for {server_name}: {e}")
+            return None
+
+    def load_backup(self) -> Dict:
+        """Load backed up server configurations."""
+        if self.backup_file.exists():
+            try:
+                with open(self.backup_file, 'r') as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Error loading backup: {e}")
+        return {}
+
+    def save_backup(self, servers: Dict):
+        """Save server configurations to backup file."""
+        try:
+            with open(self.backup_file, 'w') as f:
+                json.dump(servers, f, indent=2)
+            print(f"Backup saved to {self.backup_file}")
+        except Exception as e:
+            print(f"Error saving backup: {e}")
+
+    def disable_server(self, server_name: str) -> bool:
+        """Disable a specific MCP server."""
+        try:
+            # First, get server details for backup
+            active_servers = self.get_active_servers()
+            if server_name not in active_servers:
+                print(f"Server '{server_name}' is not currently active")
+                return False
+
+            # Load existing backup
+            backup = self.load_backup()
+
+            # Save server info to backup
+            backup[server_name] = active_servers[server_name]
+            self.save_backup(backup)
+
+            # Remove the server
+            self.run_claude_command(['mcp', 'remove', server_name])
+            print(f"Disabled MCP server: {server_name}")
+            return True
+
+        except Exception as e:
+            print(f"Error disabling server {server_name}: {e}")
+            return False
+
+    def enable_server(self, server_name: str) -> bool:
+        """Enable a specific MCP server from backup."""
+        try:
+            backup = self.load_backup()
+            if server_name not in backup:
+                print(f"No backup found for server '{server_name}'")
+                return False
+
+            server_info = backup[server_name]['info']
+
+            # Parse server info to determine how to re-add it
+            if server_info.startswith('https://') and 'SSE' in server_info:
+                # SSE server
+                url = server_info.split(' (SSE)')[0]
+                self.run_claude_command(['mcp', 'add', server_name, url])
+            elif server_info.startswith('https://') and 'HTTP' in server_info:
+                # HTTP server
+                url = server_info.split(' (HTTP)')[0]
+                self.run_claude_command(['mcp', 'add', server_name, url])
+            elif server_info.startswith('npx ') or '/' in server_info:
+                # Command-based server
+                cmd_parts = server_info.split()
+                self.run_claude_command(['mcp', 'add', server_name] + cmd_parts)
+            else:
+                print(f"Unknown server type for {server_name}: {server_info}")
+                return False
+
+            # Remove from backup after successful re-addition
+            del backup[server_name]
+            self.save_backup(backup)
+
+            print(f"Enabled MCP server: {server_name}")
+            return True
+
+        except Exception as e:
+            print(f"Error enabling server {server_name}: {e}")
+            return False
+
+    def disable_all_servers(self):
+        """Disable all currently active MCP servers."""
+        active_servers = self.get_active_servers()
+        if not active_servers:
+            print("No active MCP servers found")
+            return
+
+        success_count = 0
+        for server_name in active_servers:
+            if self.disable_server(server_name):
+                success_count += 1
+
+        print(f"Disabled {success_count}/{len(active_servers)} MCP servers")
+
+    def enable_all_servers(self):
+        """Enable all servers from backup."""
+        backup = self.load_backup()
+        if not backup:
+            print("No backed up servers found")
+            return
+
+        success_count = 0
+        for server_name in list(backup.keys()):  # Use list() to avoid dict changed during iteration
+            if self.enable_server(server_name):
+                success_count += 1
+
+        print(f"Enabled {success_count}/{len(backup)} MCP servers")
+
+    def show_status(self):
+        """Show current status of active and backed up servers."""
+        print("=== MCP Server Status ===")
+
+        active_servers = self.get_active_servers()
+        backup_servers = self.load_backup()
+
+        print(f"\nActive servers ({len(active_servers)}):")
+        if active_servers:
+            for name, info in active_servers.items():
+                status_icon = "✓" if info['status'] else "✗"
+                print(f"  {status_icon} {name}: {info['info']}")
+        else:
+            print("  None")
+
+        print(f"\nDisabled servers ({len(backup_servers)}):")
+        if backup_servers:
+            for name, info in backup_servers.items():
+                print(f"  - {name}: {info['info']}")
+        else:
+            print("  None")
+
+    def list_servers(self):
+        """List all servers (active and disabled)."""
+        try:
+            result = self.run_claude_command(['mcp', 'list'])
+            print("Current MCP server status:")
+            print(result.stdout)
+
+            backup = self.load_backup()
+            if backup:
+                print("\nDisabled servers (backed up):")
+                for name, info in backup.items():
+                    print(f"  - {name}: {info['info']}")
+        except Exception as e:
+            print(f"Error listing servers: {e}")
+
+
+def main():
+    manager = ClaudeMCPManager()
+
+    if len(sys.argv) < 2:
+        # Default to status if no command provided
+        manager.show_status()
+        return
+
+    command = sys.argv[1].lower()
+
+    if command in ['-h', '--help']:
+        print(__doc__)
+        return
+    elif command == 'list':
+        manager.list_servers()
+    elif command == 'status':
+        manager.show_status()
+    elif command == 'disable':
+        if len(sys.argv) > 2:
+            server_name = sys.argv[2]
+            manager.disable_server(server_name)
+        else:
+            manager.disable_all_servers()
+    elif command == 'enable':
+        if len(sys.argv) > 2:
+            server_name = sys.argv[2]
+            manager.enable_server(server_name)
+        else:
+            manager.enable_all_servers()
+    else:
+        print(f"Unknown command: {command}")
+        print(__doc__)
+
+
+if __name__ == '__main__':
+    main()
