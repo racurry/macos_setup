@@ -18,8 +18,8 @@ HELP_TEXT = <<~HELP
     OUTPUT_NAME      Name for the output file (without extension)
 
   OPTIONS:
-    -h, --help      Show this help message
-    --delete-originals  Delete original files after merging
+    -h, --help             Show this help message
+    --delete-originals     Delete original files after merging
 
   DESCRIPTION:
     Concatenates video files using ffmpeg and outputs a single MP4 file.
@@ -61,6 +61,6 @@ if ARGV.empty? || ['-h', '--help'].include?(ARGV.first)
 end
 
 all_args = ARGV
-delete_originals_param = all_args.delete('-d') || all_args.delete('--delete-originals')
+delete_originals_param = all_args.delete('--delete-originals')
 outputfile = all_args.pop
 merge(all_args, outputfile, !delete_originals_param.nil?)

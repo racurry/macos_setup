@@ -34,7 +34,7 @@ def strip_digits(filename_no_extension)
 end
 
 def dedot(filename_without_extension)
-  retval = filename_without_extension.gsub(/\./, ' ')
+  filename_without_extension.gsub(/\./, ' ')
 end
 
 def clean_up_spaces(filename_without_extension)

@@ -29,7 +29,7 @@ def add_background(source_dir, target_dir, color)
     exit 1
   end
 
-  # Make sure the target_dir exists target_dir
+  # Make sure the target_dir exists
   FileUtils.mkdir_p target_dir
 
   all_files = Dir.entries(source_dir)

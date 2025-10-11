@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-require 'open3'
 require 'shellwords'
 
 HELP_TEXT = <<~HELP
@@ -24,36 +23,13 @@ def ocrify_file(filename)
   file_extension = filename_parts.last
   filename_no_extension = filename_parts.take(filename_parts.size - 1).join('.')
 
-  # Make a tiff for tesseract
-  # system("convert #{filename} -resize 400% -type Grayscale #{filename_no_extension}.tif")
-
-
-
-  # thumbnail, err, s = Open3.capture3("
   convert_cmd = "convert -density 300 #{Shellwords.escape(filename)} -type Grayscale -compress lzw -background white -flatten +matte -depth 32 #{Shellwords.escape(filename_no_extension)}.tif"
-  puts convert_cmd
-
-
   tesseract_cmd = "tesseract #{Shellwords.escape(filename_no_extension)}.tif #{Shellwords.escape(filename_no_extension)}-ocred -l eng pdf"
-  puts tesseract_cmd
 
+  puts "Converting to TIFF..."
+  system(convert_cmd)
 
-  output=`#{convert_cmd}` ;  result=$?.success?
-  puts result
-  # system(convert_cmd)
-
-
-  # puts command
-
-  # stdout, stderr, status = Open3.capture3(command)
-  # unless status.success?
-  #   error = stderr.to_s.strip.empty? ? stdout : stderr
-  #   raise error
-  # end
-  # result = stdout
-
-
-  # Okay now feed that to tesseract
+  puts "Running OCR..."
   system(tesseract_cmd)
 end
 

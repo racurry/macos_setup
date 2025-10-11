@@ -21,5 +21,4 @@ if ['-h', '--help'].include?(ARGV.first)
   exit 0
 end
 
-system(Shellwords.escape("mv ./*/**/*(.D) ."))
-# system(Shellwords.escape("rm -rf ./*/"))
+system("mv ./*/**/*(.D) .")
