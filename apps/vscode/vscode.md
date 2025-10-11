@@ -1,3 +1,3 @@
 # VS Code Setup
 
-tbd
+<!-- TODO: Add VS Code setup instructions -->
