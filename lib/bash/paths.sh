@@ -28,3 +28,7 @@ export PATH_AI_AGENTS="${HOME}/.ai_agents"
 # iCloud paths
 export PATH_ICLOUD="${HOME}/iCloud"
 export PATH_ICLOUD_MOBILE_DOCUMENTS="${HOME}/Library/Mobile Documents/com~apple~CloudDocs"
+
+# Setup configuration paths
+export SETUP_MODE_FILE="${REPO_ROOT}/data/.meta/setup_mode"
+export ZSHRC_LOCAL="${HOME}/.zshrc.local"
