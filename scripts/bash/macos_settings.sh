@@ -277,9 +277,15 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     *)
-      echo "Error: Unknown option '$1'" >&2
-      echo "Run '$(basename "$0") --help' for usage information." >&2
-      exit 1
+      # If it starts with -, it's an unknown option
+      if [[ "$1" == -* ]]; then
+        echo "Error: Unknown option '$1'" >&2
+        echo "Run '$(basename "$0") --help' for usage information." >&2
+        exit 1
+      fi
+      # Otherwise, treat it as a command (will be validated later)
+      COMMAND="$1"
+      shift
       ;;
   esac
 done
@@ -310,5 +316,10 @@ case "${COMMAND}" in
     ;;
   all)
     apply_all_settings
+    ;;
+  *)
+    echo "Error: Unknown command '${COMMAND}'" >&2
+    echo "Run '$(basename "$0") --help' for usage information." >&2
+    exit 1
     ;;
 esac
