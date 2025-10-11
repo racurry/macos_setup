@@ -1,3 +1,3 @@
 # Obsidian Setup
 
-tbd
+<!-- TODO: Add Obsidian setup instructions -->
