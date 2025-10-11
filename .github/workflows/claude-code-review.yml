@@ -1,59 +1,59 @@
-name: Claude Code Review
+# name: Claude Code Review
 
-on:
-  pull_request:
-    types: [opened, synchronize]
+# on:
+#   pull_request:
+#     types: [opened, synchronize]
 
-jobs:
-  claude-review:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: read
-      id-token: write
+# jobs:
+#   claude-review:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#       pull-requests: write
+#       issues: read
+#       id-token: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
 
-      - name: Run Claude Code Review
-        id: claude-review
-        uses: anthropics/claude-code-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          allowed_bots: 'claude[bot]'
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+#       - name: Run Claude Code Review
+#         id: claude-review
+#         uses: anthropics/claude-code-action@v1
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+#           allowed_bots: 'claude[bot]'
+#           prompt: |
+#             REPO: ${{ github.repository }}
+#             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Please review this pull request following these steps:
+#             Please review this pull request following these steps:
 
-            1. Read CLAUDE.md and @AGENTS.md for repository guidelines
-            2. Use `gh pr diff` to see what changed
-            3. Read the changed files to understand the context
-            4. Fix issues directly when appropriate:
-               - Auto-fix: linting errors, formatting issues, simple bugs, typos
-               - Comment only: complex logic changes, architectural decisions, security concerns
-            5. Use `gh pr comment` to explain what you fixed or suggest manual changes
-            6. Run tests if appropriate to verify the changes work
+#             1. Read CLAUDE.md and @AGENTS.md for repository guidelines
+#             2. Use `gh pr diff` to see what changed
+#             3. Read the changed files to understand the context
+#             4. Fix issues directly when appropriate:
+#                - Auto-fix: linting errors, formatting issues, simple bugs, typos
+#                - Comment only: complex logic changes, architectural decisions, security concerns
+#             5. Use `gh pr comment` to explain what you fixed or suggest manual changes
+#             6. Run tests if appropriate to verify the changes work
 
-            Focus your review on:
-            - Following repository conventions from AGENTS.md
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Security concerns
-            - Test coverage
-            - Adherence to the project's bash scripting standards
+#             Focus your review on:
+#             - Following repository conventions from AGENTS.md
+#             - Code quality and best practices
+#             - Potential bugs or issues
+#             - Security concerns
+#             - Test coverage
+#             - Adherence to the project's bash scripting standards
 
-            Be constructive and helpful in your feedback. Keep output brief and to the point.
+#             Be constructive and helpful in your feedback. Keep output brief and to the point.
 
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
-          claude_args: '--allowed-tools "Bash(gh *),Bash(./tests/*),Bash(git *),Read(**),Glob(**),Grep(**),Edit(**),Write(**),TodoWrite" --model sonnet'
-          track_progress: true
-          use_sticky_comment: true
+#           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
+#           # or https://docs.claude.com/en/docs/claude-code/sdk#command-line for available options
+#           claude_args: '--allowed-tools "Bash(gh *),Bash(./tests/*),Bash(git *),Read(**),Glob(**),Grep(**),Edit(**),Write(**),TodoWrite" --model sonnet'
+#           track_progress: true
+#           use_sticky_comment: true
