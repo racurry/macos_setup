@@ -17,8 +17,8 @@ applications, and system settings.
 
 OPTIONS:
   --skip-sudo      Skip operations requiring sudo
-  --reset-mode     Reset saved work/personal mode and prompt for new selection
-  --mode=MODE      Set mode directly (work or personal) without prompting
+  --reset-mode     Reset saved setup mode and prompt for new selection
+  --mode=MODE      Set mode directly (work/personal) without prompting
   -h, --help       Show this help message and exit
 
 ENVIRONMENT VARIABLES:
@@ -89,6 +89,18 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       show_help
       exit 0
+      ;;
+    --reset-mode)
+      rm -f "${SETUP_MODE_FILE}"
+      log_info "Setup mode reset - will prompt for new selection"
+      shift
+      ;;
+    --mode=*)
+      export SETUP_MODE="${1#*=}"
+      if [[ "${SETUP_MODE}" != "work" && "${SETUP_MODE}" != "personal" ]]; then
+        fail "Invalid mode: ${SETUP_MODE}. Must be 'work' or 'personal'"
+      fi
+      shift
       ;;
     *)
       fail "Unknown option: $1. Use --help for usage information"
