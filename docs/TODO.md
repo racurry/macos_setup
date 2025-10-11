@@ -3,28 +3,27 @@
 
 Stuff to add to this setup
 
-## Straightforward todos
+## Agent workflow
 
-- [ ] Add VSCode extensions to the Brewfile(s)
-  - **Clarifying questions needed:**
-  - Should ALL 50 currently installed extensions be added, or only a curated subset?
-  - How should extensions be distributed across Brewfile/Brewfile.personal/Brewfile.work?
-  - Is VSCode Settings Sync currently being used? Does this conflict with Brewfile-based extension management?
-  - Which extensions are work-specific vs personal?
-- [ ] Create a script for updates; brew cleanup, brew update, brew upgrade, mas upgrade, get latest asdf versions, clear old dotfiles backups
-  - **Clarifying questions needed:**
-  - Standalone executable in /bin/ or bash script in /scripts/bash/?
-  - Should homebrew operations run on all Brewfiles or just installed packages?
-  - Should mas upgrade all apps or only those in Brewfile?
-  - For "get latest asdf versions": update plugins, update .tool-versions, or update to latest available versions?
-  - What defines "old" dotfiles backups? (keep N most recent, keep from last X days, prompt user?)
-  - Should it also clean ~/.ssh/backups/ or only ~/.dotfiles_backup/?
-  - Fully automated or interactive (ask for confirmation)?
-  - How to handle errors? (fail fast or continue and report at end?)
-- [ ] Update @scipts/python/audit_apps.py to write to ./tmp instead of /docs.  Add ./tmp to .gitignore
-- [ ] Update @scipts/python/audit_apps.py to document currently installed VS Code extensions
+For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent should read the entire codebase to fully understand the context of the todo.  If it is
+  clear what the problem and solution is, use `gh` to open an issue in <https://github.com/racurry/macos_setup> using gh.  Add enough
+  detail of the problem, solution, and actions to take in the issue so that an AI agent can implement the solution.
+  \
+  If it is not clear, the subagent should return to the main agent a list of clarifying questions.  The main agent should add sub
+  bullets asking the clarifying questions.
 
-## Bigger picture things; needs more thought
+## Ready
+
+- [ ] Add all VS Code user settings to apps/vscode, create script to sync/symlink as needed
+  - **Clarifying questions needed:**
+    1. Where are the VS Code user settings currently located? Are they at the standard location (`~/Library/Application Support/Code/User/settings.json`), already synced somewhere, or should we copy them from a specific machine?
+    2. What should the sync/symlink strategy be? Should VS Code settings be symlinked (like dotfiles/ai_agents), copied (like MailMate keybindings), or something else?
+    3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
+    4. Should this script be integrated into the main setup.sh workflow or remain manual?
+    5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
+- [ ] create a computer specific config file for this repo that lives in ~/.everythingscomputer. Everything should be moved in there that is mutable. For example, backup files, home versus work setting, etc.
+
+## Icebox
 
 - [ ] How do I get things updated to simplify for real life?  Eg getting 1password set up unlocks a lot as I can easily login to app store & github
 - [ ] Figure out how to get the install to run without having to do git clone first.  Maybe a curl pipe to bash that does the git clone and then runs setup.sh?
@@ -32,5 +31,5 @@ Stuff to add to this setup
 - [ ] Think about update strategies for installed apps
 - [ ] How do we clean up old dotfiles backups?
 - [ ] should i move my helper scripts in here?
-- [ ] Can I make more more complex settings with an applescript?
-- [ ] Audit my systems settings and see what I can automate
+- [ ] Can I make more complex settings with an applescript?
+- [ ] Audit my system settings and see what I can automate

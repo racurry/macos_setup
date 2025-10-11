@@ -41,7 +41,7 @@ done
 print_heading "Link dotfiles"
 
 DOTFILES_DIR="${REPO_ROOT}/dotfiles"
-BACKUP_ROOT="${HOME}/.dotfiles_backup"
+BACKUP_ROOT="${PATH_DOTFILES_BACKUP}"
 RUN_STAMP="$(date +%Y%m%d_%H%M%S)"
 
 require_directory "${DOTFILES_DIR}"

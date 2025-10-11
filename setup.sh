@@ -5,6 +5,68 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/lib/bash/common.sh"
 
+show_help() {
+  cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Automated macOS setup script that installs and configures development tools,
+applications, and system settings.
+
+OPTIONS:
+  -h, --help    Show this help message and exit
+
+ENVIRONMENT VARIABLES:
+  SETUP_MODE    Set to 'work' or 'personal' to install mode-specific packages
+                from dotfiles/Brewfile.work or dotfiles/Brewfile.personal
+                in addition to the main dotfiles/Brewfile.
+                If not set, the script will prompt for selection.
+
+SETUP STEPS:
+  1. System requirements check (Xcode CLT, bash version, etc.)
+  2. Install Homebrew
+  3. Create standard folder structure
+  4. Configure iCloud Drive access
+  5. Apply macOS system settings (global, input, dock, finder, misc)
+  6. Link dotfiles to home directory
+  7. Install Homebrew packages from Brewfile(s)
+  8. Install asdf plugins and runtimes
+  9. Install Oh My Zsh
+  10. Configure SSH keys
+  11. Install Claude Code CLI
+
+EXIT CODES:
+  0 - Success
+  1 - Failure
+  2 - Manual follow-up required (rerun after completing the action)
+
+EXAMPLES:
+  # Run setup interactively (will prompt for mode)
+  ./setup.sh
+
+  # Run setup for work environment
+  SETUP_MODE=work ./setup.sh
+
+  # Run setup for personal environment
+  SETUP_MODE=personal ./setup.sh
+
+EOF
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      show_help
+      exit 1
+      ;;
+  esac
+done
+
 # Prompt user for setup mode if not already set
 prompt_setup_mode() {
   if [[ -n "${SETUP_MODE:-}" ]]; then
@@ -57,7 +119,7 @@ STEPS=(
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
   "ssh.sh"
-  "claude_code.sh"
+  "ai_agents.sh"
 )
 
 for step in "${STEPS[@]}"; do
