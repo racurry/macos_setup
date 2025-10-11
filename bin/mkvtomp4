@@ -36,7 +36,7 @@ end
 def convert_file_or_folder_of_files(file_or_folder_name)
 
   unless File.exists?(file_or_folder_name)
-    puts "No such file or folder, dweebus"
+    puts "Error: No such file or directory: #{file_or_folder_name}"
     return
   end
 

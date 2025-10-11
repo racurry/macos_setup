@@ -26,14 +26,14 @@ HELP
 
 def change_file_extensions(current_extension, new_extension)
   unless current_extension && new_extension
-    puts "Nope.  You gotta gimme the current and new extensions"
+    puts "Error: Both current and new extensions are required"
     return
   end
 
   matching_files = Dir["./*.#{current_extension}"]
 
   if matching_files.empty?
-    puts "Nuh uh.  There aren't any #{current_extension} files in this directory"
+    puts "Error: No files with .#{current_extension} extension found in current directory"
     return
   end
 

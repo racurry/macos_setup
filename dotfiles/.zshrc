@@ -176,7 +176,7 @@ alias killport=findandkill
 export PATH="$BREW_PREFIX/opt/bison/bin:$PATH"  # Modern bison for parser generation
 export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH # 
 export PATH="$PATH:$HOME/.lmstudio/bin"
-export PATH="$PATH:$workspace/infra/helper-scripts/bin:$HOME/.local/bin"  # Personal scripts and tools
+export PATH="$PATH:$workspace/infra/macos_setup/bin:$HOME/.local/bin"  # Personal scripts and tools
 
 # Remove duplicates from PATH
 typeset -U PATH

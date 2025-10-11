@@ -25,7 +25,8 @@ HELP
 
 def add_background(source_dir, target_dir, color)
   if source_dir == target_dir
-    puts "Hey fuckwit, you're gonna overwrite your source images"
+    puts "Error: Source and target directories cannot be the same (would overwrite source images)"
+    exit 1
   end
 
   # Make sure the target_dir exists target_dir
