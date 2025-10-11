@@ -29,16 +29,6 @@ HELP_TEXT = <<~HELP
     filename_fixer /path/to/dir strip_digits dedot
 HELP
 
-# def folderify_one_file(file, directory_name)
-#   filename_parts = file.split('.')
-#   file_name_no_extension = filename_parts.take(filename_parts.size - 1).join
-#   old_path = "#{directory_name}/#{file}"
-#   new_path = "#{directory_name}/#{file_name_no_extension}/#{file}"
-#   FileUtils.mkdir_p("#{directory_name}/#{file_name_no_extension}/")
-#   FileUtils.mv(old_path, new_path)}
-#   puts "    #{file_name_no_extension}/#{file}"
-# end
-
 def strip_digits(filename_no_extension)
   filename_no_extension.delete('0-9')
 end
@@ -79,15 +69,6 @@ def fix_filenames(directory_name, options)
     new_path = "#{directory_name}/#{new_name}"
     FileUtils.mv(old_path, new_path)
   end
-
-  # options.each do |option|
-  # end
-
-
-  # puts "Folderifying #{good_files.count} files inside of #{directory_name}"
-  # good_files.each do |file|
-  #   folderify_one_file(file, directory_name)
-  # end
 end
 
 

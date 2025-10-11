@@ -26,7 +26,7 @@ HELP
 def rename(directory, desired_filename)
 
   unless File.directory?(directory)
-    puts "Fuck off, this isn't a directory name"
+    puts "Error: '#{directory}' is not a valid directory"
     return
   end
 

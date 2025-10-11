@@ -27,7 +27,8 @@ HELP_TEXT = <<~HELP
 
   EXAMPLES:
     vidmerge video1.mp4 video2.mp4 merged
-    vidmerge -d /path/to/videos merged
+    vidmerge --delete-originals video1.mp4 video2.mp4 merged
+    vidmerge /path/to/videos merged
 HELP
 
 def merge(filepaths, outputfile, delete_originals=false)
