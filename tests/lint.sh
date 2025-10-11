@@ -58,5 +58,5 @@ if [ ${#bash_sources[@]} -eq 0 ]; then
 fi
 
 echo "Running shellcheck on ${#bash_sources[@]} bash files..."
-shellcheck "${bash_sources[@]}"
+shellcheck --source-path="${REPO_ROOT}" "${bash_sources[@]}"
 echo "✓ All bash files passed shellcheck"
