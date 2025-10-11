@@ -38,7 +38,7 @@ done
 
 print_heading "Configure AI Coding Agents"
 
-AI_AGENTS_DIR="${HOME}/.ai_agents"
+AI_AGENTS_DIR="${PATH_AI_AGENTS}"
 SRC="${REPO_ROOT}/apps/ai_coding/AGENTS.md"
 DEST="${AI_AGENTS_DIR}/AGENTS.md"
 
