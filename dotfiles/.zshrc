@@ -78,7 +78,7 @@ export HF_HOME="$HOME/.cache/huggingface"
 
 # Anything local that doesn't go in git goes in here.  
 # Eg, global secrets, etc
-[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+[[ -f ~/.local.zshrc ]] && source ~/.local.zshrc
 
 # ============================================================================
 # HISTORY CONFIGURATION
