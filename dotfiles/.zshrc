@@ -76,7 +76,8 @@ export LESS="-FRXK"
 # Hug the face
 export HF_HOME="$HOME/.cache/huggingface"
 
-# Secrets go in here
+# Anything local that doesn't go in git goes in here.  
+# Eg, global secrets, etc
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
 
 # ============================================================================
