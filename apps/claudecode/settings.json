@@ -2,11 +2,11 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|MultiEdit",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/acurry/.claude/hooks/markdown-formatter.sh"
+            "command": "~/.claude/hooks/lint-and-fix.sh"
           }
         ]
       }
