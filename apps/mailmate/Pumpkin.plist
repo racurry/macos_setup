@@ -19,7 +19,7 @@
 	"c" = "newMessage:"; // [GM/SH] Compose new message
 	"r" = "replySenderOrAsk:"; // [GM/SH] Reply (to sender or ask)
 	"a" = "replyAll:"; // [GM] Reply all
-	"\U000D" = "replyAll:"; // enter - [SH] Reply all (Superhuman's default)
+	"\U000D" = "openMessages:"; // enter - Open selected message
 	"f" = "forwardMessage:"; // [GM/SH] Forward message
 	"^s" = "saveDocument:"; // [MM] Save draft
 
