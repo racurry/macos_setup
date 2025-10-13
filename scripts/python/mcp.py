@@ -78,8 +78,9 @@ def main():
         print(f"\nRegistering '{name}' with Claude…")
         rc = run(["claude", "mcp", "add-json", name, compact_json], args.dry_run)
         if rc != 0:
-            sys.exit(rc)
-        print("✓ Claude: added.")
+            print(f"⚠️  Claude returned non-zero exit code ({rc}). Continuing to Codex…", file=sys.stderr)
+        else:
+            print("✓ Claude: added.")
 
     # Codex
     if not args.skip_codex:
