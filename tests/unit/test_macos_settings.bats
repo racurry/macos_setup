@@ -68,3 +68,21 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" =~ "sudo" ]]
 }
+
+@test "help output mentions --skip-sudo flag" {
+    run "$SCRIPT_PATH" --help
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "--skip-sudo" ]]
+}
+
+@test "--skip-sudo flag is accepted with commands" {
+    run "$SCRIPT_PATH" global --skip-sudo
+    # Should not fail with "unknown option" error
+    [[ ! "$output" =~ "Error: Unknown option" ]]
+}
+
+@test "--skip-sudo works in any position with command" {
+    run "$SCRIPT_PATH" --skip-sudo global
+    # Should not fail with "unknown option" error
+    [[ ! "$output" =~ "Error: Unknown option" ]]
+}
