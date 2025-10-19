@@ -43,12 +43,12 @@ if [[ -x "$BRCTL" ]]; then
   section "Quick counters from status"
   # Heuristic counters; brctl output varies across macOS versions. We grep common states.
   {
-    echo -n "Uploading:   "; grep -Ei 'upload(ing| pending)?' "$STATUS_OUT" | wc -l | awk '{print $1}'
-    echo -n "Downloading: "; grep -Ei 'download(ing| pending)?' "$STATUS_OUT" | wc -l | awk '{print $1}'
-    echo -n "Conflicts:   "; grep -Ei 'conflict' "$STATUS_OUT" | wc -l | awk '{print $1}'
-    echo -n "Errors:      "; grep -Ei 'error|failed|denied|forbidden|nospace|quota' "$STATUS_OUT" | wc -l | awk '{print $1}'
-    echo -n "Evicted:     "; grep -Ei 'evict(ed)?' "$STATUS_OUT" | wc -l | awk '{print $1}'
-    echo -n "Waiting:     "; grep -Ei 'waiting|queued|pending' "$STATUS_OUT" | wc -l | awk '{print $1}'
+    echo -n "Uploading:   "; grep -Eic 'upload(ing| pending)?' "$STATUS_OUT"
+    echo -n "Downloading: "; grep -Eic 'download(ing| pending)?' "$STATUS_OUT"
+    echo -n "Conflicts:   "; grep -Eic 'conflict' "$STATUS_OUT"
+    echo -n "Errors:      "; grep -Eic 'error|failed|denied|forbidden|nospace|quota' "$STATUS_OUT"
+    echo -n "Evicted:     "; grep -Eic 'evict(ed)?' "$STATUS_OUT"
+    echo -n "Waiting:     "; grep -Eic 'waiting|queued|pending' "$STATUS_OUT"
   } | column -t
 fi
 
@@ -107,6 +107,7 @@ fi
 section "Permissions sanity (drwx for folders; look for odd owners)"
 if [[ -d "$ICLOUD_ROOT" ]]; then
   # Show top-level with owners/permissions (quick scan)
+  # shellcheck disable=SC2012
   ls -lO@ "$ICLOUD_ROOT" | sed 's/^/  /'
 fi
 
