@@ -242,3 +242,8 @@ alias grbp='git rebase-and-push'
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/aaron/.lmstudio/bin"
+# End of LM Studio CLI section
+

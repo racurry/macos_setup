@@ -11,23 +11,18 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 # shellcheck disable=SC1091
 source "${REPO_ROOT}/lib/bash/common.sh"
 
-# Additional logging functions
-log_success() {
-  printf "\033[1;32m[%s] %s\033[0m\n" "${LOG_TAG}" "$*"
+# Configuration - Discover OpenSCAD installation
+discover_openscad_app() {
+  # Find OpenSCAD app in /Applications (handles any version)
+  local app
+  app=$(find /Applications -maxdepth 1 -name "OpenSCAD*.app" -print -quit 2>/dev/null)
+  if [[ -z "${app}" ]]; then
+    return 1
+  fi
+  echo "${app}"
 }
 
-log_section() {
-  printf "\n\033[1;36m==> %s\033[0m\n" "$*"
-}
-
-# TODO - re-use whatever is in @common.sh
-# Color codes for summary
-BOLD=$'\033[1m'
-GREEN=$'\033[1;32m'
-NC=$'\033[0m'
-
-# Configuration
-OPENSCAD_APP="/Applications/OpenSCAD-2021.01.app" # TODO: should this be discovered w/ a brew command?
+OPENSCAD_APP=$(discover_openscad_app)
 OPENSCAD_BINARY="${OPENSCAD_APP}/Contents/MacOS/OpenSCAD"
 VSCODE_SETTINGS="$HOME/Library/Application Support/Code/User/settings.json"
 RECOMMENDED_EXTENSIONS=(
@@ -50,41 +45,88 @@ This script:
 
 OPTIONS:
   -h, --help              Show this help message and exit
+  --install               Install OpenSCAD and Rosetta 2 if not present
   --install-extensions    Install recommended VS Code extensions
   --test                  Run a test render after setup
-  --skip-config          Skip VS Code configuration (only verify installation)
+  --skip-config           Skip VS Code configuration (only verify installation)
 
 EXAMPLES:
   $(basename "$0")                          # Basic setup and configuration
-  $(basename "$0") --install-extensions     # Setup and install extensions
+  $(basename "$0") --install                # Install OpenSCAD and Rosetta 2, then configure
+  $(basename "$0") --install-extensions     # Setup and install VS Code extensions
   $(basename "$0") --test                   # Setup and test with sample file
 
 PREREQUISITES:
-  - OpenSCAD installed via Homebrew (brew install --cask openscad)
-  - VS Code installed
-  - Rosetta 2 (for Apple Silicon Macs)
+  - Homebrew installed
+  - VS Code installed (for VS Code integration)
+
+NOTE:
+  - Without --install flag, OpenSCAD and Rosetta 2 must be pre-installed
+  - Use --install to automatically install OpenSCAD and Rosetta 2
 
 EOF
 }
 
-# TODO - This should be using system checks in @common.sh.  Extend them as needed to support this functionality
-check_rosetta() {
+install_rosetta() {
+  log_info "Installing Rosetta 2..."
+
+  if check_rosetta; then
+    log_success "Rosetta 2 is already installed"
+    return 0
+  fi
+
+  log_info "Installing Rosetta 2 (this may take a few minutes)..."
+  if softwareupdate --install-rosetta --agree-to-license; then
+    log_success "Rosetta 2 installed successfully"
+  else
+    log_error "Failed to install Rosetta 2"
+    return 1
+  fi
+}
+
+verify_rosetta() {
   log_info "Checking Rosetta 2 installation..."
 
-  # TODO - we'll only ever be on silocon macs, do not test architecture
-  if [[ "$(uname -m)" == "arm64" ]]; then
-    if ! pgrep -q oahd; then
-      log_warn "Rosetta 2 may not be installed. OpenSCAD requires Rosetta 2 on Apple Silicon."
-      log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
-      return 1
-    else
-      log_success "Rosetta 2 is installed"
-    fi
+  if check_rosetta; then
+    log_success "Rosetta 2 is installed"
+  else
+    log_warn "Rosetta 2 is not installed. OpenSCAD requires Rosetta 2 on Apple Silicon."
+    log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
+    return 1
+  fi
+}
+
+install_openscad() {
+  log_info "Installing OpenSCAD..."
+
+  require_command brew
+
+  if brew list --cask openscad &>/dev/null; then
+    log_success "OpenSCAD is already installed"
+    return 0
+  fi
+
+  log_info "Installing OpenSCAD via Homebrew..."
+  if brew install --cask openscad; then
+    log_success "OpenSCAD installed successfully"
+
+    # Re-discover the app path after installation
+    OPENSCAD_APP=$(discover_openscad_app)
+    OPENSCAD_BINARY="${OPENSCAD_APP}/Contents/MacOS/OpenSCAD"
+  else
+    log_error "Failed to install OpenSCAD"
+    return 1
   fi
 }
 
 verify_openscad() {
   log_info "Verifying OpenSCAD installation..."
+
+  if [[ -z "${OPENSCAD_APP}" ]]; then
+    log_error "OpenSCAD not found in /Applications"
+    log_info "Install with: brew install --cask openscad"
+    fail "OpenSCAD installation required"
+  fi
 
   require_directory "${OPENSCAD_APP}"
   require_file "${OPENSCAD_BINARY}"
@@ -184,20 +226,20 @@ test_setup() {
 print_summary() {
   cat << EOF
 
-${BOLD}${GREEN}OpenSCAD Setup Complete!${NC}
+${CLR_BOLD}${CLR_SUCCESS}OpenSCAD Setup Complete!${CLR_RESET}
 
-${BOLD}Installed Components:${NC}
+${CLR_BOLD}Installed Components:${CLR_RESET}
   - OpenSCAD: $(openscad --version 2>&1 | head -1)
   - Command-line tool: $(which openscad)
   - VS Code extensions: $(code --list-extensions | grep -i openscad | tr '\n' ', ' | sed 's/,$//')
 
-${BOLD}VS Code Usage:${NC}
+${CLR_BOLD}VS Code Usage:${CLR_RESET}
   1. Open any .scad file in VS Code
   2. Click 'Preview in OpenSCAD' button (top right)
   3. Edit and save - preview auto-reloads
   4. Click 'Export Model' to export to STL, 3MF, etc.
 
-${BOLD}Command-line Usage:${NC}
+${CLR_BOLD}Command-line Usage:${CLR_RESET}
   # Render to STL
   openscad -o output.stl input.scad
 
@@ -207,7 +249,7 @@ ${BOLD}Command-line Usage:${NC}
   # With parameters
   openscad -o output.stl -D 'width=50' -D 'height=100' input.scad
 
-${BOLD}Useful Resources:${NC}
+${CLR_BOLD}Useful Resources:${CLR_RESET}
   - OpenSCAD Cheatsheet: https://openscad.org/cheatsheet/
   - Tutorial: https://openscad.org/documentation.html
   - VS Code Extension Docs: https://marketplace.visualstudio.com/items?itemName=Antyos.openscad
@@ -215,8 +257,8 @@ ${BOLD}Useful Resources:${NC}
 EOF
 }
 
-# TODO this also needs to actually install openscad and rosetta as needed
 main() {
+  local do_install=false
   local install_exts=false
   local run_test=false
   local skip_config=false
@@ -227,6 +269,10 @@ main() {
       -h|--help)
         show_help
         exit 0
+        ;;
+      --install)
+        do_install=true
+        shift
         ;;
       --install-extensions)
         install_exts=true
@@ -248,13 +294,19 @@ main() {
     esac
   done
 
-  log_section "OpenSCAD Setup"
+  print_heading "OpenSCAD Setup"
+
+  # Install if requested
+  if [[ "${do_install}" == true ]]; then
+    install_rosetta
+    install_openscad
+  fi
 
   # Verify installation (will exit on failure)
   verify_openscad
 
   # Check Rosetta 2
-  check_rosetta || true
+  verify_rosetta || true
 
   # Install extensions if requested
   if [[ "${install_exts}" == true ]]; then

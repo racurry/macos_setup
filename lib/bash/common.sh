@@ -16,6 +16,9 @@ CLR_RESET=$'\033[0m'   # reset / default
 CLR_INFO=$'\033[1;34m' # bright blue for informational messages
 CLR_WARN=$'\033[1;33m' # bright yellow for warnings
 CLR_ERROR=$'\033[1;31m' # bright red for errors
+CLR_SUCCESS=$'\033[1;32m' # bright green for success messages
+CLR_BOLD=$'\033[1m'    # bold text
+CLR_CYAN=$'\033[1;36m' # bright cyan for headings
 
 log_info() {
   printf "%s[%s] %s%s\n" "${CLR_INFO}" "${LOG_TAG}" "$*" "${CLR_RESET}"
@@ -27,6 +30,10 @@ log_warn() {
 
 log_error() {
   printf "%s[%s] %s%s\n" "${CLR_ERROR}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
+}
+
+log_success() {
+  printf "%s[%s] %s%s\n" "${CLR_SUCCESS}" "${LOG_TAG}" "$*" "${CLR_RESET}"
 }
 
 fail() {
@@ -63,5 +70,25 @@ print_heading() {
   printf "\n\033[1;36m==> %s\033[0m\n" "$text"
 }
 
+# check_rosetta verifies Rosetta 2 is installed on Apple Silicon.
+check_rosetta() {
+  if ! pgrep -q oahd; then
+    return 1
+  fi
+  return 0
+}
+
+# require_rosetta ensures Rosetta 2 is installed, failing with instructions if not.
+require_rosetta() {
+  if ! check_rosetta; then
+    log_error "Rosetta 2 is not installed but is required"
+    log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
+    fail "Rosetta 2 installation required"
+  fi
+}
+
 # Guard against sourcing multiple times.
 export REPO_ROOT
+
+# Export color codes for external use
+export CLR_RESET CLR_INFO CLR_WARN CLR_ERROR CLR_SUCCESS CLR_BOLD CLR_CYAN
