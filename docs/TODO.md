@@ -23,6 +23,7 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
 - [ ] create a computer specific config file for this repo that lives in ~/.everythingscomputer. Everything should be moved in there that is mutable. For example, backup files, home versus work setting, etc.
 - [ ] Figure out a way for the claudecode.sh script to merge apps/claudecode/settings.json into ~/.claude/settings.json
+- [ ] Overhaul mcp - just create a .mcp.json in ~/ that has my servers in it.  Remove the mcp stuff from this repo.
 
 ## Icebox
 
@@ -34,3 +35,4 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 - [ ] should i move my helper scripts in here?
 - [ ] Can I make more complex settings with an applescript?
 - [ ] Audit my system settings and see what I can automate
+- [ ] Pull claude code settings out into a standalone repo; this repo will need to pull that repo down and set it up
