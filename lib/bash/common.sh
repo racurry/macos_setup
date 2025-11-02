@@ -6,6 +6,10 @@ COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # COMMON_DIR is lib/bash, so bubble up two levels to reach the repo root.
 REPO_ROOT="$(cd "${COMMON_DIR}/../.." && pwd)"
 
+# Setup configuration paths
+SETUP_MODE_FILE="${REPO_ROOT}/data/.meta/setup_mode"
+ZSHRC_LOCAL="${HOME}/.zshrc.local"
+
 # Source paths for centralized path definitions
 # shellcheck source=lib/bash/paths.sh
 source "${COMMON_DIR}/paths.sh"
