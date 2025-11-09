@@ -1,27 +1,30 @@
 alias galileocfg="code -nw ~/.galileorc"
-alias sequel="LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN=y /Applications/Sequel\ Pro.app/Contents/MacOS/Sequel\ Pro &"
-alias mysql_port="docker port api_flask | grep -Eo '[0-9]+$'"
-
-# From galileo onboarding docs
-export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH"
 
 # Galileo auto-bootstraping
-# Automatically update bootstrap
-git -C ~/workspace/galileo/dotfiles reset --hard origin/master > /dev/null 2>&1
-git -C ~/workspace/galileo/dotfiles pull > /dev/null 2>&1
+DOTFILES_DIR=~/workspace/galileo/dotfiles
+if [ -d "$DOTFILES_DIR/.git" ]; then
+  CURRENT_BRANCH=$(git -C "$DOTFILES_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [ "$CURRENT_BRANCH" != "master" ]; then
+    echo "⚠️  Galileo dotfiles not on master branch (currently on: $CURRENT_BRANCH)" >&2
+  elif ! git -C "$DOTFILES_DIR" diff-index --quiet HEAD -- 2>/dev/null; then
+    echo "⚠️  Galileo dotfiles has local changes, skipping auto-update" >&2
+  else
+    git -C "$DOTFILES_DIR" pull > /dev/null 2>&1
+  fi
+fi
 
 # Source library functions from bootstrap
-if [ -f ~/workspace/galileo/dotfiles/bootstrap.sh ]; then
-  source ~/workspace/galileo/dotfiles/bootstrap.sh
+if [ -f "$DOTFILES_DIR/bootstrap.sh" ]; then
+  source "$DOTFILES_DIR/bootstrap.sh"
 fi
 
 # Galileo projects
 export galileo=~/workspace/galileo/
 export gdots=~/workspace/galileo/dotfiles/
-export api=~/workspace/galileo/api.galileo.io/
+export api=~/workspace/galileo/api/
 export ios=~/workspace/galileo/health-ios/
 export android=~/workspace/galileo/health-android/
-export core=~/workspace/galileo/api-django/
+export core=~/workspace/galileo/core-api/
 
 # dbt
 alias dbt="python3 -m dbt.cli.main"
