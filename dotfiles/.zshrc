@@ -21,18 +21,14 @@ fi
 # PACKAGE MANAGERS & TOOL SETUP
 # ============================================================================
 
-# Homebrew and ASDF setup
-# Ensure Homebrew is on the path and asdf is sourced
-# (Order matters as asdf is installed via Homebrew)
+# Homebrew setup
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Set Homebrew prefix for reuse throughout shell and exported for subprocesses
 export BREW_PREFIX=$(brew --prefix)
 
-. $BREW_PREFIX/opt/asdf/libexec/asdf.sh
-
-# Add asdf completions
-fpath=(${ASDF_DIR}/completions $fpath)
+# mise 
+eval "$(mise activate zsh)"
 
 # Source Homebrew-installed zsh plugins
 source_brew_plugin() {
@@ -45,11 +41,6 @@ source_brew_plugin "share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source_brew_plugin "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"  # Must be last
 
 unset -f source_brew_plugin
-
-# Initialize direnv if available
-if command -v direnv >/dev/null 2>&1; then
-  eval "$(direnv hook zsh)"
-fi
 
 # ============================================================================
 # SHELL APPEARANCE & BEHAVIOR

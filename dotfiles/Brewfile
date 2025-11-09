@@ -1,5 +1,4 @@
 # Homebrew packages (brew)
-brew "asdf"
 brew "bat"
 brew "bats-core"
 brew "diff-so-fancy"
@@ -16,6 +15,7 @@ brew "hub"
 brew "imagemagick"
 brew "markdownlint-cli2"
 brew "mas"  # Required for Mac App Store apps
+brew "mise"
 brew "pure"
 brew "qpdf"
 brew "ruff"

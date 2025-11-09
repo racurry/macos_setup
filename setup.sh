@@ -35,7 +35,7 @@ SETUP STEPS:
   5. Apply macOS system settings (global, input, dock, finder, misc)
   6. Link dotfiles to home directory
   7. Install Homebrew packages from Brewfile(s)
-  8. Install asdf plugins and runtimes
+  8. Install and configure mise, install runtimes
   9. Install Oh My Zsh
   10. Configure SSH keys
   11. Install AI agent tooling
@@ -144,8 +144,8 @@ STEPS=(
   "macos_settings.sh misc ${SUDO_FLAG}"
   "dotfiles.sh"
   "brew.sh bundle"
-  "asdf.sh plugins"
-  "asdf.sh runtimes"
+  "mise.sh install"
+  "mise.sh runtimes"
   "oh_my_zsh.sh"
   "ssh.sh"
 )

@@ -42,7 +42,7 @@ This will run the full setup process.  Sometimes, it might need manual intervent
 ## Stuff that is managed
 
 - App management via [Homebrew](https://brew.sh/) and [mas](https://github.com/mas-cli/mas) using the [Brewfile](./dotfiles/Brewfile)
-- Environment management via [asdf](https://asdf-vm.com/) using [.tool-versions](./dotfiles/.tool-versions), and global packages for [`nodejs`](./dotfiles/.default-npm-packages), [`ruby`](./dotfiles/.default-gems), and [`python`](./dotfiles/.default-python-packages)
+- Environment management via [mise](https://mise.jdx.dev/) using [.tool-versions](./dotfiles/.tool-versions), and global packages for [`nodejs`](./apps/mise/.default-npm-packages), [`ruby`](./apps/mise/.default-gems), and [`python`](./apps/mise/.default-python-packages)
 - Dotfiles in [dotfiles](./dotfiles) symlinked to `~/.dotfiles`, including [zsh config](./dotfiles/.zshrc), [git config](./dotfiles/.gitconfig), and more.
 
 ## Resources
