@@ -17,6 +17,7 @@ brew "imagemagick"
 brew "markdownlint-cli2"
 brew "mas"  # Required for Mac App Store apps
 brew "pure"
+brew "qpdf"
 brew "ruff"
 brew "shellcheck"
 brew "thefuck"

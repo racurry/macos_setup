@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+"""
+Split a multi-page PDF into individual single-page PDFs.
+
+Usage:
+    python split_pdf.py <input.pdf>
+
+This will create files named:
+    input_page_1.pdf
+    input_page_2.pdf
+    ...
+"""
+
+import sys
+from pathlib import Path
+
+try:
+    from pypdf import PdfReader, PdfWriter
+except ImportError:
+    print("Error: pypdf library is not installed.")
+    print("Install it with: pip install pypdf")
+    sys.exit(1)
+
+
+def split_pdf(input_path: str) -> None:
+    """Split a PDF file into individual pages."""
+    input_file = Path(input_path)
+
+    if not input_file.exists():
+        print(f"Error: File '{input_path}' does not exist.")
+        sys.exit(1)
+
+    if input_file.suffix.lower() != ".pdf":
+        print(f"Error: File '{input_path}' is not a PDF.")
+        sys.exit(1)
+
+    try:
+        reader = PdfReader(input_file)
+        num_pages = len(reader.pages)
+
+        print(f"Splitting '{input_file.name}' ({num_pages} pages)...")
+
+        output_dir = input_file.parent
+        base_name = input_file.stem
+
+        for page_num in range(num_pages):
+            writer = PdfWriter()
+            writer.add_page(reader.pages[page_num])
+
+            output_file = output_dir / f"{base_name}_page_{page_num + 1}.pdf"
+
+            with open(output_file, "wb") as output_pdf:
+                writer.write(output_pdf)
+
+            print(f"  Created: {output_file.name}")
+
+        print(f"\nSuccessfully split {num_pages} pages into individual PDFs.")
+
+    except Exception as e:
+        print(f"Error processing PDF: {e}")
+        sys.exit(1)
+
+
+def main():
+    """Main entry point."""
+    if len(sys.argv) != 2:
+        print("Usage: python split_pdf.py <input.pdf>")
+        sys.exit(1)
+
+    input_path = sys.argv[1]
+    split_pdf(input_path)
+
+
+if __name__ == "__main__":
+    main()
