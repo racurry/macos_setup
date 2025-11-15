@@ -31,9 +31,9 @@ SETUP STEPS:
   1. System requirements check (Xcode CLT, bash version, etc.)
   2. Install Homebrew
   3. Create standard folder structure
-  4. Configure iCloud Drive access
-  5. Apply macOS system settings (global, input, dock, finder, misc)
-  6. Link dotfiles to home directory
+  4. Link dotfiles to home directory
+  5. Configure iCloud Drive access
+  6. Apply macOS system settings (global, input, dock, finder, misc)
   7. Install Homebrew packages from Brewfile(s)
   8. Install asdf plugins and runtimes
   9. Install Oh My Zsh
@@ -136,13 +136,13 @@ STEPS=(
   "mvp_system_reqs_check.sh ${SUDO_FLAG}"
   "brew.sh install"
   "folders.sh ${PATH_DOCUMENTS}"
+  "dotfiles.sh"
   "icloud.sh"
   "macos_settings.sh global ${SUDO_FLAG}"
   "macos_settings.sh input ${SUDO_FLAG}"
   "macos_settings.sh dock ${SUDO_FLAG}"
   "macos_settings.sh finder ${SUDO_FLAG}"
   "macos_settings.sh misc ${SUDO_FLAG}"
-  "dotfiles.sh"
   "brew.sh bundle"
   "asdf.sh plugins"
   "asdf.sh runtimes"
