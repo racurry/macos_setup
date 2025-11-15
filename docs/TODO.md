@@ -26,6 +26,7 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 - [ ] create a computer specific config file for this repo that lives in ~/.everythingscomputer. Everything should be moved in there that is mutable. For example, backup files, home versus work setting, etc.
 - [ ] Figure out a way for the claudecode.sh script to merge apps/claudecode/settings.json into ~/.claude/settings.json
 - [ ] Overhaul mcp - just create a .mcp.json in ~/ that has my servers in it.  Remove the mcp stuff from this repo.
+- [ ] Auto-update/generate @docs/README.md and @docs/dev_tools.md.
 
 ## Icebox
 
