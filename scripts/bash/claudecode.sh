@@ -9,20 +9,18 @@ show_help() {
   cat << EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Link Claude Code configuration files to ~/.claude.
+Link Claude Code global configuration to ~/.claude.
 
 OPTIONS:
   -h, --help    Show this help message and exit
 
 DESCRIPTION:
-  This script creates symbolic links for:
-  - Hook files from apps/claudecode/hooks to ~/.claude/hooks
-  - Command files from apps/claudecode/commands to ~/.claude/commands (recursive)
-  - AGENTS.md to ~/.claude/CLAUDE.md
+  This script creates a symbolic link from apps/claudecode/CLAUDE.global.md
+  to ~/.claude/CLAUDE.md.
 
-  If a symlink already exists at the destination, it will be replaced. If a
-  non-symlink file exists at ~/.claude/CLAUDE.md, it will be backed up to
-  ~/.claude/CLAUDE.local.md. Other files are backed up with a timestamp suffix.
+  - If a symlink already exists at the destination, it will be replaced.
+  - If a non-symlink file exists at ~/.claude/CLAUDE.md, it will be backed up
+    to ~/.lament-configuration/backups/ with a timestamp suffix.
 
 EOF
 }
@@ -45,101 +43,61 @@ done
 print_heading "Link Claude Code configuration"
 
 RUN_STAMP="$(date +%Y%m%d_%H%M%S)"
-BACKUP_ROOT="${HOME}/.claude/backups"
+BACKUP_ROOT="${HOME}/.lament-configuration/backups"
 mkdir -p "${BACKUP_ROOT}"
 
-# Function to link files recursively from a source directory to a destination directory
-# Arguments:
-#   $1 - Source directory (absolute path)
-#   $2 - Destination directory (absolute path)
-#   $3 - Type name (for logging, e.g., "hooks" or "commands")
-link_files_recursive() {
-  local src_dir="$1"
-  local dest_dir="$2"
-  local type_name="$3"
-
-  require_directory "${src_dir}"
-  mkdir -p "${dest_dir}"
-
-  # Use find to get all files recursively
-  while IFS= read -r -d '' src; do
-    # Calculate relative path from source directory
-    local rel_path="${src#"${src_dir}"/}"
-    local dest="${dest_dir}/${rel_path}"
-    local dest_parent
-    dest_parent="$(dirname "${dest}")"
-
-    # Create parent directory if needed
-    mkdir -p "${dest_parent}"
-
-    # Handle existing files/symlinks
-    if [[ -L "${dest}" ]]; then
-      current_target="$(readlink "${dest}")"
-      if [[ "${current_target}" == "${src}" ]]; then
-        log_info "Symlink already correct: ${dest}"
-        continue
-      fi
-      log_info "Replacing existing symlink ${dest}"
-      rm "${dest}"
-    elif [[ -e "${dest}" ]]; then
-      # Preserve directory structure in backup
-      local backup_rel_path="${rel_path}.bak.${RUN_STAMP}"
-      local backup_target="${BACKUP_ROOT}/${type_name}/${backup_rel_path}"
-      local backup_parent
-      backup_parent="$(dirname "${backup_target}")"
-      mkdir -p "${backup_parent}"
-      log_info "Backing up existing file ${dest} to ${backup_target}"
-      mv "${dest}" "${backup_target}"
-    fi
-
-    log_info "Linking ${dest} -> ${src}"
-    ln -s "${src}" "${dest}"
-  done < <(find "${src_dir}" -type f -print0)
-
-  log_info "Claude Code ${type_name} linked"
-}
-
-# Link hooks
-HOOKS_SRC_DIR="${REPO_ROOT}/apps/claudecode/hooks"
-HOOKS_DEST_DIR="${HOME}/.claude/hooks"
-if [[ -d "${HOOKS_SRC_DIR}" ]]; then
-  link_files_recursive "${HOOKS_SRC_DIR}" "${HOOKS_DEST_DIR}" "hooks"
-fi
-
-# Link commands
-COMMANDS_SRC_DIR="${REPO_ROOT}/apps/claudecode/commands"
-COMMANDS_DEST_DIR="${HOME}/.claude/commands"
-if [[ -d "${COMMANDS_SRC_DIR}" ]]; then
-  link_files_recursive "${COMMANDS_SRC_DIR}" "${COMMANDS_DEST_DIR}" "commands"
-fi
-
-# Link AGENTS.md to CLAUDE.md
-AGENTS_SRC="${REPO_ROOT}/AGENTS.md"
+# Link CLAUDE.global.md to CLAUDE.md
+CLAUDE_GLOBAL_SRC="${REPO_ROOT}/apps/claudecode/CLAUDE.global.md"
 CLAUDE_DEST="${HOME}/.claude/CLAUDE.md"
-CLAUDE_LOCAL="${HOME}/.claude/CLAUDE.local.md"
 
-if [[ -f "${AGENTS_SRC}" ]]; then
-  if [[ -L "${CLAUDE_DEST}" ]]; then
-    current_target="$(readlink "${CLAUDE_DEST}")"
-    if [[ "${current_target}" == "${AGENTS_SRC}" ]]; then
-      log_info "Symlink already correct: ${CLAUDE_DEST}"
-    else
-      log_info "Replacing existing symlink ${CLAUDE_DEST}"
-      rm "${CLAUDE_DEST}"
-      log_info "Linking ${CLAUDE_DEST} -> ${AGENTS_SRC}"
-      ln -s "${AGENTS_SRC}" "${CLAUDE_DEST}"
-    fi
-  elif [[ -e "${CLAUDE_DEST}" ]]; then
-    log_info "Backing up existing file ${CLAUDE_DEST} to ${CLAUDE_LOCAL}"
-    mv "${CLAUDE_DEST}" "${CLAUDE_LOCAL}"
-    log_info "Linking ${CLAUDE_DEST} -> ${AGENTS_SRC}"
-    ln -s "${AGENTS_SRC}" "${CLAUDE_DEST}"
-  else
-    log_info "Linking ${CLAUDE_DEST} -> ${AGENTS_SRC}"
-    ln -s "${AGENTS_SRC}" "${CLAUDE_DEST}"
-  fi
-else
-  log_warn "AGENTS.md not found at ${AGENTS_SRC}, skipping"
+if [[ ! -f "${CLAUDE_GLOBAL_SRC}" ]]; then
+  fail "CLAUDE.global.md not found at ${CLAUDE_GLOBAL_SRC}"
 fi
 
-log_info "All Claude Code configuration files linked"
+# Ensure ~/.claude directory exists
+mkdir -p "${HOME}/.claude"
+
+# Handle existing files/symlinks
+if [[ -L "${CLAUDE_DEST}" ]]; then
+  current_target="$(readlink "${CLAUDE_DEST}")"
+  if [[ "${current_target}" == "${CLAUDE_GLOBAL_SRC}" ]]; then
+    log_info "Symlink already correct: ${CLAUDE_DEST}"
+  else
+    log_info "Replacing existing symlink ${CLAUDE_DEST}"
+    rm "${CLAUDE_DEST}"
+    log_info "Linking ${CLAUDE_DEST} -> ${CLAUDE_GLOBAL_SRC}"
+    ln -s "${CLAUDE_GLOBAL_SRC}" "${CLAUDE_DEST}"
+  fi
+elif [[ -e "${CLAUDE_DEST}" ]]; then
+  backup_target="${BACKUP_ROOT}/CLAUDE.md.bak.${RUN_STAMP}"
+  log_info "Backing up existing file ${CLAUDE_DEST} to ${backup_target}"
+  mv "${CLAUDE_DEST}" "${backup_target}"
+  log_info "Linking ${CLAUDE_DEST} -> ${CLAUDE_GLOBAL_SRC}"
+  ln -s "${CLAUDE_GLOBAL_SRC}" "${CLAUDE_DEST}"
+else
+  log_info "Linking ${CLAUDE_DEST} -> ${CLAUDE_GLOBAL_SRC}"
+  ln -s "${CLAUDE_GLOBAL_SRC}" "${CLAUDE_DEST}"
+fi
+
+# Configure Claude Code settings
+SETTINGS_FILE="${HOME}/.claude/settings.json"
+
+log_info "Configuring Claude Code settings"
+
+# Ensure settings file exists
+if [[ ! -f "${SETTINGS_FILE}" ]]; then
+  log_info "Creating new settings.json file"
+  echo '{}' > "${SETTINGS_FILE}"
+fi
+
+# Use jq to set alwaysThinkingEnabled and enableAllProjectMcpServers to true
+require_command jq
+
+tmp_file=$(mktemp)
+jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true' "${SETTINGS_FILE}" > "${tmp_file}"
+mv "${tmp_file}" "${SETTINGS_FILE}"
+
+log_info "Set alwaysThinkingEnabled = true"
+log_info "Set enableAllProjectMcpServers = true"
+
+log_success "Claude Code configuration linked successfully"
