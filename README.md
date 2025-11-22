@@ -27,12 +27,12 @@ This will run the full setup process.  Sometimes, it might need manual intervent
 ./setup.sh
 
 # Non-interactive setup (skip sudo operations)
-./setup.sh --skip-sudo
+./setup.sh --unattended
 ```
 
 ### Setup Options
 
-- `--skip-sudo` - Skip operations requiring sudo (useful for CI/CD or non-interactive environments)
+- `--unattended` - Skip operations requiring sudo (useful for CI/CD or non-interactive environments)
 - `--mode=MODE` - Set mode directly (work or personal)
 - `--reset-mode` - Reset saved work/personal mode
 - `-h, --help` - Show help message

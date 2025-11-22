@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/bash/common.sh"
 
 # Global flag
-SKIP_SUDO=false
+UNATTENDED=false
 
 show_help() {
   cat << EOF
@@ -16,7 +16,7 @@ Automated macOS setup script that installs and configures development tools,
 applications, and system settings.
 
 OPTIONS:
-  --skip-sudo      Skip operations requiring sudo
+  --unattended     Skip operations requiring sudo
   --reset-mode     Reset saved work/personal mode
   --mode=MODE      Set mode directly (work or personal)
   -h, --help       Show this help message and exit
@@ -56,7 +56,7 @@ EXAMPLES:
   SETUP_MODE=personal ./setup.sh
 
   # Non-interactive setup (skip sudo operations)
-  ./setup.sh --skip-sudo
+  ./setup.sh --unattended
 
   # Set mode via command line flag
   ./setup.sh --mode=work
@@ -67,8 +67,8 @@ EOF
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --skip-sudo)
-      SKIP_SUDO=true
+    --unattended)
+      UNATTENDED=true
       shift
       ;;
     --reset-mode)
@@ -128,8 +128,8 @@ prompt_setup_mode
 
 # Build sudo flag for scripts
 SUDO_FLAG=""
-if [[ "${SKIP_SUDO}" == "true" ]]; then
-  SUDO_FLAG="--skip-sudo"
+if [[ "${UNATTENDED}" == "true" ]]; then
+  SUDO_FLAG="--unattended"
 fi
 
 STEPS=(
@@ -148,9 +148,17 @@ STEPS=(
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
   "ssh.sh"
+  "claudecode.sh"
+  "direnv.sh"
 )
 
 for step in "${STEPS[@]}"; do
+  # Skip SSH setup in unattended mode (requires 1Password unlock)
+  if [[ "${UNATTENDED}" == "true" ]] && [[ "${step}" == "ssh.sh" ]]; then
+    log_warn "Skipping ${step} (requires 1Password unlock in unattended mode)"
+    continue
+  fi
+
   set +e
   (cd "${SCRIPT_DIR}/scripts/bash" && bash ${step})
   status=$?

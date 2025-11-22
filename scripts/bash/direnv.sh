@@ -37,7 +37,6 @@ setup_direnv_lib() {
         return 0
     fi
 
-    local file_count=0
     for source_file in "${source_dir}"/*.sh; do
         # Check if glob matched anything
         [[ -e "${source_file}" ]] || continue
@@ -53,14 +52,7 @@ setup_direnv_lib() {
 
         log_info "Symlinking ${filename}"
         ln -s "${source_file}" "${target_file}"
-        ((file_count++))
     done
-
-    if [[ ${file_count} -eq 0 ]]; then
-        log_info "No .sh files found in ${source_dir}"
-    else
-        log_info "Symlinked ${file_count} direnv library file(s)"
-    fi
 }
 
 main() {

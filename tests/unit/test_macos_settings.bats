@@ -69,20 +69,20 @@ setup() {
     [[ "$output" =~ "sudo" ]]
 }
 
-@test "help output mentions --skip-sudo flag" {
+@test "help output mentions --unattended flag" {
     run "$SCRIPT_PATH" --help
     [ "$status" -eq 0 ]
-    [[ "$output" =~ "--skip-sudo" ]]
+    [[ "$output" =~ "--unattended" ]]
 }
 
-@test "--skip-sudo flag is accepted with commands" {
-    run "$SCRIPT_PATH" global --skip-sudo
+@test "--unattended flag is accepted with commands" {
+    run "$SCRIPT_PATH" global --unattended
     # Should not fail with "unknown option" error
     [[ ! "$output" =~ "Error: Unknown option" ]]
 }
 
-@test "--skip-sudo works in any position with command" {
-    run "$SCRIPT_PATH" --skip-sudo global
+@test "--unattended works in any position with command" {
+    run "$SCRIPT_PATH" --unattended global
     # Should not fail with "unknown option" error
     [[ ! "$output" =~ "Error: Unknown option" ]]
 }

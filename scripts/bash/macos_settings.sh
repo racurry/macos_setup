@@ -6,11 +6,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 # Global flag
-SKIP_SUDO=false
+UNATTENDED=false
 
 ensure_sudo_cached() {
-  if [[ "${SKIP_SUDO}" == "true" ]]; then
-    log_warn "Skipping sudo operations (--skip-sudo flag set)"
+  if [[ "${UNATTENDED}" == "true" ]]; then
+    log_warn "Skipping sudo operations (--unattended flag set)"
     return 0
   fi
 
@@ -43,16 +43,16 @@ COMMANDS:
   all          Apply all settings (equivalent to running all commands above)
 
 OPTIONS:
-  --skip-sudo  Skip operations requiring sudo
-  -h, --help   Show this help message and exit
+  --unattended  Skip operations requiring sudo
+  -h, --help    Show this help message and exit
 
 EXAMPLES:
   $(basename "$0") global           # Apply only global settings
   $(basename "$0") dock             # Apply only dock settings
   $(basename "$0") all              # Apply all settings
-  $(basename "$0") global --skip-sudo  # Apply global settings, skip sudo operations
+  $(basename "$0") global --unattended  # Apply global settings, skip sudo operations
 
-NOTE: Commands that modify system-wide settings will prompt for sudo unless --skip-sudo is specified.
+NOTE: Commands that modify system-wide settings will prompt for sudo unless --unattended is specified.
 EOF
 }
 
@@ -77,7 +77,7 @@ apply_global_settings() {
   log_info "Automatically quit printer app when jobs complete"
   defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-  if [[ "${SKIP_SUDO}" == "false" ]]; then
+  if [[ "${UNATTENDED}" == "false" ]]; then
     log_info "Disable automatic display brightness adjustment"
     sudo defaults write /Library/Preferences/com.apple.iokit.AmbientLightSensor "Automatic Display Enabled" -bool false
   else
@@ -264,8 +264,8 @@ apply_all_settings() {
 COMMAND=""
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --skip-sudo)
-      SKIP_SUDO=true
+    --unattended)
+      UNATTENDED=true
       shift
       ;;
     -h|--help|help)

@@ -50,18 +50,18 @@ teardown() {
   run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --help
   [ "$status" -eq 0 ]
   [[ "$output" =~ "Usage:" ]]
-  [[ "$output" =~ "--skip-sudo" ]]
+  [[ "$output" =~ "--unattended" ]]
 }
 
-@test "--skip-sudo flag is accepted" {
+@test "--unattended flag is accepted" {
   cd "${REPO_ROOT}"
-  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --skip-sudo
+  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --unattended
   # Should not fail with "unknown option" error
   [[ ! "$output" =~ "Error: Unknown option" ]]
 }
 
-@test "--skip-sudo skips sudo check" {
+@test "--unattended skips sudo check" {
   cd "${REPO_ROOT}"
-  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --skip-sudo
+  run bash "${REPO_ROOT}/scripts/bash/mvp_system_reqs_check.sh" --unattended
   [[ "$output" =~ "Skipping sudo availability check" ]]
 }
