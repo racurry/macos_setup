@@ -174,10 +174,10 @@ alias killport=findandkill
 # ============================================================================
 
 # PATH modifications
-export PATH="$BREW_PREFIX/opt/bison/bin:$PATH"  # Modern bison for parser generation
-export PATH=/Applications/SnowSQL.app/Contents/MacOS:$PATH # 
-export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$workspace/infra/macos_setup/bin:$HOME/.local/bin"  # Personal scripts and tools
+export PATH="$BREW_PREFIX/opt/bison/bin:$PATH"  # Modern bison for parser generation
+export PATH="$PATH:$HOME/.lmstudio/bin" # Local Llama Studio binaries
+export PATH="$PATH:$HOME/.antigravity/antigravity/bin" # Google's Antigravity - agry
 
 # Remove duplicates from PATH
 typeset -U PATH
@@ -242,8 +242,4 @@ alias grbp='git rebase-and-push'
 if [ -f ~/.galileorc ]; then
   source ~/.galileorc
 fi
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/aaron/.lmstudio/bin"
-# End of LM Studio CLI section
 
