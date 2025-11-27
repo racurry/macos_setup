@@ -1,41 +1,20 @@
-# macOS Setup
+# Motherbox
 
-## Set up a new Mac
+This is my "all-in-one" project for managing multiple macOS environments (personal and work) consistently. It houses setup scripts for a new Mac setup, development environment setup, overall app & tool settings, dotfiles, and a handful of convenience scripts that help with various workflows.
 
-**Step 1:**
+## Set up a new mac
 
-1. Generate a new ssh key:
-`ssh-keygen -t rsa`
-2. Copy it to your clipboard:
-`pbcopy < ~/.ssh/id_rsa.pub`
-3. Add it here: [github settings](https://github.com/settings/keys)
+Pre-requisites:
+Step 1 - set up your dirs: `mkdir -p ~/.ssh && chmod 700 ~/.ssh && mkdir -p ~/workspace/infra`
+Step 2 - get the ssh key: [Download](<https://1password.com/downloads/mac>), install, and sign in.  Copy the ssh key to your clipboard.
+Step 3 - put it in place: `pbpaste > ~/.ssh/id_personal_github && chmod 600 ~/.ssh/id_personal_github && echo -e "Host github.com\n    IdentityFile ~/.ssh/id_personal_github" > ~/.ssh/config && git clone git@github.com:racurry/osx_setup.git ~/workspace/infra/osx_setup`
 
-**Step 2:**
-
-```bash
-mkdir ~/workspace
-cd ~/workspace
-git clone git@github.com:racurry/osx_setup.git
-```
-
-**Step 3:**
-
-This will run the full setup process.  Sometimes, it might need manual intervention; do what it says and run it again. It is idempotent, run it til its done.
+Run the setup script:
 
 ```bash
-# Normal setup (requires sudo for some operations)
+cd ~/workspace/infra/osx_setup
 ./setup.sh
-
-# Non-interactive setup (skip sudo operations)
-./setup.sh --unattended
 ```
-
-### Setup Options
-
-- `--unattended` - Skip operations requiring sudo (useful for CI/CD or non-interactive environments)
-- `--mode=MODE` - Set mode directly (work or personal)
-- `--reset-mode` - Reset saved work/personal mode
-- `-h, --help` - Show help message
 
 ## What's in here?
 
