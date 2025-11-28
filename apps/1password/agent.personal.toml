@@ -1,0 +1,7 @@
+# 1Password SSH Agent Configuration
+# Personal machine: personal key only
+
+[[ssh-keys]]
+item = "Aaron's github ssh key"
+vault = "Private"
+account = "my.1password.com"

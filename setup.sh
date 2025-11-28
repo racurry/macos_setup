@@ -37,7 +37,7 @@ SETUP STEPS:
   7. Install Homebrew packages from Brewfile(s)
   8. Install asdf plugins and runtimes
   9. Install Oh My Zsh
-  10. Configure SSH keys
+  10. Configure 1Password SSH agent
   11. Install AI agent tooling
 
 EXIT CODES:
@@ -147,18 +147,12 @@ STEPS=(
   "asdf.sh plugins"
   "asdf.sh runtimes"
   "oh_my_zsh.sh"
-  "ssh.sh"
+  "1password.sh"
   "claudecode.sh"
   "direnv.sh"
 )
 
 for step in "${STEPS[@]}"; do
-  # Skip SSH setup in unattended mode (requires 1Password unlock)
-  if [[ "${UNATTENDED}" == "true" ]] && [[ "${step}" == "ssh.sh" ]]; then
-    log_warn "Skipping ${step} (requires 1Password unlock in unattended mode)"
-    continue
-  fi
-
   set +e
   (cd "${SCRIPT_DIR}/scripts/bash" && bash ${step})
   status=$?

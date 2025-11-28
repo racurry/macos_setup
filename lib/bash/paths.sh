@@ -21,8 +21,6 @@ export PATH_DESKTOP="${HOME}/Desktop"
 export PATH_DOWNLOADS="${HOME}/Downloads"
 
 # Application data paths
-export PATH_SSH_DIR="${HOME}/.ssh"
-export PATH_SSH_BACKUPS="${HOME}/.ssh/backups"
 export PATH_DOTFILES_BACKUP="${HOME}/.dotfiles_backup"
 
 # iCloud paths

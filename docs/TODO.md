@@ -15,7 +15,6 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 ## Ready
 
 - [ ] Bug: When running setup.sh on a system that doesn't already have brew installed, the whole set up fails.  It tries to run brew bundle referencing files in ~. before it calls `dotfiles.sh`.
-- [ ] When running for the first time on a machine, something is wrong with ssh: `Updating SSH configuration... Warning: ~.ssh/config not found, skipping config update`
 - [ ] Add all VS Code user settings to apps/vscode, create script to sync/symlink as needed
   - **Clarifying questions needed:**
     1. Where are the VS Code user settings currently located? Are they at the standard location (`~/Library/Application Support/Code/User/settings.json`), already synced somewhere, or should we copy them from a specific machine?
