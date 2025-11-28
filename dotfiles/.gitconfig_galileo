@@ -1,4 +1,3 @@
 [user]
   email = acurry@galileo.io
   name = Aaron Curry
-  signingkey = ~/.ssh/id_work_github.pub

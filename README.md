@@ -4,17 +4,10 @@ This is my "all-in-one" project for managing multiple macOS environments (person
 
 ## Set up a new mac
 
-Pre-requisites:
-Step 1 - set up your dirs: `mkdir -p ~/.ssh && chmod 700 ~/.ssh && mkdir -p ~/workspace/infra`
-Step 2 - get the ssh key: [Download](<https://1password.com/downloads/mac>), install, and sign in.  Copy the ssh key to your clipboard.
-Step 3 - put it in place: `pbpaste > ~/.ssh/id_personal_github && chmod 600 ~/.ssh/id_personal_github && echo -e "Host github.com\n    IdentityFile ~/.ssh/id_personal_github" > ~/.ssh/config && git clone git@github.com:racurry/osx_setup.git ~/workspace/infra/osx_setup`
-
-Run the setup script:
-
-```bash
-cd ~/workspace/infra/osx_setup
-./setup.sh
-```
+1. [Download 1Password](https://1password.com/downloads/mac), install, and sign in
+2. Enable SSH agent: Settings → Developer → SSH Agent
+3. Clone: `git clone git@github.com:racurry/osx_setup.git ~/workspace/infra/osx_setup`
+4. Run: `cd ~/workspace/infra/osx_setup && ./setup.sh`
 
 ## What's in here?
 
