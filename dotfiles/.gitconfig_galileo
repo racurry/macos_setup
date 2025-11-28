@@ -1,3 +1,4 @@
 [user]
   email = acurry@galileo.io
   name = Aaron Curry
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOknMGcpYxYOmkpwzhXStPli/xVhU/GhBHNV7oKZiV8H
