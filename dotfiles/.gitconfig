@@ -1,9 +1,19 @@
 [user]
   email = aaroncurry@gmail.com
 	name = Aaron Curry
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPFgJeR2xvRDGOb0/QZpdHU3B75y3KnHymp3sG5pGrzB
 
+# Work-specific settings; basically, user & signing key
 [includeIf "gitdir:~/workspace/galileo/"]
   path = ~/.gitconfig_galileo
+
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+[commit]
+  gpgsign = true
+
 
 [alias]
   # Command shortcuts
