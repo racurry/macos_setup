@@ -169,39 +169,57 @@ if [[ "${UNATTENDED}" == "true" ]]; then
   SUDO_FLAG="--unattended"
 fi
 
-STEPS=(
+# Phase 1: Package Management (everything else depends on this)
+STEPS_FOUNDATION=(
   "apps/brew/brew.sh install"
-  "apps/macos/folders.sh ${PATH_DOCUMENTS}"
-  "apps/git/git.sh"
+  "apps/brew/brew.sh bundle"
+)
+
+# Phase 2: Shell & Security Configuration
+STEPS_SHELL=(
   "apps/zsh/zsh.sh"
+  "apps/git/git.sh"
+  "apps/ohmyzsh/ohmyzsh.sh"
+  "apps/direnv/direnv.sh"
+  "apps/1password/1password.sh"
+)
+
+# Phase 3: Language Runtimes (slow, requires asdf from brew bundle)
+STEPS_RUNTIMES=(
+  "apps/asdf/asdf.sh plugins"
+  "apps/asdf/asdf.sh runtimes"
+)
+
+# Phase 4: File System Organization
+STEPS_FILESYSTEM=(
+  "apps/macos/folders.sh ${PATH_DOCUMENTS}"
   "apps/icloud/icloud.sh"
+)
+
+# Phase 5: System Preferences
+STEPS_MACOS=(
   "apps/macos/macos.sh global ${SUDO_FLAG}"
   "apps/macos/macos.sh input ${SUDO_FLAG}"
   "apps/macos/macos.sh dock ${SUDO_FLAG}"
   "apps/macos/macos.sh finder ${SUDO_FLAG}"
   "apps/macos/macos.sh misc ${SUDO_FLAG}"
-  "apps/brew/brew.sh bundle"
-  "apps/asdf/asdf.sh plugins"
-  "apps/asdf/asdf.sh runtimes"
-  "apps/ohmyzsh/ohmyzsh.sh"
-  "apps/1password/1password.sh"
-  "apps/claudecode/claudecode.sh"
-  "apps/devonthink/devonthink.sh"
-  "apps/direnv/direnv.sh"
-  "apps/mailmate/mailmate.sh"
-  "apps/openscad/openscad.sh"
-  "scripts/update_repo.sh"
 )
 
-for step in "${STEPS[@]}"; do
+# Phase 6: Application Configuration
+STEPS_APPS=(
+  "apps/claudecode/claudecode.sh"
+)
+
+# Run a single step, handling exit codes
+run_step() {
+  local step="$1"
   set +e
   (cd "${SCRIPT_DIR}" && bash ${step})
-  status=$?
+  local status=$?
   set -e
 
   case ${status} in
-    0)
-      ;;
+    0) ;;
     2)
       log_warn "${step} requested manual follow-up; rerun once complete"
       exit 2
@@ -210,7 +228,26 @@ for step in "${STEPS[@]}"; do
       fail "${step} exited with status ${status}"
       ;;
   esac
-done
+}
+
+# Run all steps in a phase
+run_phase() {
+  local phase_name="$1"
+  shift
+  local steps=("$@")
+
+  print_heading "${phase_name}"
+  for step in "${steps[@]}"; do
+    run_step "${step}"
+  done
+}
+
+run_phase "Foundation"      "${STEPS_FOUNDATION[@]}"
+run_phase "Shell & Security" "${STEPS_SHELL[@]}"
+run_phase "Runtimes"        "${STEPS_RUNTIMES[@]}"
+run_phase "File System"     "${STEPS_FILESYSTEM[@]}"
+run_phase "macOS Settings"  "${STEPS_MACOS[@]}"
+run_phase "Applications"    "${STEPS_APPS[@]}"
 manual_file="${SCRIPT_DIR}/docs/manual_todos.md"
 if [[ -f "${manual_file}" ]]; then
   echo
