@@ -1,18 +1,18 @@
-# Backup Strategy
+# Config Backups
 
 This document defines the backup strategy for user configuration files.
 
-For deploying config files to user locations, see [Deploying Configs](copying_configs.md).
+For copying or symlinking config files to user locations, see [copying_configs.md](copying_configs.md).
 
 ## Backup Location
 
-```
+```text
 ~/.config/motherbox/backups/{date}/{app_name}/{filename}.{timestamp}
 ```
 
 **Example:**
 
-```
+```text
 ~/.config/motherbox/backups/
 └── 20241130/
     ├── zsh/

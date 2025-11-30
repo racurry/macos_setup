@@ -1,10 +1,10 @@
-# Deploying Configs
+# Copying Configs
 
-This document describes how to deploy configuration files from the repository
-to user locations.
+This document describes how to copy or symlink configuration files from the
+repository to user locations.
 
 Both functions automatically back up existing files before replacing them.
-See [Backup Strategy](backup_strategy.md) for backup details.
+See [config_backups.md](config_backups.md) for backup details.
 
 ## Functions
 
