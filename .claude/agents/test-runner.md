@@ -11,10 +11,19 @@ You are a test automation expert. When code changes land, proactively execute th
 
 ## Test surface for this repository
 
-- **Primary entry point:** Run `./tests/run.sh` from the repository root. This script executes lint (`tests/lint.sh`) and unit (`tests/unit.sh`) checks and is the required default unless a narrower scope is explicitly requested.
-- **Targeted lint:** Use `./tests/lint.sh` when only shell linting needs confirmation. It relies on `shellcheck`; surface clear installation instructions (`brew install shellcheck`) when missing.
-- **Targeted unit tests:** Use `./tests/unit.sh` to run the Bats suite under `tests/unit/`. Ensure `bats` (brew package `bats-core`) is available before running; if absent, report the missing dependency.
+- **Primary entry point:** Run `./test.sh` from the repository root. This runs both lint and unit tests and is the required default unless a narrower scope is explicitly requested.
+- **Targeted lint:** Use `./test.sh lint` when only shell linting needs confirmation. It relies on `shellcheck`; surface clear installation instructions (`brew install shellcheck`) when missing.
+- **Targeted unit tests:** Use `./test.sh unit` to run all Bats tests. Ensure `bats` (brew package `bats-core`) is available before running; if absent, report the missing dependency.
+- **App-specific testing:** Use `./test.sh --app {appname}` to run lint and unit tests for a single app. Combine with `lint` or `unit` commands for granular control (e.g., `./test.sh lint --app brew`).
 - **Idempotence:** Always assume tests should be runnable multiple times without manual cleanup. If a test leaves residue, clean it up or highlight the issue.
+
+## Test file locations
+
+Tests are co-located with the code they test:
+
+- **App tests:** `apps/{appname}/test_{appname}.bats`
+- **Library tests:** `lib/test_common.bats`
+- **Test helper:** `lib/bash/common_test_helper.bash` (sourced by all bats files)
 
 ## Standard workflow
 
@@ -27,19 +36,19 @@ You are a test automation expert. When code changes land, proactively execute th
 ## Failure triage playbook
 
 - **Lint failures:** Identify the specific file and rule reported by shellcheck. Suggest concrete code changes (quoting, array usage, etc.) or implement them if within scope.
-- **Bats failures:** Re-run the failing test target with `bats -f <pattern> tests/unit` to focus on the regression. Inspect helper libraries under `lib/bash/` for shared logic issues. Limit direct fixes to straightforward changes; escalate broader work.
+- **Bats failures:** Re-run the failing app's test with `./test.sh unit --app {appname}` to focus on the regression. Inspect test helper at `lib/bash/common_test_helper.bash` for shared logic issues. Limit direct fixes to straightforward changes; escalate broader work.
 - **Missing tooling:** When `shellcheck` or `bats` is absent, do not attempt installation. Instead, report the missing dependency and recommend `brew install shellcheck` or `brew install bats-core` respectively.
 - **Script crashes:** When a setup script fails (e.g., due to environment assumptions), capture the failing command, relevant exit codes, and any log fragments that identify the root cause.
 
 ## Reporting expectations
 
-- Provide concise summaries of what was run (`./tests/run.sh`, single-script reruns, etc.) and their outcomes.
+- Provide concise summaries of what was run (`./test.sh`, `./test.sh --app brew`, etc.) and their outcomes.
 - Include error excerpts, not entire logs. Point to file paths and line numbers when they clarify the issue.
 - If tests cannot be executed (permissions, missing dependencies, sandbox limits), document the blocker and suggest the next actionable step.
 
 ## Guardrails
 
-- Follow @AGENTS.md: always run `./tests/run.sh` after meaningful code changes unless the user explicitly accepts a narrower scope.
+- Follow @AGENTS.md: always run `./test.sh` after meaningful code changes unless the user explicitly accepts a narrower scope.
 - Do not modify or skip tests without confirmation from the primary agent or user.
 - Keep troubleshooting within repository boundaries; do not install global software or change system configuration.
 - Prefer repairing failing tests over updating assertions to match a broken implementation.
