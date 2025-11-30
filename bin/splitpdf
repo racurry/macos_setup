@@ -1,9 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#   "pypdf>=4.0.0",
+# ]
+# ///
 """
 Split a multi-page PDF into individual single-page PDFs.
 
 Usage:
-    python split_pdf.py <input.pdf>
+    ./splitpdf <input.pdf>
 
 This will create files named:
     input_page_1.pdf
@@ -14,12 +20,7 @@ This will create files named:
 import sys
 from pathlib import Path
 
-try:
-    from pypdf import PdfReader, PdfWriter
-except ImportError:
-    print("Error: pypdf library is not installed.")
-    print("Install it with: pip install pypdf")
-    sys.exit(1)
+from pypdf import PdfReader, PdfWriter
 
 
 def split_pdf(input_path: str) -> None:
@@ -64,7 +65,7 @@ def split_pdf(input_path: str) -> None:
 def main():
     """Main entry point."""
     if len(sys.argv) != 2:
-        print("Usage: python split_pdf.py <input.pdf>")
+        print("Usage: ./splitpdf <input.pdf>")
         sys.exit(1)
 
     input_path = sys.argv[1]
