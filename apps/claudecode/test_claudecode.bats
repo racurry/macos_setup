@@ -21,14 +21,14 @@ teardown() {
 }
 
 @test "claudecode.sh creates CLAUDE.md symlink" {
-  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}"
+  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
   [ "$status" -eq 0 ]
   [ -L "${HOME}/.claude/CLAUDE.md" ]
   [ "$(readlink "${HOME}/.claude/CLAUDE.md")" = "${REPO_ROOT}/apps/claudecode/CLAUDE.global.md" ]
 }
 
 @test "claudecode.sh creates settings.json with required fields" {
-  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}"
+  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
   [ "$status" -eq 0 ]
   [ -f "${HOME}/.claude/settings.json" ]
   grep -q '"alwaysThinkingEnabled": true' "${HOME}/.claude/settings.json"
@@ -36,8 +36,8 @@ teardown() {
 }
 
 @test "claudecode.sh is idempotent" {
-  env HOME="${HOME}" "${CLAUDECODE_SCRIPT}"
-  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}"
+  env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
+  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
   [ "$status" -eq 0 ]
   [ -L "${HOME}/.claude/CLAUDE.md" ]
   [ -f "${HOME}/.claude/settings.json" ]
@@ -47,11 +47,11 @@ teardown() {
   mkdir -p "${HOME}/.claude"
   echo "existing content" > "${HOME}/.claude/CLAUDE.md"
 
-  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}"
+  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
   [ "$status" -eq 0 ]
   [ -L "${HOME}/.claude/CLAUDE.md" ]
-  # Should be backed up to ~/.lament-configuration/backups/
-  [ -f "${HOME}/.lament-configuration/backups/CLAUDE.md.bak."* ]
+  # Should be backed up to ~/.config/motherbox/backups/
+  [ -f "${HOME}/.config/motherbox/backups/CLAUDE.md.bak."* ]
 }
 
 @test "claudecode.sh --help shows usage information" {
@@ -70,9 +70,9 @@ teardown() {
   [[ "$output" == *"-h, --help"* ]]
 }
 
-@test "claudecode.sh with unknown option shows error and help" {
+@test "claudecode.sh with unknown argument shows error and help" {
   run "${CLAUDECODE_SCRIPT}" --invalid-option
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Unknown option: --invalid-option"* ]]
+  [[ "$output" == *"Unknown argument"* ]]
   [[ "$output" == *"Usage:"* ]]
 }

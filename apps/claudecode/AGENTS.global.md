@@ -4,6 +4,7 @@
 - **Project environment**: Use `direnv` to manage project environments (venvs, PATH, env vars, etc.). Create `.envrc` if needed. If direnv is not installed, ask for guidance.
 - **Package management**: For asdf-managed runtimes (node/python/ruby/etc), install packages locally to the project; never install globally
 - **Web searches**: Verify current date/year in search queries when searching for recent documentation or time-sensitive information
+- **Git commands**: Use `git` directly, not `git -C /path` - the working directory is already the repo root
 - **Default license**: NEVER include license information in generated code unless explicitly requested by the user
 - **Author attribution**: NEVER include author attribution in generated code unless explicitly requested by the user
 

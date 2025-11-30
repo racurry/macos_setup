@@ -1,4 +1,4 @@
-# Motherbox
+# Mother Box
 
 This is my "all-in-one" project for managing multiple macOS environments (personal and work) consistently. It houses setup scripts for a new Mac setup, development environment setup, overall app & tool settings, dotfiles, and a handful of convenience scripts that help with various workflows.
 

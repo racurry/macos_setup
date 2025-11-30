@@ -65,6 +65,28 @@ require_directory() {
   fi
 }
 
+# backup_file moves a file to the Mother Box backups directory.
+# Usage: backup_file <file_path> <app_name>
+# Creates: ~/.config/motherbox/backups/<app_name>/<filename>.<timestamp>
+backup_file() {
+  local file_path="$1"
+  local app_name="$2"
+  local filename timestamp backup_dir backup_path
+
+  if [[ ! -e "$file_path" ]]; then
+    return 0
+  fi
+
+  filename="$(basename "$file_path")"
+  timestamp="$(date +%Y%m%d_%H%M%S)"
+  backup_dir="${PATH_MOTHERBOX_BACKUPS}/${app_name}"
+  backup_path="${backup_dir}/${filename}.${timestamp}"
+
+  mkdir -p "$backup_dir"
+  mv "$file_path" "$backup_path"
+  log_warn "Backed up ${filename} to ${backup_path}"
+}
+
 print_heading() {
   local text="$1"
   printf "\n\033[1;36m==> %s\033[0m\n" "$text"
@@ -85,6 +107,43 @@ require_rosetta() {
     log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
     fail "Rosetta 2 installation required"
   fi
+}
+
+# link_file creates or updates a symlink, backing up existing files if needed.
+# Usage: link_file <source> <destination>
+# - If destination is already a correct symlink, does nothing
+# - If destination is a different symlink, replaces it
+# - If destination is a regular file, backs it up to PATH_MOTHERBOX_BACKUPS
+link_file() {
+    local src="$1"
+    local dest="$2"
+    local dest_name
+    dest_name="$(basename "${dest}")"
+
+    if [[ -L "${dest}" ]]; then
+        local current_target
+        current_target="$(readlink "${dest}")"
+        if [[ "${current_target}" == "${src}" ]]; then
+            log_info "Symlink already correct: ${dest}"
+        else
+            log_info "Replacing existing symlink ${dest}"
+            rm "${dest}"
+            log_info "Linking ${dest} -> ${src}"
+            ln -s "${src}" "${dest}"
+        fi
+    elif [[ -e "${dest}" ]]; then
+        local run_stamp
+        run_stamp="$(date +%Y%m%d_%H%M%S)"
+        mkdir -p "${PATH_MOTHERBOX_BACKUPS}"
+        local backup_target="${PATH_MOTHERBOX_BACKUPS}/${dest_name}.bak.${run_stamp}"
+        log_info "Backing up existing file ${dest} to ${backup_target}"
+        mv "${dest}" "${backup_target}"
+        log_info "Linking ${dest} -> ${src}"
+        ln -s "${src}" "${dest}"
+    else
+        log_info "Linking ${dest} -> ${src}"
+        ln -s "${src}" "${dest}"
+    fi
 }
 
 # Guard against sourcing multiple times.

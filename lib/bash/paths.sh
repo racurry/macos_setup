@@ -14,14 +14,15 @@
 #
 # ===============================================================================
 
+# Mother Box paths (this project's config and data)
+export PATH_MOTHERBOX_CONFIG="${HOME}/.config/motherbox"
+export PATH_MOTHERBOX_BACKUPS="${PATH_MOTHERBOX_CONFIG}/backups"
+
 # User directory paths
 export PATH_DOCUMENTS="${HOME}/Documents"
 export PATH_SCREENSHOTS="${HOME}/Screenshots"
 export PATH_DESKTOP="${HOME}/Desktop"
 export PATH_DOWNLOADS="${HOME}/Downloads"
-
-# Application data paths
-export PATH_DOTFILES_BACKUP="${HOME}/.dotfiles_backup"
 
 # iCloud paths
 export PATH_ICLOUD="${HOME}/iCloud"
