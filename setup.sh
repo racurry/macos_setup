@@ -211,8 +211,9 @@ STEPS_MACOS=(
 
 # Application Configuration
 STEPS_APPS=(
-  "apps/claudecode/claudecode.sh"
+  "apps/claudecode/claudecode.sh setup"
   "apps/shellcheck/shellcheck.sh setup"
+  "apps/markdownlint/markdownlint.sh setup"
 )
 
 # Run a single step, handling exit codes
