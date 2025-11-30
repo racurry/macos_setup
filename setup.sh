@@ -169,13 +169,13 @@ if [[ "${UNATTENDED}" == "true" ]]; then
   SUDO_FLAG="--unattended"
 fi
 
-# Phase 1: Package Management (everything else depends on this)
+# Package Management (everything else depends on this)
 STEPS_FOUNDATION=(
   "apps/brew/brew.sh install"
   "apps/brew/brew.sh bundle"
 )
 
-# Phase 2: Shell & Security Configuration
+# Shell & Security Configuration
 STEPS_SHELL=(
   "apps/zsh/zsh.sh"
   "apps/git/git.sh"
@@ -184,19 +184,19 @@ STEPS_SHELL=(
   "apps/1password/1password.sh"
 )
 
-# Phase 3: Language Runtimes (slow, requires asdf from brew bundle)
+# Language Runtimes (slow, requires asdf from brew bundle)
 STEPS_RUNTIMES=(
   "apps/asdf/asdf.sh plugins"
   "apps/asdf/asdf.sh runtimes"
 )
 
-# Phase 4: File System Organization
+# File System Organization
 STEPS_FILESYSTEM=(
   "apps/macos/folders.sh ${PATH_DOCUMENTS}"
   "apps/icloud/icloud.sh"
 )
 
-# Phase 5: System Preferences
+# System Preferences
 STEPS_MACOS=(
   "apps/macos/macos.sh global ${SUDO_FLAG}"
   "apps/macos/macos.sh input ${SUDO_FLAG}"
@@ -205,9 +205,10 @@ STEPS_MACOS=(
   "apps/macos/macos.sh misc ${SUDO_FLAG}"
 )
 
-# Phase 6: Application Configuration
+# Application Configuration
 STEPS_APPS=(
   "apps/claudecode/claudecode.sh"
+  "apps/shellcheck/shellcheck.sh setup"
 )
 
 # Run a single step, handling exit codes
