@@ -41,7 +41,7 @@
   aco = !git add -A && git commit -m
 
   # Stash pull and reapply
-  restash = !git stash -u && git pull --rebase && git stash apply
+  restash = !git stash push -u -m \"Auto-stash $(date +%Y-%m-%d)\" && git pull --rebase && git stash pop
 
   # Prettier, easier to follow logs.
   lol = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
