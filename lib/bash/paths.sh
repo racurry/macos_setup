@@ -16,6 +16,7 @@
 
 # Mother Box paths (this project's config and data)
 export PATH_MOTHERBOX_CONFIG="${HOME}/.config/motherbox"
+export PATH_MOTHERBOX_CONFIG_FILE="${PATH_MOTHERBOX_CONFIG}/config"
 export PATH_MOTHERBOX_BACKUPS="${PATH_MOTHERBOX_CONFIG}/backups"
 
 # User directory paths

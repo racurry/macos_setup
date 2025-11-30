@@ -41,9 +41,8 @@ install_keybindings() {
         mkdir -p "${target_dir}"
     fi
 
-    # Copy keybindings file
-    log_info "Copying Pumpkin.plist to ${target_plist}"
-    cp "${source_plist}" "${target_plist}"
+    # Copy keybindings file (use copy_file for backup support)
+    copy_file "${source_plist}" "${target_plist}" "mailmate"
 
     # Set message selection strategy
     # For inbox sorted with newest at top, "previous" means select older message after delete/archive

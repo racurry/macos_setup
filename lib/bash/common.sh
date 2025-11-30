@@ -41,6 +41,81 @@ fail() {
   exit 1
 }
 
+# =============================================================================
+# Configuration Management
+# =============================================================================
+# Config file: ~/.config/motherbox/config
+# Format: Shell variables that can be sourced
+#
+# Default values:
+#   BACKUP_RETENTION_DAYS=60
+#   SETUP_MODE=           (empty, set by setup.sh)
+# =============================================================================
+
+# _config_defaults returns default config values as shell assignments
+_config_defaults() {
+  cat << 'EOF'
+BACKUP_RETENTION_DAYS=60
+SETUP_MODE=
+EOF
+}
+
+# ensure_config creates the config file with defaults if it doesn't exist.
+# Called automatically by get_config and set_config.
+# Silent by default to avoid disrupting output.
+ensure_config() {
+  if [[ -f "${PATH_MOTHERBOX_CONFIG_FILE}" ]]; then
+    return 0
+  fi
+
+  mkdir -p "${PATH_MOTHERBOX_CONFIG}"
+  _config_defaults > "${PATH_MOTHERBOX_CONFIG_FILE}"
+}
+
+# get_config retrieves a configuration value.
+# Usage: get_config <key>
+# Returns: The value via stdout, or empty string if not set
+get_config() {
+  local key="$1"
+
+  ensure_config
+
+  # Source config in subshell and echo the requested variable
+  (
+    # shellcheck source=/dev/null
+    source "${PATH_MOTHERBOX_CONFIG_FILE}"
+    eval "echo \"\${${key}:-}\""
+  )
+}
+
+# set_config sets a configuration value.
+# Usage: set_config <key> <value>
+# Creates config file with defaults if it doesn't exist.
+set_config() {
+  local key="$1"
+  local value="$2"
+
+  ensure_config
+
+  # Read current config
+  local tmp_file
+  tmp_file="$(mktemp)"
+
+  # Update or add the key
+  if grep -q "^${key}=" "${PATH_MOTHERBOX_CONFIG_FILE}"; then
+    # Key exists, update it
+    sed "s|^${key}=.*|${key}=${value}|" "${PATH_MOTHERBOX_CONFIG_FILE}" > "${tmp_file}"
+  else
+    # Key doesn't exist, append it
+    cat "${PATH_MOTHERBOX_CONFIG_FILE}" > "${tmp_file}"
+    echo "${key}=${value}" >> "${tmp_file}"
+  fi
+
+  mv "${tmp_file}" "${PATH_MOTHERBOX_CONFIG_FILE}"
+}
+
+# =============================================================================
+
 # require_command ensures a binary is available before we call it.
 require_command() {
   local cmd="$1"
@@ -65,26 +140,59 @@ require_directory() {
   fi
 }
 
+# prune_backups removes backup files older than BACKUP_RETENTION_DAYS.
+# Usage: prune_backups
+# Cleans up empty directories after pruning.
+# Retention period is read from config (default: 60 days).
+prune_backups() {
+  if [[ ! -d "${PATH_MOTHERBOX_BACKUPS}" ]]; then
+    return 0
+  fi
+
+  local retention_days
+  retention_days="$(get_config BACKUP_RETENTION_DAYS)"
+  retention_days="${retention_days:-60}"  # Fallback if empty
+
+  # Find and delete files older than retention period, logging each deletion
+  while IFS= read -r -d '' file; do
+    log_warn "Pruning old backup: ${file}"
+    rm -f "$file"
+  done < <(find "${PATH_MOTHERBOX_BACKUPS}" -type f -mtime "+${retention_days}" -print0 2>/dev/null)
+
+  # Clean up empty directories
+  find "${PATH_MOTHERBOX_BACKUPS}" -type d -empty -delete 2>/dev/null || true
+}
+
 # backup_file moves a file to the Mother Box backups directory.
 # Usage: backup_file <file_path> <app_name>
-# Creates: ~/.config/motherbox/backups/<app_name>/<filename>.<timestamp>
+# Creates: ~/.config/motherbox/backups/<datetime>/<app_name>/<filename>.<timestamp>
+# Triggers pruning of backups older than 60 days.
 backup_file() {
   local file_path="$1"
   local app_name="$2"
-  local filename timestamp backup_dir backup_path
+
+  if [[ -z "$app_name" ]]; then
+    fail "backup_file requires app_name argument"
+  fi
 
   if [[ ! -e "$file_path" ]]; then
     return 0
   fi
 
+  local filename datestamp timestamp backup_dir backup_path
   filename="$(basename "$file_path")"
+  datestamp="$(date +%Y%m%d)"
   timestamp="$(date +%Y%m%d_%H%M%S)"
-  backup_dir="${PATH_MOTHERBOX_BACKUPS}/${app_name}"
+  backup_dir="${PATH_MOTHERBOX_BACKUPS}/${datestamp}/${app_name}"
   backup_path="${backup_dir}/${filename}.${timestamp}"
 
   mkdir -p "$backup_dir"
   mv "$file_path" "$backup_path"
+  touch "$backup_path"  # Reset mtime so pruning uses backup time, not original file time
   log_warn "Backed up ${filename} to ${backup_path}"
+
+  # Opportunistic pruning
+  prune_backups
 }
 
 print_heading() {
@@ -110,15 +218,19 @@ require_rosetta() {
 }
 
 # link_file creates or updates a symlink, backing up existing files if needed.
-# Usage: link_file <source> <destination> [app_name]
+# Usage: link_file <source> <destination> <app_name>
 # - If destination is already a correct symlink, does nothing
-# - If destination is a different symlink, replaces it
+# - If destination is a different symlink, replaces it (no backup needed)
 # - If destination is a regular file, backs it up using backup_file
-# - If app_name provided, backs up to backups/{app_name}/, otherwise flat backups/
+# - app_name is REQUIRED
 link_file() {
     local src="$1"
     local dest="$2"
-    local app_name="${3:-}"
+    local app_name="$3"
+
+    if [[ -z "${app_name}" ]]; then
+        fail "link_file requires app_name argument"
+    fi
 
     if [[ -L "${dest}" ]]; then
         local current_target
@@ -130,22 +242,37 @@ link_file() {
         log_info "Replacing existing symlink ${dest}"
         rm "${dest}"
     elif [[ -e "${dest}" ]]; then
-        if [[ -n "${app_name}" ]]; then
-            backup_file "${dest}" "${app_name}"
-        else
-            # Flat backup for backward compatibility
-            local dest_name timestamp backup_target
-            dest_name="$(basename "${dest}")"
-            timestamp="$(date +%Y%m%d_%H%M%S)"
-            mkdir -p "${PATH_MOTHERBOX_BACKUPS}"
-            backup_target="${PATH_MOTHERBOX_BACKUPS}/${dest_name}.${timestamp}"
-            mv "${dest}" "${backup_target}"
-            log_warn "Backed up ${dest_name} to ${backup_target}"
-        fi
+        backup_file "${dest}" "${app_name}"
     fi
 
     ln -s "${src}" "${dest}"
     log_info "Linked ${dest} -> ${src}"
+}
+
+# copy_file copies a file to destination, backing up existing files if needed.
+# Usage: copy_file <source> <destination> <app_name>
+# - If destination is a symlink, removes it and copies
+# - If destination is a regular file, backs it up using backup_file
+# - app_name is REQUIRED
+# Use this for apps that don't follow symlinks.
+copy_file() {
+    local src="$1"
+    local dest="$2"
+    local app_name="$3"
+
+    if [[ -z "${app_name}" ]]; then
+        fail "copy_file requires app_name argument"
+    fi
+
+    if [[ -L "${dest}" ]]; then
+        log_info "Removing existing symlink ${dest}"
+        rm "${dest}"
+    elif [[ -e "${dest}" ]]; then
+        backup_file "${dest}" "${app_name}"
+    fi
+
+    cp "${src}" "${dest}"
+    log_info "Copied ${src} -> ${dest}"
 }
 
 # Guard against sourcing multiple times.

@@ -4,10 +4,14 @@
 - **Project environment**: Use `direnv` to manage project environments (venvs, PATH, env vars, etc.). Create `.envrc` if needed. If direnv is not installed, ask for guidance.
 - **Package management**: For asdf-managed runtimes (node/python/ruby/etc), install packages locally to the project; never install globally
 - **Web searches**: Verify current date/year in search queries when searching for recent documentation or time-sensitive information
-- **Git commands**: Use `git` directly, not `git -C /path` - the working directory is already the repo root
 - **Default license**: NEVER include license information in generated code unless explicitly requested by the user
 - **Author attribution**: NEVER include author attribution in generated code unless explicitly requested by the user
 - **Running bash scripts**: ALWAYS use local paths for execution (`./script.sh`); NEVER fully qualified paths (`/Users/user/path/to/script.sh`)
+
+## Git rules
+
+- **Git commands**: Use `git` directly, not `git -C /path` - the working directory is already the repo root
+- **Git commits**: - ALWAYS use terse, concise, one line messages describing the change.  NEVER add attribution text (no "Generated with Claude Code", no "Co-Authored-By:").  NO emojis.
 
 ## Python rules
 

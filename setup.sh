@@ -5,30 +5,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/lib/bash/common.sh"
 
-# Configuration
-CONFIG_DIR="${HOME}/.config/motherbox"
-CONFIG_FILE="${CONFIG_DIR}/config"
-
 # Global flags
 UNATTENDED=false
 RESET_MODE=false
-
-# Load configuration from file
-load_config() {
-  if [[ -f "${CONFIG_FILE}" ]]; then
-    # shellcheck source=/dev/null
-    source "${CONFIG_FILE}"
-  fi
-}
-
-# Save configuration to file
-save_config() {
-  mkdir -p "${CONFIG_DIR}"
-  cat > "${CONFIG_FILE}" << EOF
-SETUP_MODE=${SETUP_MODE}
-EOF
-  log_info "Configuration saved to ${CONFIG_FILE}"
-}
 
 show_help() {
   cat << EOF
@@ -112,7 +91,7 @@ prompt_setup_mode() {
 
 # Determine setup mode (precedence: flag > config > prompt)
 if [[ -z "${SETUP_MODE:-}" ]] && [[ "${RESET_MODE}" != "true" ]]; then
-  load_config
+  SETUP_MODE="$(get_config SETUP_MODE)"
 fi
 
 if [[ -z "${SETUP_MODE:-}" ]]; then
@@ -120,7 +99,7 @@ if [[ -z "${SETUP_MODE:-}" ]]; then
 fi
 
 # Persist configuration
-save_config
+set_config SETUP_MODE "${SETUP_MODE}"
 log_info "Setup mode: ${SETUP_MODE}"
 
 # Preflight checks

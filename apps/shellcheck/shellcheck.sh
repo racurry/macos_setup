@@ -37,18 +37,7 @@ setup_shellcheck_config() {
         mkdir -p "${target_dir}"
     fi
 
-    # Remove existing symlink or file
-    if [[ -L "${target_file}" ]]; then
-        log_info "Removing existing symlink"
-        rm "${target_file}"
-    elif [[ -f "${target_file}" ]]; then
-        log_warn "Backing up existing shellcheckrc to shellcheckrc.backup"
-        mv "${target_file}" "${target_file}.backup"
-    fi
-
-    # Create symlink
-    log_info "Symlinking shellcheckrc to ${target_file}"
-    ln -s "${source_file}" "${target_file}"
+    link_file "${source_file}" "${target_file}" "shellcheck"
     log_success "Shellcheck configuration symlinked successfully"
 }
 

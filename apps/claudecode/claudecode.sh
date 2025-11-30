@@ -36,13 +36,13 @@ do_setup() {
     local claude_dest="${HOME}/.claude/CLAUDE.md"
     require_file "${claude_global_src}"
     mkdir -p "${HOME}/.claude"
-    link_file "${claude_global_src}" "${claude_dest}"
+    link_file "${claude_global_src}" "${claude_dest}" "claudecode"
 
     # Link AGENTS.global.md to ~/AGENTS.md
     local agents_global_src="${REPO_ROOT}/apps/claudecode/AGENTS.global.md"
     local agents_dest="${HOME}/AGENTS.md"
     require_file "${agents_global_src}"
-    link_file "${agents_global_src}" "${agents_dest}"
+    link_file "${agents_global_src}" "${agents_dest}" "claudecode"
 
     # Configure Claude Code settings
     local settings_file="${HOME}/.claude/settings.json"
