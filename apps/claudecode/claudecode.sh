@@ -19,12 +19,6 @@ Description:
     This script creates symbolic links for Claude Code global configuration:
     - apps/claudecode/CLAUDE.global.md -> ~/.claude/CLAUDE.md
     - apps/claudecode/AGENTS.global.md -> ~/AGENTS.md
-
-    It also configures Claude Code settings.
-
-    - If a symlink already exists at a destination, it will be replaced.
-    - If a non-symlink file exists at a destination, it will be backed up
-      to ~/.config/motherbox/backups/ with a timestamp suffix.
 EOF
 }
 
@@ -83,10 +77,7 @@ main() {
                 shift
                 ;;
             *)
-                echo "Error: Unknown argument '${1}'" >&2
-                echo
-                show_help
-                exit 1
+                fail "Unknown argument '${1}'. Run '$0 help' for usage."
                 ;;
         esac
     done
