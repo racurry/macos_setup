@@ -1,6 +1,6 @@
 #!/bin/bash
 # 1Password SSH agent configuration
-# Copies the appropriate agent.toml based on SETUP_MODE
+# Copies the appropriate agent.toml based on mode (work or personal)
 
 set -euo pipefail
 
@@ -25,14 +25,11 @@ Commands:
 
 Options:
     --mode MODE     Set mode to 'work' or 'personal' (default: personal)
-
-Environment:
-    SETUP_MODE      Set to 'work' or 'personal' (overridden by --mode)
 EOF
 }
 
 do_setup() {
-    local mode="${1:-${SETUP_MODE:-personal}}"
+    local mode="${1:-personal}"
 
     print_heading "Configuring 1Password SSH agent"
 

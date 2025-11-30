@@ -119,9 +119,8 @@ if [[ -z "${SETUP_MODE:-}" ]]; then
   prompt_setup_mode
 fi
 
-# Persist and export for child processes
+# Persist configuration
 save_config
-export SETUP_MODE
 log_info "Setup mode: ${SETUP_MODE}"
 
 # Preflight checks
@@ -185,7 +184,7 @@ STEPS_SHELL=(
   "apps/git/git.sh setup"
   "apps/ohmyzsh/ohmyzsh.sh setup"
   "apps/direnv/direnv.sh setup"
-  "apps/1password/1password.sh setup"
+  "apps/1password/1password.sh setup ${MODE_FLAG}"
 )
 
 # Language Runtimes (slow, requires asdf from brew bundle)

@@ -11,7 +11,7 @@ Configuration files for the 1Password SSH agent.
 
 ## Usage
 
-The `1password.sh` script copies the appropriate file to `~/.config/1password/ssh/agent.toml` based on `SETUP_MODE`.
+The `1password.sh` script copies the appropriate file to `~/.config/1password/ssh/agent.toml` based on the `--mode` argument (`work` or `personal`).
 
 ## Documentation
 

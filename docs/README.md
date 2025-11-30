@@ -112,8 +112,6 @@ All scripts are located in [`scripts/`](../scripts/) and organized by language.
 Application-specific scripts are located in their respective `apps/*/` directories:
 
 - **apps/brew/brew.sh** - Installs Homebrew and manages Brewfile packages
-  - Commands: `install`, `bundle`
-  - Supports `SETUP_MODE` environment variable for work/personal Brewfiles
 - **apps/devonthink/devonthink.sh** - DEVONthink configuration and setup
 - **apps/dotfiles/dotfiles.sh** - Symlinks dotfiles to home directory
 - **apps/macos/folders.sh** - Creates standard workspace directory structure
