@@ -7,23 +7,26 @@ source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
     cat << EOF
-Usage: $0 [COMMAND]
+Usage: $0 [COMMAND] [OPTIONS]
 
 Manage Homebrew installation and package management.
 
 Commands:
+    setup       Run full setup (install Homebrew, then install packages)
     install     Install Homebrew if not already installed
     bundle      Install packages from Brewfile(s)
-    --help      Show this help message
+    audit       Audit installed apps against Brewfile definitions
+    help        Show this help message (also: -h, --help)
 
-If no command is specified, both install and bundle will be processed.
-
-Environment Variables:
-    SETUP_MODE  Set to 'work' or 'personal' to install mode-specific packages
-                from apps/brew/Brewfile.work or apps/brew/Brewfile.personal
-                in addition to the main apps/brew/Brewfile
+Options:
+    --mode MODE  Set to 'work' or 'personal' to install mode-specific packages
+                 from apps/brew/work.Brewfile or apps/brew/personal.Brewfile
+                 in addition to the main apps/brew/Brewfile
 EOF
 }
+
+# Global variable for mode
+MODE=""
 
 install_homebrew() {
     print_heading "Install Homebrew"
@@ -68,17 +71,17 @@ install_bundle() {
     log_info "Installing common packages from main Brewfile"
     install_brewfile "${main_manifest}"
 
-    # Install mode-specific packages if SETUP_MODE is set
-    if [[ -n "${SETUP_MODE:-}" ]]; then
-        mode_manifest="${REPO_ROOT}/apps/brew/Brewfile.${SETUP_MODE}"
+    # Install mode-specific packages if --mode is set
+    if [[ -n "${MODE}" ]]; then
+        mode_manifest="${REPO_ROOT}/apps/brew/${MODE}.Brewfile"
         if [[ -f "${mode_manifest}" ]]; then
-            log_info "Installing ${SETUP_MODE}-specific packages from ${mode_manifest}"
+            log_info "Installing ${MODE}-specific packages from ${mode_manifest}"
             install_brewfile "${mode_manifest}"
         else
-            log_warn "No ${SETUP_MODE}-specific Brewfile found at ${mode_manifest}"
+            log_warn "No ${MODE}-specific Brewfile found at ${mode_manifest}"
         fi
     else
-        log_warn "SETUP_MODE not set, skipping mode-specific packages"
+        log_warn "--mode not set, skipping mode-specific packages"
     fi
 }
 
@@ -107,26 +110,52 @@ install_brewfile() {
 }
 
 main() {
-    case "${1:-}" in
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --mode)
+                if [[ "${2:-}" =~ ^(work|personal)$ ]]; then
+                    MODE="$2"
+                    shift 2
+                else
+                    shift
+                fi
+                ;;
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            setup|install|bundle|audit)
+                command="$1"
+                shift
+                ;;
+            *)
+                echo "Error: Unknown argument '${1}'"
+                echo
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+
+    case "${command}" in
+        setup)
+            install_homebrew
+            install_bundle
+            ;;
         install)
             install_homebrew
             ;;
         bundle)
             install_bundle
             ;;
-        help|--help|-h)
-            show_help
-            exit 0
+        audit)
+            "${SCRIPT_DIR}/audit_apps.py"
             ;;
         "")
-            install_homebrew
-            install_bundle
-            ;;
-        *)
-            echo "Error: Unknown command '${1}'"
-            echo
             show_help
-            exit 1
+            exit 0
             ;;
     esac
 }

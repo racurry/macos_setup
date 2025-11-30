@@ -98,25 +98,26 @@ def main():
         epilog='''
 This script compares installed packages (brew formulas, casks, and Mac App Store apps)
 against the declared packages in Brewfile manifests. It generates a markdown report at
-docs/APP_AUDIT.md with the following information:
+.tmp/APP_AUDIT.md with the following information:
 
   - Installed packages not tracked in any Brewfile (consider adding or uninstalling)
   - Declared packages not installed (install or remove from Brewfile)
-  - Status of optional Brewfile entries (Brewfile.work, Brewfile.personal)
+  - Status of optional Brewfile entries (work.Brewfile, personal.Brewfile)
 
 Required commands: brew, mas
         '''
     )
-    parser.add_argument('-h', '--help', action='help', help='Show this help message and exit')
     parser.parse_args()
 
     check_dependencies()
 
     repo_root = get_repo_root()
-    audit_path = repo_root / "docs" / "APP_AUDIT.md"
-    brewfile = repo_root / "dotfiles" / "Brewfile"
-    optional_personal = repo_root / "dotfiles" / "Brewfile.personal"
-    optional_work = repo_root / "dotfiles" / "Brewfile.work"
+    tmp_dir = repo_root / ".tmp"
+    tmp_dir.mkdir(exist_ok=True)
+    audit_path = tmp_dir / "APP_AUDIT.md"
+    brewfile = repo_root / "apps" / "brew" / "Brewfile"
+    optional_personal = repo_root / "apps" / "brew" / "personal.Brewfile"
+    optional_work = repo_root / "apps" / "brew" / "work.Brewfile"
 
     if not brewfile.exists():
         raise SystemExit(f"Missing Brewfile at {brewfile}")

@@ -1,5 +1,3 @@
-# Optional personal applications (install with `brew bundle --file=apps/brew/Brewfile.personal`)
-
 # Brew casks
 cask "daisydisk"
 cask "macwhisper"

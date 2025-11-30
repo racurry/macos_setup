@@ -21,9 +21,9 @@ When writing scripts:
   - JavaScript/Node: npm ecosystem tools, frontend-related tasks
   - Ruby: gem ecosystem tools, text processing
   - Write the logic directly in the target language instead of generating code (e.g., write Python directly instead of bash that generates Python)
-- ALWAYS include a --help flag that describes purpose and usage
-- ALWAYS use consistent flag formats:
-  - Help flag: `-h|--help` (both short and long forms)
+- ALWAYS include help that describes purpose and usage
+- ALWAYS use consistent argument formats:
+  - Help: `help` subcommand (also accept `-h`, `--help` as alternatives)
   - Boolean flags: `--flag-name` (long form only, use hyphens not underscores)
   - Positional arguments for main parameters (e.g., parent directory, file path)
 - App-specific scripts can be any language but should be named appropriately:
@@ -31,6 +31,11 @@ When writing scripts:
   - Python: `apps/{appname}/{appname}.py`
   - JavaScript: `apps/{appname}/{appname}.js`
   - Ruby: `apps/{appname}/{appname}.rb`
+- App scripts should use subcommands with `setup` as the main entry point:
+  - `setup` - Run full setup (primary entry point, called by setup.sh)
+  - `help` - Show help text (also accept `-h`, `--help`)
+  - Additional subcommands for granular control (e.g., `install`, `configure`)
+  - No arguments should show help text
 - Bash scripts should source lib/bash/common.sh for shared utilities
 - Non-bash scripts should be executable with appropriate shebang (#!/usr/bin/env python3, etc.)
 
@@ -75,7 +80,7 @@ When writing tests:
   - Main script: `apps/{appname}/{appname}.{ext}` (use appropriate language: .sh, .py, .js, .rb)
   - Tests: `apps/{appname}/test_{appname}.bats`
   - Configs: co-located with the app
-  - README: `apps/{appname}/README.md` (required)
+  - README: `apps/{appname}/README.md` (required, should include: description, contents list, setup instructions)
 - **bin/**: Standalone CLI utilities (on PATH)
 - **lib/**: Common libraries and test helpers
   - **lib/bash/**: Bash utilities (common.sh, paths.sh, common_test_helper.bash)

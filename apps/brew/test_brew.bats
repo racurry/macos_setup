@@ -35,10 +35,10 @@ teardown() {
   [[ "$output" == *"bundle"* ]]
 }
 
-@test "brew.sh shows error for unknown command" {
+@test "brew.sh shows error for unknown argument" {
   run bash "${BATS_TEST_DIRNAME}/brew.sh" unknown
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Error: Unknown command"* ]]
+  [[ "$output" == *"Error: Unknown argument"* ]]
 }
 
 @test "brew.sh bundle requires brew command" {

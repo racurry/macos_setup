@@ -163,16 +163,20 @@ preflight_checks() {
 # Run preflight checks before anything else
 preflight_checks
 
-# Build sudo flag for scripts
+# Build flags for downstream scripts
 SUDO_FLAG=""
 if [[ "${UNATTENDED}" == "true" ]]; then
   SUDO_FLAG="--unattended"
 fi
 
-# Package Management (everything else depends on this)
+MODE_FLAG=""
+if [[ -n "${SETUP_MODE:-}" ]]; then
+  MODE_FLAG="--mode ${SETUP_MODE}"
+fi
+
+# Install all the apps - everything else depends on this
 STEPS_FOUNDATION=(
-  "apps/brew/brew.sh install"
-  "apps/brew/brew.sh bundle"
+  "apps/brew/brew.sh setup ${MODE_FLAG}"
 )
 
 # Shell & Security Configuration
