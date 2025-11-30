@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load 'helpers/common_test_helper.bash'
+load '../lib/bash/common_test_helper.bash'
 
 setup() {
   ORIGINAL_PWD="$(pwd)"

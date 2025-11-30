@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load 'helpers/common_test_helper.bash'
+load '../../lib/bash/common_test_helper.bash'
 
 setup() {
   TEST_TMPDIR="$(mktemp -d)"
@@ -8,7 +8,7 @@ setup() {
   export HOME="${TEST_TMPDIR}/home"
   mkdir -p "${HOME}"
 
-  CLAUDECODE_SCRIPT="${REPO_ROOT}/apps/claudecode/claudecode.sh"
+  CLAUDECODE_SCRIPT="${BATS_TEST_DIRNAME}/claudecode.sh"
 }
 
 teardown() {

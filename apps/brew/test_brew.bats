@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load 'helpers/common_test_helper.bash'
+load '../../lib/bash/common_test_helper.bash'
 
 setup() {
   TEST_TMPDIR="$(mktemp -d)"
@@ -22,13 +22,13 @@ teardown() {
   ln -s "$(command -v true)" "${TEST_TMPDIR}/bin/brew"
   export PATH="${TEST_TMPDIR}/bin:${PATH}"
 
-  run bash "${REPO_ROOT}/apps/brew/brew.sh" install
+  run bash "${BATS_TEST_DIRNAME}/brew.sh" install
   [ "$status" -eq 0 ]
   [[ "$output" == *"Homebrew already installed"* ]]
 }
 
 @test "brew.sh shows help when --help is passed" {
-  run bash "${REPO_ROOT}/apps/brew/brew.sh" --help
+  run bash "${BATS_TEST_DIRNAME}/brew.sh" --help
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
   [[ "$output" == *"install"* ]]
@@ -36,7 +36,7 @@ teardown() {
 }
 
 @test "brew.sh shows error for unknown command" {
-  run bash "${REPO_ROOT}/apps/brew/brew.sh" unknown
+  run bash "${BATS_TEST_DIRNAME}/brew.sh" unknown
   [ "$status" -eq 1 ]
   [[ "$output" == *"Error: Unknown command"* ]]
 }
@@ -46,6 +46,6 @@ teardown() {
   # Remove brew from PATH if it exists
   export PATH="$(echo "$PATH" | tr ':' '\n' | grep -v brew | tr '\n' ':')"
 
-  run bash "${REPO_ROOT}/apps/brew/brew.sh" bundle
+  run bash "${BATS_TEST_DIRNAME}/brew.sh" bundle
   [ "$status" -ne 0 ]
 }

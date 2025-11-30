@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load 'helpers/common_test_helper.bash'
+load '../../lib/bash/common_test_helper.bash'
 
 setup() {
   TEST_TMPDIR="$(mktemp -d)"
@@ -16,7 +16,7 @@ setup() {
   export HOME="${TEST_HOME}"
   export REPO_ROOT="${TEST_REPO_ROOT}"
 
-  SCRIPT_PATH="${BATS_TEST_DIRNAME}/../apps/asdf/asdf.sh"
+  SCRIPT_PATH="${BATS_TEST_DIRNAME}/asdf.sh"
 }
 
 teardown() {

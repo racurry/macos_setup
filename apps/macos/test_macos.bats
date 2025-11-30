@@ -1,10 +1,7 @@
 #!/usr/bin/env bats
 
 setup() {
-    # Get the project root directory (one level up from tests/)
-    TEST_DIR="$(cd "$(dirname "$BATS_TEST_FILENAME")" && pwd)"
-    PROJECT_ROOT="$(cd "${TEST_DIR}/.." && pwd)"
-    SCRIPT_PATH="${PROJECT_ROOT}/apps/macos/macos.sh"
+    SCRIPT_PATH="${BATS_TEST_DIRNAME}/macos.sh"
 }
 
 @test "script exists and is executable" {

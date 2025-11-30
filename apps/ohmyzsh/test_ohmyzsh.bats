@@ -1,10 +1,10 @@
 #!/usr/bin/env bats
 
-load 'helpers/common_test_helper.bash'
+load '../../lib/bash/common_test_helper.bash'
 
 setup() {
   TEST_TMPDIR="$(mktemp -d)"
-  OH_MY_ZSH_SCRIPT="${REPO_ROOT}/apps/ohmyzsh/ohmyzsh.sh"
+  OH_MY_ZSH_SCRIPT="${BATS_TEST_DIRNAME}/ohmyzsh.sh"
 }
 
 teardown() {

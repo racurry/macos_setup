@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load 'helpers/common_test_helper.bash'
+load 'bash/common_test_helper.bash'
 
 setup() {
   TEST_TMPDIR="$(mktemp -d)"

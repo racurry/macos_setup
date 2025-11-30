@@ -5,7 +5,7 @@ setup() {
   ORIGINAL_HOME="${HOME:-}"
   export HOME="${TEST_TMPDIR}/home"
   mkdir -p "${HOME}"
-  SCRIPT_PATH="${BATS_TEST_DIRNAME}/../apps/macos/folders.sh"
+  SCRIPT_PATH="${BATS_TEST_DIRNAME}/folders.sh"
 }
 
 teardown() {
