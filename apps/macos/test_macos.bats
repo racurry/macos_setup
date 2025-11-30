@@ -13,13 +13,8 @@ setup() {
     run "$SCRIPT_PATH" --help
     [ "$status" -eq 0 ]
     [[ "$output" =~ "Usage:" ]]
-    [[ "$output" =~ "COMMANDS:" ]]
-    [[ "$output" =~ "global" ]]
-    [[ "$output" =~ "input" ]]
-    [[ "$output" =~ "dock" ]]
-    [[ "$output" =~ "finder" ]]
-    [[ "$output" =~ "misc" ]]
-    [[ "$output" =~ "all" ]]
+    [[ "$output" =~ "Commands:" ]]
+    [[ "$output" =~ "setup" ]]
 }
 
 @test "short help flag works" {
@@ -34,30 +29,28 @@ setup() {
     [[ "$output" =~ "Usage:" ]]
 }
 
-@test "no arguments shows error and suggests help" {
+@test "no arguments shows help" {
     run "$SCRIPT_PATH"
-    [ "$status" -eq 1 ]
-    [[ "$output" =~ "Error: No command specified" ]]
-    [[ "$output" =~ "--help" ]]
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "Usage:" ]]
 }
 
-@test "invalid command shows error and suggests help" {
+@test "invalid command shows error" {
     run "$SCRIPT_PATH" invalid_command
     [ "$status" -eq 1 ]
-    [[ "$output" =~ "Error: Unknown command 'invalid_command'" ]]
-    [[ "$output" =~ "--help" ]]
+    [[ "$output" =~ "Unknown argument" ]]
 }
 
 @test "help output contains examples section" {
     run "$SCRIPT_PATH" --help
     [ "$status" -eq 0 ]
-    [[ "$output" =~ "EXAMPLES:" ]]
+    [[ "$output" =~ "Examples:" ]]
 }
 
 @test "help output contains options section" {
     run "$SCRIPT_PATH" --help
     [ "$status" -eq 0 ]
-    [[ "$output" =~ "OPTIONS:" ]]
+    [[ "$output" =~ "Options:" ]]
 }
 
 @test "help output mentions sudo requirements" {
@@ -72,14 +65,14 @@ setup() {
     [[ "$output" =~ "--unattended" ]]
 }
 
-@test "--unattended flag is accepted with commands" {
-    run "$SCRIPT_PATH" global --unattended
-    # Should not fail with "unknown option" error
-    [[ ! "$output" =~ "Error: Unknown option" ]]
+@test "--unattended flag is accepted with setup command" {
+    run "$SCRIPT_PATH" setup --unattended
+    # Should not fail with "unknown argument" error
+    [[ ! "$output" =~ "Unknown argument" ]]
 }
 
-@test "--unattended works in any position with command" {
-    run "$SCRIPT_PATH" --unattended global
-    # Should not fail with "unknown option" error
-    [[ ! "$output" =~ "Error: Unknown option" ]]
+@test "--unattended works in any position with setup command" {
+    run "$SCRIPT_PATH" --unattended setup
+    # Should not fail with "unknown argument" error
+    [[ ! "$output" =~ "Unknown argument" ]]
 }

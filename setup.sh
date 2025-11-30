@@ -181,32 +181,27 @@ STEPS_FOUNDATION=(
 
 # Shell & Security Configuration
 STEPS_SHELL=(
-  "apps/zsh/zsh.sh"
-  "apps/git/git.sh"
-  "apps/ohmyzsh/ohmyzsh.sh"
-  "apps/direnv/direnv.sh"
-  "apps/1password/1password.sh"
+  "apps/zsh/zsh.sh setup"
+  "apps/git/git.sh setup"
+  "apps/ohmyzsh/ohmyzsh.sh setup"
+  "apps/direnv/direnv.sh setup"
+  "apps/1password/1password.sh setup"
 )
 
 # Language Runtimes (slow, requires asdf from brew bundle)
 STEPS_RUNTIMES=(
-  "apps/asdf/asdf.sh plugins"
-  "apps/asdf/asdf.sh runtimes"
+  "apps/asdf/asdf.sh setup"
 )
 
 # File System Organization
 STEPS_FILESYSTEM=(
-  "apps/macos/folders.sh ${PATH_DOCUMENTS}"
-  "apps/icloud/icloud.sh"
+  "apps/macos/folders.sh setup"
+  "apps/icloud/icloud.sh setup"
 )
 
 # System Preferences
 STEPS_MACOS=(
-  "apps/macos/macos.sh global ${SUDO_FLAG}"
-  "apps/macos/macos.sh input ${SUDO_FLAG}"
-  "apps/macos/macos.sh dock ${SUDO_FLAG}"
-  "apps/macos/macos.sh finder ${SUDO_FLAG}"
-  "apps/macos/macos.sh misc ${SUDO_FLAG}"
+  "apps/macos/macos.sh setup ${SUDO_FLAG}"
 )
 
 # Application Configuration

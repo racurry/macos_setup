@@ -7,6 +7,7 @@
 - **Git commands**: Use `git` directly, not `git -C /path` - the working directory is already the repo root
 - **Default license**: NEVER include license information in generated code unless explicitly requested by the user
 - **Author attribution**: NEVER include author attribution in generated code unless explicitly requested by the user
+- **Running bash scripts**: ALWAYS use local paths for execution (`./script.sh`); NEVER fully qualified paths (`/Users/user/path/to/script.sh`)
 
 ## Python rules
 

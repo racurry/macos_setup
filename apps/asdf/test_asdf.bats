@@ -33,16 +33,16 @@ teardown() {
   fi
 }
 
-@test "asdf runtimes fails when asdf not installed" {
+@test "asdf setup fails when asdf not installed" {
   # Create a minimal PATH excluding asdf
   create_minimal_path "${TEST_TMPDIR}" "asdf"
 
-  run env PATH="${TEST_TMPDIR}/bin" HOME="${HOME}" REPO_ROOT="${REPO_ROOT}" bash "${SCRIPT_PATH}" runtimes
+  run env PATH="${TEST_TMPDIR}/bin" HOME="${HOME}" REPO_ROOT="${REPO_ROOT}" bash "${SCRIPT_PATH}" setup
   [ "$status" -eq 1 ]
   [[ "$output" == *"Required command 'asdf' not found in PATH"* ]]
 }
 
-@test "asdf runtimes unsets version environment variables" {
+@test "asdf setup unsets version environment variables" {
   # Create test .tool-versions file
   cat > "${TEST_DOTFILES}/.tool-versions" << 'EOF'
 nodejs 18.17.0
@@ -67,27 +67,17 @@ exit 0
 EOF
   chmod +x "${TEST_TMPDIR}/bin/asdf"
 
-  run env PATH="${TEST_TMPDIR}/bin:${PATH}" HOME="${HOME}" REPO_ROOT="${REPO_ROOT}" ASDF_RUBY_VERSION="${ASDF_RUBY_VERSION}" ASDF_NODEJS_VERSION="${ASDF_NODEJS_VERSION}" ASDF_PYTHON_VERSION="${ASDF_PYTHON_VERSION}" bash "${SCRIPT_PATH}" runtimes
+  run env PATH="${TEST_TMPDIR}/bin:${PATH}" HOME="${HOME}" REPO_ROOT="${REPO_ROOT}" ASDF_RUBY_VERSION="${ASDF_RUBY_VERSION}" ASDF_NODEJS_VERSION="${ASDF_NODEJS_VERSION}" ASDF_PYTHON_VERSION="${ASDF_PYTHON_VERSION}" bash "${SCRIPT_PATH}" setup
   [ "$status" -eq 0 ]
   [[ "$output" == *"ASDF_RUBY_VERSION: unset"* ]]
   [[ "$output" == *"ASDF_NODEJS_VERSION: unset"* ]]
   [[ "$output" == *"ASDF_PYTHON_VERSION: unset"* ]]
 }
 
-@test "asdf plugins fails when asdf not installed" {
-  # Create a minimal PATH excluding asdf
-  create_minimal_path "${TEST_TMPDIR}" "asdf"
-
-  run env PATH="${TEST_TMPDIR}/bin" HOME="${HOME}" REPO_ROOT="${REPO_ROOT}" bash "${SCRIPT_PATH}" plugins
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"Required command 'asdf' not found in PATH"* ]]
-}
-
 @test "asdf shows help with no arguments" {
   run bash "${SCRIPT_PATH}"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
-  [[ "$output" == *"plugins"* ]]
-  [[ "$output" == *"runtimes"* ]]
+  [[ "$output" == *"setup"* ]]
 }
 

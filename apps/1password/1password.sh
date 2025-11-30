@@ -2,7 +2,7 @@
 # 1Password SSH agent configuration
 # Copies the appropriate agent.toml based on SETUP_MODE
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
@@ -12,23 +12,26 @@ APPS_DIR="${REPO_ROOT}/apps/1password"
 CONFIG_DIR="${HOME}/.config/1password/ssh"
 AGENT_TOML="${CONFIG_DIR}/agent.toml"
 
-show_usage() {
+show_help() {
     cat << EOF
-Usage: $(basename "$0") [command]
+Usage: $(basename "$0") [COMMAND] [OPTIONS]
 
 Configure 1Password SSH agent.
 
 Commands:
-    setup [work|personal]  - Copy agent.toml (default: personal)
-    show                   - Display current agent.toml
-    help                   - Show this help
+    setup       Run full setup (primary entry point)
+    show        Display current agent.toml
+    help        Show this help message (also: -h, --help)
+
+Options:
+    --mode MODE     Set mode to 'work' or 'personal' (default: personal)
 
 Environment:
-    SETUP_MODE             - Set to 'work' or 'personal' (overridden by command args)
+    SETUP_MODE      Set to 'work' or 'personal' (overridden by --mode)
 EOF
 }
 
-setup_agent_toml() {
+do_setup() {
     local mode="${1:-${SETUP_MODE:-personal}}"
 
     print_heading "Configuring 1Password SSH agent"
@@ -37,26 +40,18 @@ setup_agent_toml() {
 
     local source_file="${APPS_DIR}/agent.${mode}.toml"
 
-    if [[ ! -f "${source_file}" ]]; then
-        fail "Source file not found: ${source_file}"
-    fi
+    require_file "${source_file}"
 
     mkdir -p "${CONFIG_DIR}"
-    log_info "Created ${CONFIG_DIR}"
 
-    # Remove existing file/symlink if present
-    if [[ -e "${AGENT_TOML}" || -L "${AGENT_TOML}" ]]; then
-        rm "${AGENT_TOML}"
-    fi
+    link_file "${source_file}" "${AGENT_TOML}" "1password"
 
-    ln -s "${source_file}" "${AGENT_TOML}"
-
-    log_success "Linked ${AGENT_TOML} -> ${source_file}"
+    log_success "1Password SSH agent configured"
     echo ""
     cat "${AGENT_TOML}"
 }
 
-show_config() {
+do_show() {
     if [[ -f "${AGENT_TOML}" ]]; then
         cat "${AGENT_TOML}"
     else
@@ -65,45 +60,51 @@ show_config() {
 }
 
 main() {
-    local command="setup"
+    local command=""
     local mode_arg=""
 
     while [[ $# -gt 0 ]]; do
-        case $1 in
-            -h|--help|help)
-                show_usage
+        case "$1" in
+            --mode)
+                if [[ $# -lt 2 ]]; then
+                    fail "Option --mode requires an argument"
+                fi
+                mode_arg="$2"
+                if [[ "${mode_arg}" != "work" && "${mode_arg}" != "personal" ]]; then
+                    fail "Invalid mode '${mode_arg}'. Must be 'work' or 'personal'."
+                fi
+                shift 2
+                ;;
+            help|--help|-h)
+                show_help
                 exit 0
                 ;;
-            setup|show)
-                command="$1"
+            setup)
+                command="setup"
                 shift
-                if [[ $# -gt 0 && ($1 == "work" || $1 == "personal") ]]; then
-                    mode_arg="$1"
-                    shift
-                fi
                 ;;
-            work|personal)
-                mode_arg="$1"
+            show)
+                command="show"
                 shift
                 ;;
             *)
-                log_error "Unknown argument: $1"
-                show_usage
-                exit 1
+                fail "Unknown argument '${1}'. Run '$0 help' for usage."
                 ;;
         esac
     done
 
-    case "$command" in
+    case "${command}" in
         setup)
-            setup_agent_toml "$mode_arg"
+            do_setup "${mode_arg}"
             ;;
         show)
-            show_config
+            do_show
+            ;;
+        "")
+            show_help
+            exit 0
             ;;
     esac
 }
 
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+main "$@"

@@ -15,3 +15,7 @@ System Preferences > Keyboard > Shortcuts
 ![Shottr](img/shottr_general.png)
 
 ![Shottr](img/shottr_hotkeys.png)
+
+## Notes
+
+This is a test edit to check the markdownlinting hook.

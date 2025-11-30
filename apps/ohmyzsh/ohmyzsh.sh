@@ -6,52 +6,71 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-  cat << EOF
-Usage: $(basename "$0") [OPTIONS]
+    cat << EOF
+Usage: $(basename "$0") [COMMAND]
 
 Install Oh My Zsh shell framework if not already present.
 
-OPTIONS:
-  -h, --help    Show this help message and exit
+Commands:
+    setup       Run full setup (primary entry point)
+    help        Show this help message (also: -h, --help)
 
-DESCRIPTION:
-  This script checks if Oh My Zsh is already installed in ~/.oh-my-zsh.
-  If not present, it downloads and installs Oh My Zsh using the official
-  installer script with safe defaults (no shell change, keep existing .zshrc).
+Description:
+    This script checks if Oh My Zsh is already installed in ~/.oh-my-zsh.
+    If not present, it downloads and installs Oh My Zsh using the official
+    installer script with safe defaults (no shell change, keep existing .zshrc).
 
 EOF
 }
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      show_help
-      exit 0
-      ;;
-    *)
-      echo "Unknown option: $1" >&2
-      show_help
-      exit 1
-      ;;
-  esac
-done
+do_setup() {
+    print_heading "Ensure shell framework"
 
-print_heading "Ensure shell framework"
+    if [[ -d "${HOME}/.oh-my-zsh" ]]; then
+        log_info "Oh My Zsh already installed"
+        return 0
+    fi
 
-if [[ -d "${HOME}/.oh-my-zsh" ]]; then
-  log_info "Oh My Zsh already installed"
-  exit 0
-fi
+    require_command curl
 
-require_command curl
+    log_info "Installing Oh My Zsh"
+    if RUNZSH=no KEEP_ZSHRC=yes CHSH=no \
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null
+    then
+        log_info "Oh My Zsh installed. Open a new shell session to pick it up."
+    else
+        fail "Oh My Zsh installer failed"
+    fi
+}
 
-log_info "Installing Oh My Zsh"
-if RUNZSH=no KEEP_ZSHRC=yes CHSH=no \
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null
-then
-  log_info "Oh My Zsh installed. Open a new shell session to pick it up."
-  exit 0
-else
-  fail "Oh My Zsh installer failed"
-fi
+main() {
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            setup)
+                command="$1"
+                shift
+                ;;
+            *)
+                fail "Unknown argument '${1}'. Run '$(basename "$0") help' for usage."
+                ;;
+        esac
+    done
+
+    case "${command}" in
+        setup)
+            do_setup
+            ;;
+        "")
+            show_help
+            exit 0
+            ;;
+    esac
+}
+
+main "$@"

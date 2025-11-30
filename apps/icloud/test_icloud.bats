@@ -19,58 +19,68 @@ teardown() {
   fi
 }
 
-@test "link_icloud skips when source missing" {
-  run env HOME="${HOME}" "${SCRIPT_PATH}"
+@test "setup skips when source missing" {
+  run env HOME="${HOME}" "${SCRIPT_PATH}" setup
   [ "$status" -eq 0 ]
   [[ "$output" == *"iCloud Drive not found"* ]]
   [ ! -e "${TARGET_LINK}" ]
 }
 
-@test "link_icloud creates symlink when source present" {
+@test "setup creates symlink when source present" {
   mkdir -p "${ICLOUD_SOURCE}"
-  run env HOME="${HOME}" "${SCRIPT_PATH}"
+  run env HOME="${HOME}" "${SCRIPT_PATH}" setup
   [ "$status" -eq 0 ]
   [ -L "${TARGET_LINK}" ]
   [[ "$(readlink "${TARGET_LINK}")" == "${ICLOUD_SOURCE}" ]]
 }
 
-@test "link_icloud leaves existing symlink pointing correctly" {
+@test "setup leaves existing symlink pointing correctly" {
   mkdir -p "${ICLOUD_SOURCE}"
   ln -s "${ICLOUD_SOURCE}" "${TARGET_LINK}"
-  run env HOME="${HOME}" "${SCRIPT_PATH}"
+  run env HOME="${HOME}" "${SCRIPT_PATH}" setup
   [ "$status" -eq 0 ]
   [ -L "${TARGET_LINK}" ]
   [[ "$(readlink "${TARGET_LINK}")" == "${ICLOUD_SOURCE}" ]]
 }
 
-@test "link_icloud fails when target exists and is not symlink" {
+@test "setup fails when target exists and is not symlink" {
   mkdir -p "${ICLOUD_SOURCE}"
   echo "conflict" > "${TARGET_LINK}"
-  run env HOME="${HOME}" "${SCRIPT_PATH}"
+  run env HOME="${HOME}" "${SCRIPT_PATH}" setup
   [ "$status" -eq 1 ]
   [ ! -L "${TARGET_LINK}" ]
   [[ "$(cat "${TARGET_LINK}")" == "conflict" ]]
+}
+
+@test "icloud.sh help shows usage information" {
+  run "${SCRIPT_PATH}" help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Usage:"* ]]
+  [[ "$output" == *"Manage iCloud Drive symlink and diagnose sync issues"* ]]
+  [[ "$output" == *"setup"* ]]
+  [[ "$output" == *"diagnose"* ]]
 }
 
 @test "icloud.sh --help shows usage information" {
   run "${SCRIPT_PATH}" --help
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
-  [[ "$output" == *"Manage iCloud Drive symlink and diagnose sync issues"* ]]
-  [[ "$output" == *"-h, --help"* ]]
 }
 
 @test "icloud.sh -h shows usage information" {
   run "${SCRIPT_PATH}" -h
   [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
-  [[ "$output" == *"Manage iCloud Drive symlink and diagnose sync issues"* ]]
-  [[ "$output" == *"-h, --help"* ]]
 }
 
-@test "icloud.sh with unknown option shows error and help" {
+@test "icloud.sh with no arguments shows help" {
+  run "${SCRIPT_PATH}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Usage:"* ]]
+}
+
+@test "icloud.sh with unknown command shows error" {
   run "${SCRIPT_PATH}" --invalid-option
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Unknown option: --invalid-option"* ]]
-  [[ "$output" == *"Usage:"* ]]
+  [[ "$output" == *"Unknown command"* ]]
 }

@@ -6,74 +6,61 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 APPS_DIR="${REPO_ROOT}/apps/zsh"
+APP_NAME="zsh"
 
 show_help() {
-  cat << EOF
-Usage: $(basename "$0") [OPTIONS]
+    cat << EOF
+Usage: $0 [COMMAND]
 
 Symlink zsh configuration files to home directory.
 
 Files managed:
-  .zshrc       - Main zsh configuration
-  .galileorc   - Work-specific zsh config
+    .zshrc       - Main zsh configuration
+    .galileorc   - Work-specific zsh config
 
-OPTIONS:
-  -h, --help    Show this help message and exit
+Commands:
+    setup       Run full setup (symlink configuration files)
+    help        Show this help message (also: -h, --help)
 EOF
 }
 
-link_file() {
-  local src="$1"
-  local dest="$2"
-  local name
-  name="$(basename "$src")"
+do_setup() {
+    print_heading "Setting up zsh configuration"
 
-  if [[ ! -f "$src" ]]; then
-    log_warn "Source file not found: $src"
-    return 0
-  fi
+    link_file "${APPS_DIR}/.zshrc" "${HOME}/.zshrc" "${APP_NAME}"
+    link_file "${APPS_DIR}/.galileorc" "${HOME}/.galileorc" "${APP_NAME}"
 
-  if [[ -L "$dest" ]]; then
-    local current_target
-    current_target="$(readlink "$dest")"
-    if [[ "$current_target" == "$src" ]]; then
-      log_info "$name already linked correctly"
-      return 0
-    fi
-    log_info "Removing existing symlink: $dest"
-    rm "$dest"
-  elif [[ -e "$dest" ]]; then
-    local backup
-    backup="${dest}.backup.$(date +%Y%m%d%H%M%S)"
-    log_warn "Backing up existing $name to $backup"
-    mv "$dest" "$backup"
-  fi
-
-  ln -s "$src" "$dest"
-  log_success "Linked $dest -> $src"
+    log_success "Zsh configuration complete"
 }
 
 main() {
-  while [[ $# -gt 0 ]]; do
-    case $1 in
-      -h|--help)
-        show_help
-        exit 0
-        ;;
-      *)
-        echo "Unknown option: $1" >&2
-        show_help
-        exit 1
-        ;;
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            setup)
+                command="$1"
+                shift
+                ;;
+            *)
+                fail "Unknown argument '${1}'. Run '$0 help' for usage."
+                ;;
+        esac
+    done
+
+    case "${command}" in
+        setup)
+            do_setup
+            ;;
+        "")
+            show_help
+            exit 0
+            ;;
     esac
-  done
-
-  print_heading "Setting up zsh configuration"
-
-  link_file "${APPS_DIR}/.zshrc" "${HOME}/.zshrc"
-  link_file "${APPS_DIR}/.galileorc" "${HOME}/.galileorc"
-
-  log_success "Zsh configuration complete"
 }
 
 main "$@"

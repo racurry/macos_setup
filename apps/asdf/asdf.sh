@@ -12,11 +12,8 @@ Usage: $0 [COMMAND]
 Manage asdf plugins and runtime installations.
 
 Commands:
-    plugins     Add asdf plugins based on .tool-versions file
-    runtimes    Install asdf runtimes based on .tool-versions file
-    --help      Show this help message
-
-If no command is specified, both plugins and runtimes will be processed.
+    setup       Run full setup (add plugins, install runtimes)
+    help        Show this help message (also: -h, --help)
 EOF
 }
 
@@ -49,27 +46,37 @@ install_runtimes() {
     asdf install
 }
 
+do_setup() {
+    add_plugins
+    install_runtimes
+}
+
 main() {
-    case "${1:-}" in
-        plugins)
-            add_plugins
-            ;;
-        runtimes)
-            install_runtimes
-            ;;
-        help|--help|-h)
-            show_help
-            exit 0
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            setup)
+                command="setup"
+                shift
+                ;;
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                fail "Unknown argument '${1}'. Run '$0 help' for usage."
+                ;;
+        esac
+    done
+
+    case "${command}" in
+        setup)
+            do_setup
             ;;
         "")
             show_help
             exit 0
-            ;;
-        *)
-            echo "Error: Unknown command '${1}'"
-            echo
-            show_help
-            exit 1
             ;;
     esac
 }

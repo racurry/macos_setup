@@ -6,96 +6,96 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-  cat << EOF
-Usage: $(basename "$0") [PARENT_DIR]
+    cat << EOF
+Usage: $0 [COMMAND]
 
-Create organizational folder structure in the specified parent directory.
+Create organizational folder structure in Documents directory.
 
-Arguments:
-  PARENT_DIR    Parent directory for folders (default: ~/Documents)
+Commands:
+    setup       Run full setup (primary entry point)
+    help        Show this help message (also: -h, --help)
 
-Folders created:
-  - @auto (automated/scripted content)
-  - 000_Inbox (incoming items to be processed)
-  - 100_Life (personal life organization)
-  - 150_Projects (active projects)
-  - 200_People (people-related information)
-  - 400_Topics (topic-based resources)
-  - 700_Libraries (reference materials)
-  - 800_Posterity (long-term archival)
-  - 999_Meta (meta information about the system)
-
-Options:
-  -h, --help    Show this help message
+Folders created in ${PATH_DOCUMENTS}:
+    @auto           Automated/scripted content
+    000_Inbox       Incoming items to be processed
+    100_Life        Personal life organization
+    150_Projects    Active projects
+    200_People      People-related information
+    400_Topics      Topic-based resources
+    700_Libraries   Reference materials
+    800_Posterity   Long-term archival
+    999_Meta        Meta information about the system
 
 Examples:
-  $(basename "$0")                           # Create in ~/Documents (default)
-  $(basename "$0") ~/iCloud/Documents        # Create in iCloud
-  $(basename "$0") "/path/to/DevonThink"    # Create in DevonThink
-
+    $0 setup    # Create folder structure in Documents
 EOF
 }
 
-# Parse arguments
-PARENT_DIR=""
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    -h|--help)
-      show_help
-      exit 0
-      ;;
-    -*)
-      echo "Unknown option: $1" >&2
-      show_help
-      exit 1
-      ;;
-    *)
-      PARENT_DIR="$1"
-      ;;
-  esac
-  shift
-done
+do_setup() {
+    print_heading "Make folders how I like em"
 
-# Set parent directory (default to ~/Documents)
-DOCS_DIR="${PARENT_DIR:-${PATH_DOCUMENTS}}"
+    log_info "Parent directory: ${PATH_DOCUMENTS}"
 
-# Expand tilde if present
-DOCS_DIR="${DOCS_DIR/#\~/$HOME}"
+    # Create parent directory if needed
+    if [[ ! -d "${PATH_DOCUMENTS}" ]]; then
+        log_info "Creating parent directory: ${PATH_DOCUMENTS}"
+        mkdir -p "${PATH_DOCUMENTS}"
+    fi
 
-print_heading "Make folders how I like em"
+    local folders=(
+        "@auto"
+        "000_Inbox"
+        "100_Life"
+        "150_Projects"
+        "200_People"
+        "400_Topics"
+        "700_Libraries"
+        "800_Posterity"
+        "999_Meta"
+    )
 
-log_info "Parent directory: ${DOCS_DIR}"
+    local folder target
+    for folder in "${folders[@]}"; do
+        target="${PATH_DOCUMENTS}/${folder}"
+        if [[ -d "${target}" ]]; then
+            log_info "Folder already exists: ${target}"
+        else
+            log_info "Creating folder: ${target}"
+            mkdir -p "${target}"
+        fi
+    done
 
-# If using default location, create it if needed (backward compatible)
-# If custom directory specified, validate it exists
-if [[ "${DOCS_DIR}" == "${PATH_DOCUMENTS}" ]]; then
-  log_info "Using default location, creating if needed: ${DOCS_DIR}"
-  mkdir -p "${DOCS_DIR}"
-elif [[ ! -d "${DOCS_DIR}" ]]; then
-  log_error "Parent directory does not exist: ${DOCS_DIR}"
-  exit 1
-fi
+    log_info "Created the folders we like"
+}
 
-folders=(
-  "@auto"
-  "000_Inbox"
-  "100_Life"
-  "150_Projects"
-  "200_People"
-  "400_Topics"
-  "700_Libraries"
-  "800_Posterity"
-  "999_Meta"
-)
+main() {
+    local command=""
 
-for folder in "${folders[@]}"; do
-  target="${DOCS_DIR}/${folder}"
-  if [[ -d "${target}" ]]; then
-    log_info "Folder already exists: ${target}"
-  else
-    log_info "Creating folder: ${target}"
-    mkdir -p "${target}"
-  fi
-done
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            setup)
+                command="$1"
+                shift
+                ;;
+            *)
+                fail "Unknown argument '${1}'. Run '$0 help' for usage."
+                ;;
+        esac
+    done
 
-log_info "Created the folders we like"
+    case "${command}" in
+        setup)
+            do_setup
+            ;;
+        "")
+            show_help
+            exit 0
+            ;;
+    esac
+}
+
+main "$@"

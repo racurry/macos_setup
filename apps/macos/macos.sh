@@ -30,29 +30,20 @@ ensure_sudo_cached() {
 
 show_help() {
   cat << EOF
-Usage: $(basename "$0") [OPTIONS] COMMAND
+Usage: $0 [COMMAND] [OPTIONS]
 
 Apply macOS system preferences and defaults.
 
-COMMANDS:
-  global       Apply global macOS defaults (scrollbars, save panels, etc.)
-  input        Apply keyboard and input defaults (key repeat, autocorrect, etc.)
-  dock         Apply Dock and Spaces defaults (position, size, animations, etc.)
-  finder       Apply Finder defaults (extensions, hidden files, paths, etc.)
-  misc         Apply miscellaneous defaults (screenshots, screensaver, sounds, etc.)
-  all          Apply all settings (equivalent to running all commands above)
+Commands:
+    setup       Run full setup (primary entry point)
+    help        Show this help message (also: -h, --help)
 
-OPTIONS:
-  --unattended  Skip operations requiring sudo
-  -h, --help    Show this help message and exit
+Options:
+    --unattended  Skip operations requiring sudo
 
-EXAMPLES:
-  $(basename "$0") global           # Apply only global settings
-  $(basename "$0") dock             # Apply only dock settings
-  $(basename "$0") all              # Apply all settings
-  $(basename "$0") global --unattended  # Apply global settings, skip sudo operations
-
-NOTE: Commands that modify system-wide settings will prompt for sudo unless --unattended is specified.
+Examples:
+    $0 setup                # Apply all macOS settings
+    $0 setup --unattended   # Apply settings, skip sudo operations
 EOF
 }
 
@@ -252,7 +243,7 @@ apply_misc_settings() {
   log_info "Misc defaults applied"
 }
 
-apply_all_settings() {
+do_setup() {
   apply_global_settings
   apply_input_settings
   apply_dock_settings
@@ -260,66 +251,38 @@ apply_all_settings() {
   apply_misc_settings
 }
 
-# Parse command line arguments
-COMMAND=""
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --unattended)
-      UNATTENDED=true
-      shift
+main() {
+  local command=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --unattended)
+        UNATTENDED=true
+        shift
+        ;;
+      help|--help|-h)
+        show_help
+        exit 0
+        ;;
+      setup)
+        command="$1"
+        shift
+        ;;
+      *)
+        fail "Unknown argument '${1}'. Run '$0 help' for usage."
+        ;;
+    esac
+  done
+
+  case "${command}" in
+    setup)
+      do_setup
       ;;
-    -h|--help|help)
+    "")
       show_help
       exit 0
       ;;
-    global|input|dock|finder|misc|all)
-      COMMAND="$1"
-      shift
-      ;;
-    *)
-      # If it starts with -, it's an unknown option
-      if [[ "$1" == -* ]]; then
-        echo "Error: Unknown option '$1'" >&2
-        echo "Run '$(basename "$0") --help' for usage information." >&2
-        exit 1
-      fi
-      # Otherwise, treat it as a command (will be validated later)
-      COMMAND="$1"
-      shift
-      ;;
   esac
-done
+}
 
-# Validate command was provided
-if [[ -z "${COMMAND}" ]]; then
-  echo "Error: No command specified." >&2
-  echo "Run '$(basename "$0") --help' for usage information." >&2
-  exit 1
-fi
-
-# Execute command
-case "${COMMAND}" in
-  global)
-    apply_global_settings
-    ;;
-  input)
-    apply_input_settings
-    ;;
-  dock)
-    apply_dock_settings
-    ;;
-  finder)
-    apply_finder_settings
-    ;;
-  misc)
-    apply_misc_settings
-    ;;
-  all)
-    apply_all_settings
-    ;;
-  *)
-    echo "Error: Unknown command '${COMMAND}'" >&2
-    echo "Run '$(basename "$0") --help' for usage information." >&2
-    exit 1
-    ;;
-esac
+main "$@"
