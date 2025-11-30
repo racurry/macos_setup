@@ -110,40 +110,42 @@ require_rosetta() {
 }
 
 # link_file creates or updates a symlink, backing up existing files if needed.
-# Usage: link_file <source> <destination>
+# Usage: link_file <source> <destination> [app_name]
 # - If destination is already a correct symlink, does nothing
 # - If destination is a different symlink, replaces it
-# - If destination is a regular file, backs it up to PATH_MOTHERBOX_BACKUPS
+# - If destination is a regular file, backs it up using backup_file
+# - If app_name provided, backs up to backups/{app_name}/, otherwise flat backups/
 link_file() {
     local src="$1"
     local dest="$2"
-    local dest_name
-    dest_name="$(basename "${dest}")"
+    local app_name="${3:-}"
 
     if [[ -L "${dest}" ]]; then
         local current_target
         current_target="$(readlink "${dest}")"
         if [[ "${current_target}" == "${src}" ]]; then
             log_info "Symlink already correct: ${dest}"
-        else
-            log_info "Replacing existing symlink ${dest}"
-            rm "${dest}"
-            log_info "Linking ${dest} -> ${src}"
-            ln -s "${src}" "${dest}"
+            return 0
         fi
+        log_info "Replacing existing symlink ${dest}"
+        rm "${dest}"
     elif [[ -e "${dest}" ]]; then
-        local run_stamp
-        run_stamp="$(date +%Y%m%d_%H%M%S)"
-        mkdir -p "${PATH_MOTHERBOX_BACKUPS}"
-        local backup_target="${PATH_MOTHERBOX_BACKUPS}/${dest_name}.bak.${run_stamp}"
-        log_info "Backing up existing file ${dest} to ${backup_target}"
-        mv "${dest}" "${backup_target}"
-        log_info "Linking ${dest} -> ${src}"
-        ln -s "${src}" "${dest}"
-    else
-        log_info "Linking ${dest} -> ${src}"
-        ln -s "${src}" "${dest}"
+        if [[ -n "${app_name}" ]]; then
+            backup_file "${dest}" "${app_name}"
+        else
+            # Flat backup for backward compatibility
+            local dest_name timestamp backup_target
+            dest_name="$(basename "${dest}")"
+            timestamp="$(date +%Y%m%d_%H%M%S)"
+            mkdir -p "${PATH_MOTHERBOX_BACKUPS}"
+            backup_target="${PATH_MOTHERBOX_BACKUPS}/${dest_name}.${timestamp}"
+            mv "${dest}" "${backup_target}"
+            log_warn "Backed up ${dest_name} to ${backup_target}"
+        fi
     fi
+
+    ln -s "${src}" "${dest}"
+    log_info "Linked ${dest} -> ${src}"
 }
 
 # Guard against sourcing multiple times.

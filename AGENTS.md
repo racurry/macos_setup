@@ -4,7 +4,12 @@ Hey, agents!  This file contains important guidelines and rules for working with
 
 ## Project Overview
 
-This is a collection of scripts and tools to enable the user to use consistent and standardized tooling across multiple macOS systems.  It includes a single automated setup script, as well as helper scripts, settings, and utilities.
+**Mother Box** is a collection of scripts and tools to enable the user to use consistent and standardized tooling across multiple macOS systems.  It includes a single automated setup script, as well as helper scripts, settings, and utilities.
+
+**Mother Box config directory:** `~/.config/motherbox/`
+
+- `config` - Runtime configuration (e.g., `SETUP_MODE=personal`)
+- `backups/{appname}/` - Backups created by setup scripts
 
 ## TOP RULES
 

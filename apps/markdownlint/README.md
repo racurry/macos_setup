@@ -10,8 +10,4 @@ Markdown linting configuration for consistent documentation style.
 
 ## Setup
 
-Manual setup required. See below.
-
-## Notes
-
-TODO: Document setup steps
+`markdownlint.sh setup`
