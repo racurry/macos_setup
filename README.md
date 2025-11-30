@@ -9,13 +9,28 @@ This is my "all-in-one" project for managing multiple macOS environments (person
 3. Clone: `git clone git@github.com:racurry/osx_setup.git ~/workspace/infra/osx_setup`
 4. Run: `cd ~/workspace/infra/osx_setup && ./setup.sh`
 
-## What's in here?
+## Structure
 
-## Stuff that is managed
+- [apps](./apps) - Application-specific configs and setup scripts, organized by app (each app has its own directory with config files, setup script, and tests)
+- [bin](./bin) - Standalone binaries that can be run manually.  Automatically added to PATH
+- [lib](./lib) - Shared library functions and helpers
+- [scripts](./scripts) - App-agnostic utility scripts
+- [docs](./docs) - Todos, manual steps, notes, etc.
 
-- App management via [Homebrew](https://brew.sh/) and [mas](https://github.com/mas-cli/mas) using the [Brewfile](./apps/brew/Brewfile)
-- Environment management via [asdf](https://asdf-vm.com/) using [.tool-versions](./apps/asdf/.tool-versions), and global packages for [`nodejs`](./apps/asdf/.default-npm-packages), [`ruby`](./apps/asdf/.default-gems), and [`python`](./apps/asdf/.default-python-packages)
-- Configuration files organized by application in [apps](./apps), including [zsh config](./apps/zsh/.zshrc), [git config](./apps/git/.gitconfig), and more.
+## Testing
+
+Tests are distributed throughout the repository, co-located with the code they test.
+
+```bash
+./test.sh           # Run all tests (lint + unit)
+./test.sh lint      # ShellCheck on all bash sources
+./test.sh unit      # BATS unit tests
+./test.sh --app brew  # Run tests for specific app only
+```
+
+## More to do
+
+[We're never really done](./docs/TODO.md)
 
 ## Resources
 
@@ -23,25 +38,3 @@ Things that can help manage or tweak macOS settings
 
 - <http://www.bresink.com/osx/TinkerTool.html>
 - <https://formulae.brew.sh/>
-
-## Structure
-
-- [apps](./apps) - Application-specific configs and setup scripts, organized by app
-- [bin](./bin) - Standalone binaries that can be run manually
-- [lib](./lib) - Shared library functions
-- [scripts](./scripts) - App-agnostic utility scripts
-- [docs](./docs) - Todos, manual steps, notes, etc.
-- [tests](./tests) - Tests, separated by type
-
-## Testing
-
-Some tests are here.
-
-```bash
-./tests/lint.sh     # ShellCheck on all bash sources
-./tests/unit.sh     # BATS unit tests (adds more over time)
-```
-
-## More to do
-
-[We're never really done](./docs/TODO.md)
