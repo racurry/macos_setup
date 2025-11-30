@@ -28,9 +28,9 @@ This document catalogs all tools, applications, and configurations specifically 
 ## Terminal & Shell
 
 - **iterm2** - Advanced terminal emulator with split panes and search
-  - Config: [`apps/iterm2.md`](../apps/iterm2.md)
+  - Config: [`apps/iterm2/README.md`](../apps/iterm2/README.md)
 - **zsh** - Modern shell with enhanced features and better scripting
-  - Config: [`dotfiles/.zshrc`](../dotfiles/.zshrc)
+  - Config: [`apps/zsh/.zshrc`](../apps/zsh/.zshrc)
 - **zsh-autosuggestions** - Fish-like command autosuggestions based on history
 - **zsh-syntax-highlighting** - Real-time syntax highlighting for shell commands
 - **pure** - Minimal and fast zsh prompt with git status
@@ -40,7 +40,7 @@ This document catalogs all tools, applications, and configurations specifically 
 ## Version Control
 
 - **git** - Distributed version control system
-  - Config: [`dotfiles/.gitconfig`](../dotfiles/.gitconfig)
+  - Config: [`apps/git/.gitconfig`](../apps/git/.gitconfig)
 - **gh** - GitHub's official CLI for issues, PRs, and workflows
 - **hub** - GitHub wrapper adding extra git commands for GitHub operations
 - **diff-so-fancy** - Enhanced git diff with improved readability and syntax highlighting
@@ -50,8 +50,8 @@ This document catalogs all tools, applications, and configurations specifically 
 ## Package & Runtime Management
 
 - **asdf** - Multi-language version manager for nodejs, python, ruby, and more
-  - Config: [`dotfiles/.tool-versions`](../dotfiles/.tool-versions)
-  - Setup: [`scripts/bash/asdf.sh`](../scripts/bash/asdf.sh)
+  - Config: [`apps/asdf/.tool-versions`](../apps/asdf/.tool-versions)
+  - Setup: [`apps/asdf/asdf.sh`](../apps/asdf/asdf.sh)
 - **uv** - Fast Python package installer and resolver written in Rust
 - **yarn** - JavaScript package manager with workspace support
 
@@ -62,7 +62,7 @@ This document catalogs all tools, applications, and configurations specifically 
 - **gemini-cli** - Google Gemini AI CLI for code assistance and generation
 - **claude-code** - Anthropic's official Claude CLI for software engineering
   - Config: [`apps/claudecode/`](../apps/claudecode/)
-  - Setup: [`scripts/bash/claudecode.sh`](../scripts/bash/claudecode.sh)
+  - Setup: [`apps/claudecode/claudecode.sh`](../apps/claudecode/claudecode.sh)
 
 ---
 
@@ -84,19 +84,19 @@ This document catalogs all tools, applications, and configurations specifically 
 
 ## Runtime Environments
 
-Managed via [`asdf`](https://asdf-vm.com/) and defined in [`dotfiles/.tool-versions`](../dotfiles/.tool-versions):
+Managed via [`asdf`](https://asdf-vm.com/) and defined in [`apps/asdf/.tool-versions`](../apps/asdf/.tool-versions):
 
 - **Python 3.11.6** - Default Python runtime for development
-  - Global packages: [`dotfiles/.default-python-packages`](../dotfiles/.default-python-packages)
-  - Config: [`dotfiles/pyproject.toml`](../dotfiles/pyproject.toml)
+  - Global packages: [`apps/asdf/.default-python-packages`](../apps/asdf/.default-python-packages)
+  - Config: [`apps/ruff/ruff.toml`](../apps/ruff/ruff.toml)
 - **Ruby 3.4.4** - Default Ruby runtime
-  - Global gems: [`dotfiles/.default-gems`](../dotfiles/.default-gems)
+  - Global gems: [`apps/asdf/.default-gems`](../apps/asdf/.default-gems)
 - **Node.js 24.1.0** - Default Node runtime for JavaScript development
-  - Global packages: [`dotfiles/.default-npm-packages`](../dotfiles/.default-npm-packages)
+  - Global packages: [`apps/asdf/.default-npm-packages`](../apps/asdf/.default-npm-packages)
   - Includes: `@anthropic-ai/claude-code`, `whic`
 
 ### Environment Management
 
 - **direnv** - Per-directory environment variable management
-  - Config: [`dotfiles/.galileorc`](../dotfiles/.galileorc)
-  - Setup: [`scripts/bash/direnv.sh`](../scripts/bash/direnv.sh)
+  - Config: [`apps/zsh/.galileorc`](../apps/zsh/.galileorc)
+  - Setup: [`apps/direnv/direnv.sh`](../apps/direnv/direnv.sh)

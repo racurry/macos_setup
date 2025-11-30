@@ -23,8 +23,8 @@ OPTIONS:
 
 ENVIRONMENT VARIABLES:
   SETUP_MODE    Set to 'work' or 'personal' to install mode-specific packages
-                from dotfiles/Brewfile.work or dotfiles/Brewfile.personal
-                in addition to the main dotfiles/Brewfile.
+                from apps/brew/Brewfile.work or apps/brew/Brewfile.personal
+                in addition to the main apps/brew/Brewfile.
                 If not set, the script will prompt for selection.
 
 SETUP STEPS:
@@ -133,28 +133,33 @@ if [[ "${UNATTENDED}" == "true" ]]; then
 fi
 
 STEPS=(
-  "mvp_system_reqs_check.sh ${SUDO_FLAG}"
-  "brew.sh install"
-  "folders.sh ${PATH_DOCUMENTS}"
-  "dotfiles.sh"
-  "icloud.sh"
-  "macos_settings.sh global ${SUDO_FLAG}"
-  "macos_settings.sh input ${SUDO_FLAG}"
-  "macos_settings.sh dock ${SUDO_FLAG}"
-  "macos_settings.sh finder ${SUDO_FLAG}"
-  "macos_settings.sh misc ${SUDO_FLAG}"
-  "brew.sh bundle"
-  "asdf.sh plugins"
-  "asdf.sh runtimes"
-  "oh_my_zsh.sh"
-  "1password.sh"
-  "claudecode.sh"
-  "direnv.sh"
+  "scripts/mvp_system_reqs_check.sh ${SUDO_FLAG}"
+  "apps/brew/brew.sh install"
+  "apps/macos/folders.sh ${PATH_DOCUMENTS}"
+  "apps/git/git.sh"
+  "apps/zsh/zsh.sh"
+  "apps/icloud/icloud.sh"
+  "apps/macos/macos.sh global ${SUDO_FLAG}"
+  "apps/macos/macos.sh input ${SUDO_FLAG}"
+  "apps/macos/macos.sh dock ${SUDO_FLAG}"
+  "apps/macos/macos.sh finder ${SUDO_FLAG}"
+  "apps/macos/macos.sh misc ${SUDO_FLAG}"
+  "apps/brew/brew.sh bundle"
+  "apps/asdf/asdf.sh plugins"
+  "apps/asdf/asdf.sh runtimes"
+  "apps/ohmyzsh/ohmyzsh.sh"
+  "apps/1password/1password.sh"
+  "apps/claudecode/claudecode.sh"
+  "apps/devonthink/devonthink.sh"
+  "apps/direnv/direnv.sh"
+  "apps/mailmate/mailmate.sh"
+  "apps/openscad/openscad.sh"
+  "scripts/update_repo.sh"
 )
 
 for step in "${STEPS[@]}"; do
   set +e
-  (cd "${SCRIPT_DIR}/scripts/bash" && bash ${step})
+  (cd "${SCRIPT_DIR}" && bash ${step})
   status=$?
   set -e
 

@@ -18,7 +18,7 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 - [ ] Add all VS Code user settings to apps/vscode, create script to sync/symlink as needed
   - **Clarifying questions needed:**
     1. Where are the VS Code user settings currently located? Are they at the standard location (`~/Library/Application Support/Code/User/settings.json`), already synced somewhere, or should we copy them from a specific machine?
-    2. What should the sync/symlink strategy be? Should VS Code settings be symlinked (like dotfiles/.tool-versions), copied (like MailMate keybindings), or something else?
+    2. What should the sync/symlink strategy be? Should VS Code settings be symlinked (like apps/asdf/.tool-versions), copied (like MailMate keybindings), or something else?
     3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
     4. Should this script be integrated into the main setup.sh workflow or remain manual?
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?

@@ -3,3 +3,5 @@
 .meta
 .claude/settings.local.json
 .out
+.ruff_cache/
+.tmp

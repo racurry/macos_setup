@@ -11,7 +11,7 @@ OPTIONS:
   -h, --help    Show this help message and exit
 
 DESCRIPTION:
-  This script runs all bats test files located in the tests/unit directory.
+  This script runs all bats test files located in the tests directory.
 
 PREREQUISITES:
   - bats-core (install with: brew install bats-core)
@@ -44,4 +44,4 @@ if ! command -v bats >/dev/null 2>&1; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-bats "${SCRIPT_DIR}/unit"
+bats "${SCRIPT_DIR}"

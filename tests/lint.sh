@@ -11,7 +11,7 @@ OPTIONS:
   -h, --help    Show this help message and exit
 
 DESCRIPTION:
-  This script finds all .sh files in lib/bash and scripts/bash directories
+  This script finds all .sh files in lib/bash, scripts, and apps directories
   and runs shellcheck on them to verify bash syntax and best practices.
 
 PREREQUISITES:
@@ -50,7 +50,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 bash_sources=()
 while IFS= read -r file; do
   bash_sources+=("$file")
-done < <(find "${REPO_ROOT}/lib/bash" "${REPO_ROOT}/scripts/bash" -name '*.sh' -print | sort)
+done < <(find "${REPO_ROOT}/lib/bash" "${REPO_ROOT}/scripts" "${REPO_ROOT}/apps" -name '*.sh' -print | sort)
 
 if [ ${#bash_sources[@]} -eq 0 ]; then
   echo "No bash sources found" >&2

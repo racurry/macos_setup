@@ -13,9 +13,9 @@ This is my "all-in-one" project for managing multiple macOS environments (person
 
 ## Stuff that is managed
 
-- App management via [Homebrew](https://brew.sh/) and [mas](https://github.com/mas-cli/mas) using the [Brewfile](./dotfiles/Brewfile)
-- Environment management via [asdf](https://asdf-vm.com/) using [.tool-versions](./dotfiles/.tool-versions), and global packages for [`nodejs`](./dotfiles/.default-npm-packages), [`ruby`](./dotfiles/.default-gems), and [`python`](./dotfiles/.default-python-packages)
-- Dotfiles in [dotfiles](./dotfiles) symlinked to `~/.dotfiles`, including [zsh config](./dotfiles/.zshrc), [git config](./dotfiles/.gitconfig), and more.
+- App management via [Homebrew](https://brew.sh/) and [mas](https://github.com/mas-cli/mas) using the [Brewfile](./apps/brew/Brewfile)
+- Environment management via [asdf](https://asdf-vm.com/) using [.tool-versions](./apps/asdf/.tool-versions), and global packages for [`nodejs`](./apps/asdf/.default-npm-packages), [`ruby`](./apps/asdf/.default-gems), and [`python`](./apps/asdf/.default-python-packages)
+- Configuration files organized by application in [apps](./apps), including [zsh config](./apps/zsh/.zshrc), [git config](./apps/git/.gitconfig), and more.
 
 ## Resources
 
@@ -26,10 +26,10 @@ Things that can help manage or tweak macOS settings
 
 ## Structure
 
+- [apps](./apps) - Application-specific configs and setup scripts, organized by app
 - [bin](./bin) - Standalone binaries that can be run manually
 - [lib](./lib) - Shared library functions
-- [scripts/bash](./scripts/bash) - Scripts, separated by language
-- [dotfiles](./dotfiles) - Dotfiles to be symlinked to the home directory
+- [scripts](./scripts) - App-agnostic utility scripts
 - [docs](./docs) - Todos, manual steps, notes, etc.
 - [tests](./tests) - Tests, separated by type
 

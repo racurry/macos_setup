@@ -15,7 +15,7 @@ This repository automates macOS system setup and configuration management. It ma
 
 ## Applications
 
-All applications are managed via [Homebrew](https://brew.sh/) and defined in [`dotfiles/Brewfile`](../dotfiles/Brewfile), with additional mode-specific apps in [`dotfiles/Brewfile.personal`](../dotfiles/Brewfile.personal) and [`dotfiles/Brewfile.work`](../dotfiles/Brewfile.work).
+All applications are managed via [Homebrew](https://brew.sh/) and defined in [`apps/brew/Brewfile`](../apps/brew/Brewfile), with additional mode-specific apps in [`apps/brew/Brewfile.personal`](../apps/brew/Brewfile.personal) and [`apps/brew/Brewfile.work`](../apps/brew/Brewfile.work).
 
 ### Productivity & Automation
 
@@ -29,7 +29,7 @@ All applications are managed via [Homebrew](https://brew.sh/) and defined in [`d
 ### Communication & Collaboration
 
 - **mailmate** - Advanced IMAP email client for macOS
-  - Setup: [`scripts/bash/mailmate.sh`](../scripts/bash/mailmate.sh)
+  - Setup: [`apps/mailmate/mailmate.sh`](../apps/mailmate/mailmate.sh)
 - **spotify** - Music streaming service
 
 ### File Management & Storage
@@ -42,7 +42,7 @@ All applications are managed via [Homebrew](https://brew.sh/) and defined in [`d
 ### Media & Graphics
 
 - **shottr** - Feature-rich screenshot and annotation tool
-  - Config: [`apps/shottr.md`](../apps/shottr.md)
+  - Config: [`apps/shottr/README.md`](../apps/shottr/README.md)
 - **ffmpeg** - Complete multimedia processing toolkit
 - **imagemagick** - Image manipulation and conversion library
 - **gifsicle** - GIF creation and optimization tool
@@ -62,9 +62,9 @@ All applications are managed via [Homebrew](https://brew.sh/) and defined in [`d
 ### Hardware Integration
 
 - **elgato-stream-deck** - Stream Deck hardware control software
-  - Config: [`apps/stream_deck.md`](../apps/stream_deck.md)
+  - Config: [`apps/stream_deck/README.md`](../apps/stream_deck/README.md)
 - **mutedeck** - Audio mute control via Stream Deck
-  - Config: [`apps/mute_deck.md`](../apps/mute_deck.md)
+  - Config: [`apps/mute_deck/README.md`](../apps/mute_deck/README.md)
 
 ### Document Processing
 
@@ -83,7 +83,7 @@ All applications are managed via [Homebrew](https://brew.sh/) and defined in [`d
 
 ### Personal Applications
 
-Installed via [`dotfiles/Brewfile.personal`](../dotfiles/Brewfile.personal):
+Installed via [`apps/brew/Brewfile.personal`](../apps/brew/Brewfile.personal):
 
 - **daisydisk** - Visual disk space analyzer
 - **macwhisper** - Local speech-to-text transcription
@@ -109,30 +109,24 @@ All scripts are located in [`scripts/`](../scripts/) and organized by language.
 
 ### Bash Scripts
 
-Located in [`scripts/bash/`](../scripts/bash/):
+Application-specific scripts are located in their respective `apps/*/` directories:
 
-- **brew.sh** - Installs Homebrew and manages Brewfile packages
+- **apps/brew/brew.sh** - Installs Homebrew and manages Brewfile packages
   - Commands: `install`, `bundle`
   - Supports `SETUP_MODE` environment variable for work/personal Brewfiles
-- **devonthink.sh** - DEVONthink configuration and setup
-- **dotfiles.sh** - Symlinks dotfiles from `dotfiles/` to home directory
-- **folders.sh** - Creates standard workspace directory structure
-- **icloud.sh** - iCloud Drive configuration
-- **icloud_sync_fix.sh** - Repairs iCloud sync issues
-- **macos_settings.sh** - Applies macOS system preferences
+- **apps/devonthink/devonthink.sh** - DEVONthink configuration and setup
+- **apps/dotfiles/dotfiles.sh** - Symlinks dotfiles to home directory
+- **apps/macos/folders.sh** - Creates standard workspace directory structure
+- **apps/icloud/icloud.sh** - iCloud Drive configuration
+- **apps/macos/macos.sh** - Applies macOS system preferences
   - Commands: `global`, `input`, `dock`, `finder`, `misc`, `all`
-  - See: [`scripts/bash/macos_settings.sh`](../scripts/bash/macos_settings.sh)
-- **mailmate.sh** - MailMate email client configuration
+- **apps/mailmate/mailmate.sh** - MailMate email client configuration
 
 ### Python Scripts
 
-Located in [`scripts/python/`](../scripts/python/):
+Located in [`scripts/`](../scripts/):
 
 - **split_pdf.py** - Splits PDF files into individual pages
-
-### JavaScript Scripts
-
-Located in [`scripts/js/`](../scripts/js/) - currently no scripts defined.
 
 ---
 
@@ -175,16 +169,15 @@ Command-line utilities in [`bin/`](../bin/). Full documentation: [`docs/SCRIPTS.
 - **[TESTING_PLAN.md](TESTING_PLAN.md)** - Test strategy and coverage
 - **[SCRIPTS.md](SCRIPTS.md)** - Detailed utility script documentation
 - **[TODO.md](TODO.md)** - Ongoing tasks and improvements
-- **[APP_AUDIT.md](APP_AUDIT.md)** - Application installation audit report
 - **[manual_todos.md](manual_todos.md)** - Manual configuration steps
 
 ---
 
 ## Quick Links
 
-- Main Brewfile: [`dotfiles/Brewfile`](../dotfiles/Brewfile)
-- Personal Apps: [`dotfiles/Brewfile.personal`](../dotfiles/Brewfile.personal)
-- Work Apps: [`dotfiles/Brewfile.work`](../dotfiles/Brewfile.work)
+- Main Brewfile: [`apps/brew/Brewfile`](../apps/brew/Brewfile)
+- Personal Apps: [`apps/brew/Brewfile.personal`](../apps/brew/Brewfile.personal)
+- Work Apps: [`apps/brew/Brewfile.work`](../apps/brew/Brewfile.work)
 - Setup Script: [`setup.sh`](../setup.sh)
 - Main README: [`README.md`](../README.md)
 - Development Tools: [dev_tools.md](dev_tools.md)
