@@ -38,10 +38,14 @@ source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 | `require_command cmd` | Guard: command exists |
 | `require_file path` | Guard: file exists |
 | `require_directory path` | Guard: directory exists |
-| `backup_file path appname` | Backup file to `~/.config/motherbox/backups/{appname}/` |
-| `link_file src dest [appname]` | Create symlink, backing up existing files |
+| `backup_file path app_name` | Backup file (see [backup_strategy.md](../../docs/backup_strategy.md)) |
+| `link_file src dest app_name` | Create symlink (see [copying_configs.md](../../docs/copying_configs.md)) |
+| `copy_file src dest app_name` | Copy file (see [copying_configs.md](../../docs/copying_configs.md)) |
+| `get_config key` | Get config value (see [motherbox_configs.md](../../docs/motherbox_configs.md)) |
+| `set_config key value` | Set config value (see [motherbox_configs.md](../../docs/motherbox_configs.md)) |
 | `$REPO_ROOT` | Repository root path |
 | `$PATH_MOTHERBOX_CONFIG` | `~/.config/motherbox` |
+| `$PATH_MOTHERBOX_CONFIG_FILE` | `~/.config/motherbox/config` |
 | `$PATH_MOTHERBOX_BACKUPS` | `~/.config/motherbox/backups` |
 
 **Conventions:**
@@ -50,7 +54,8 @@ source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 - Use `help` subcommand (primary), accept `-h`/`--help` as alternatives
 - Use `setup` as main entry point for app scripts
 - Use `--flag value` not `--flag=value`
-- Back up files to `~/.config/motherbox/backups/{appname}/` using `backup_file` or `link_file`
+- Use `link_file` or `copy_file` to deploy configs (they handle backups automatically)
+- `app_name` is **required** for `backup_file`, `link_file`, and `copy_file`
 
 ## App Script Template
 
