@@ -108,34 +108,35 @@ run_unit() {
 }
 
 # Parse arguments
-COMMAND="${1:-all}"
+COMMAND="all"
 APP_FILTER=""
 
-# Handle --app as first argument
-if [[ "$COMMAND" == "--app" ]]; then
-  if [[ -z "${2:-}" ]]; then
-    echo "Error: --app requires an app name" >&2
-    show_help
-    exit 1
-  fi
-  APP_FILTER="$2"
-  COMMAND="all"  # Default to running all tests for the app
-  shift 2
-elif [[ "$COMMAND" == "-h" || "$COMMAND" == "--help" ]]; then
-  show_help
-  exit 0
-else
-  # Command is lint/unit/all, check for --app after it
-  shift
-  if [[ "${1:-}" == "--app" ]]; then
-    if [[ -z "${2:-}" ]]; then
-      echo "Error: --app requires an app name" >&2
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    --app)
+      if [[ -z "${2:-}" ]]; then
+        echo "Error: --app requires an app name" >&2
+        show_help
+        exit 1
+      fi
+      APP_FILTER="$2"
+      shift 2
+      ;;
+    lint|unit|all)
+      COMMAND="$1"
+      shift
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
       show_help
       exit 1
-    fi
-    APP_FILTER="$2"
-  fi
-fi
+      ;;
+  esac
+done
 
 case "$COMMAND" in
   lint)

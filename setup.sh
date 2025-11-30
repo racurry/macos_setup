@@ -5,8 +5,30 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/lib/bash/common.sh"
 
-# Global flag
+# Configuration
+CONFIG_DIR="${HOME}/.config/motherbox"
+CONFIG_FILE="${CONFIG_DIR}/config"
+
+# Global flags
 UNATTENDED=false
+RESET_MODE=false
+
+# Load configuration from file
+load_config() {
+  if [[ -f "${CONFIG_FILE}" ]]; then
+    # shellcheck source=/dev/null
+    source "${CONFIG_FILE}"
+  fi
+}
+
+# Save configuration to file
+save_config() {
+  mkdir -p "${CONFIG_DIR}"
+  cat > "${CONFIG_FILE}" << EOF
+SETUP_MODE=${SETUP_MODE}
+EOF
+  log_info "Configuration saved to ${CONFIG_FILE}"
+}
 
 show_help() {
   cat << EOF
@@ -16,50 +38,23 @@ Automated macOS setup script that installs and configures development tools,
 applications, and system settings.
 
 OPTIONS:
-  --unattended     Skip operations requiring sudo
-  --reset-mode     Reset saved work/personal mode
+  --unattended     Skip operations requiring human interaction
+  --reset-mode     Ignore saved mode and prompt for selection
   --mode=MODE      Set mode directly (work or personal)
   -h, --help       Show this help message and exit
 
-ENVIRONMENT VARIABLES:
-  SETUP_MODE    Set to 'work' or 'personal' to install mode-specific packages
-                from apps/brew/Brewfile.work or apps/brew/Brewfile.personal
-                in addition to the main apps/brew/Brewfile.
-                If not set, the script will prompt for selection.
-
-SETUP STEPS:
-  1. System requirements check (Xcode CLT, bash version, etc.)
-  2. Install Homebrew
-  3. Create standard folder structure
-  4. Link dotfiles to home directory
-  5. Configure iCloud Drive access
-  6. Apply macOS system settings (global, input, dock, finder, misc)
-  7. Install Homebrew packages from Brewfile(s)
-  8. Install asdf plugins and runtimes
-  9. Install Oh My Zsh
-  10. Configure 1Password SSH agent
-  11. Install AI agent tooling
-
-EXIT CODES:
-  0 - Success
-  1 - Failure
-  2 - Manual follow-up required (rerun after completing the action)
+CONFIGURATION:
+  Configuration is persisted to ~/.config/motherbox/config
 
 EXAMPLES:
-  # Run setup interactively (will prompt for mode)
+  # First run 
   ./setup.sh
 
-  # Run setup for work environment
-  SETUP_MODE=work ./setup.sh
-
-  # Run setup for personal environment
-  SETUP_MODE=personal ./setup.sh
-
-  # Non-interactive setup (skip sudo operations)
-  ./setup.sh --unattended
-
-  # Set mode via command line flag
+  # Override saved mode, persist new mode
   ./setup.sh --mode=work
+
+  # Non-interactive setup (skip operations that need you, eg sudo)
+  ./setup.sh --unattended
 
 EOF
 }
@@ -72,12 +67,11 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --reset-mode)
-      # Reset mode will be handled in prompt_setup_mode
       RESET_MODE=true
       shift
       ;;
     --mode=*)
-      export SETUP_MODE="${1#*=}"
+      SETUP_MODE="${1#*=}"
       shift
       ;;
     -h|--help)
@@ -90,30 +84,23 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Prompt user for setup mode if not already set
+# Prompt user for setup mode
 prompt_setup_mode() {
-  if [[ -n "${SETUP_MODE:-}" ]]; then
-    log_info "Setup mode already set to: ${SETUP_MODE}"
-    return 0
-  fi
-
   print_heading "Setup Mode Selection"
   echo "Please select your setup mode:"
-  echo "  1) work     - Install work-specific packages"
-  echo "  2) personal - Install personal-specific packages"
+  echo "  1) work     - Install work-specific tools & settings"
+  echo "  2) personal - Install personal-specific tools & settings"
   echo ""
 
   while true; do
-    read -p "Enter your choice (1 or 2): " choice
+    read -rp "Enter your choice (1 or 2): " choice
     case $choice in
       1|work)
-        export SETUP_MODE="work"
-        log_info "Setup mode set to: work"
+        SETUP_MODE="work"
         break
         ;;
       2|personal)
-        export SETUP_MODE="personal"
-        log_info "Setup mode set to: personal"
+        SETUP_MODE="personal"
         break
         ;;
       *)
@@ -123,8 +110,58 @@ prompt_setup_mode() {
   done
 }
 
-# Prompt for setup mode before starting
-prompt_setup_mode
+# Determine setup mode (precedence: flag > config > prompt)
+if [[ -z "${SETUP_MODE:-}" ]] && [[ "${RESET_MODE}" != "true" ]]; then
+  load_config
+fi
+
+if [[ -z "${SETUP_MODE:-}" ]]; then
+  prompt_setup_mode
+fi
+
+# Persist and export for child processes
+save_config
+export SETUP_MODE
+log_info "Setup mode: ${SETUP_MODE}"
+
+# Preflight checks
+preflight_checks() {
+  print_heading "System Requirements Check"
+  log_info "Running preflight checks..."
+
+  # Block running as root
+  if [[ $EUID -eq 0 ]]; then
+    fail "Run this setup as a regular user, not root"
+  fi
+
+  if [[ "$(pwd)" != "${REPO_ROOT}" ]]; then
+    log_info "Changing working directory to ${REPO_ROOT}"
+    cd "${REPO_ROOT}"
+  fi
+
+  log_info "Repository root resolved to ${REPO_ROOT}"
+  log_info "Bash version ${BASH_VERSION}"
+
+  # Xcode Command Line Tools check
+  log_info "Checking Xcode Command Line Tools..."
+  if xcode-select -p >/dev/null 2>&1; then
+    log_info "Xcode Command Line Tools already installed"
+  else
+    log_info "Triggering Xcode Command Line Tools installation"
+    if xcode-select --install; then
+      log_info "Installer launched. Complete it, then rerun this script."
+      exit 2
+    else
+      log_warn "Installer launch may have failed; verify manually and rerun."
+      exit 1
+    fi
+  fi
+
+  log_info "All system requirements checks passed"
+}
+
+# Run preflight checks before anything else
+preflight_checks
 
 # Build sudo flag for scripts
 SUDO_FLAG=""
@@ -133,7 +170,6 @@ if [[ "${UNATTENDED}" == "true" ]]; then
 fi
 
 STEPS=(
-  "scripts/mvp_system_reqs_check.sh ${SUDO_FLAG}"
   "apps/brew/brew.sh install"
   "apps/macos/folders.sh ${PATH_DOCUMENTS}"
   "apps/git/git.sh"
