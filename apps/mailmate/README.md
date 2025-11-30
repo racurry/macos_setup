@@ -1,5 +1,7 @@
 # MailMate
 
+> ⚠️ Requires Homebrew
+
 MailMate email client configuration and theme.
 
 ## Contents

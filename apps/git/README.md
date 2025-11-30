@@ -1,5 +1,7 @@
 # Git
 
+> ⚠️ Requires Homebrew
+
 Git version control configuration files.
 
 ## Contents

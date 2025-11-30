@@ -1,5 +1,7 @@
 # asdf
 
+> ⚠️ Requires Homebrew
+
 Version manager for multiple runtime versions (Node.js, Python, Ruby, etc.).
 
 ## Contents

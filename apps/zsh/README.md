@@ -1,5 +1,7 @@
 # Zsh
 
+> ⚠️ Requires Homebrew
+
 Zsh shell configuration files.
 
 ## Contents

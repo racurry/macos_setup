@@ -1,5 +1,7 @@
 # Visual Studio Code
 
+> ⚠️ Requires Homebrew
+
 VS Code settings management and synchronization.
 
 ## Contents

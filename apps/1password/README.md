@@ -1,5 +1,7 @@
 # 1Password SSH Agent Configuration
 
+> ⚠️ Requires Homebrew
+
 Configuration files for the 1Password SSH agent.
 
 ## Files

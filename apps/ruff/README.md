@@ -1,5 +1,7 @@
 # Ruff
 
+> ⚠️ Requires Homebrew
+
 Ruff Python linter and formatter configuration.
 
 ## Contents

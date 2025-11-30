@@ -1,5 +1,7 @@
 # direnv
 
+> ⚠️ Requires Homebrew
+
 Environment switcher for the shell with asdf integration.
 
 ## Contents

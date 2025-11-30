@@ -1,5 +1,7 @@
 # Claude Code Configuration
 
+> ⚠️ Requires Homebrew
+
 Configuration files for Claude Code
 
 ## Structure
