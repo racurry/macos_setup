@@ -193,7 +193,7 @@ STEPS_APPS=(
 run_step() {
   local step="$1"
   set +e
-  (cd "${SCRIPT_DIR}" && bash ${step})
+  (cd "${REPO_ROOT}" && bash ${step})
   local status=$?
   set -e
 
