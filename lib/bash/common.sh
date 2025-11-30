@@ -1,24 +1,46 @@
 #!/bin/bash
 # Common helper functions for setup scripts.
 
+################################################################################
+#                              INITIALIZATION
+################################################################################
+
 # Determine repo root relative to this file.
 COMMON_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # COMMON_DIR is lib/bash, so bubble up two levels to reach the repo root.
 REPO_ROOT="$(cd "${COMMON_DIR}/../.." && pwd)"
 
-# Source paths for centralized path definitions
-# shellcheck source=lib/bash/paths.sh
-source "${COMMON_DIR}/paths.sh"
+# Mother Box paths (this project's config and data)
+PATH_MOTHERBOX_CONFIG="${HOME}/.config/motherbox"
+PATH_MOTHERBOX_CONFIG_FILE="${PATH_MOTHERBOX_CONFIG}/config"
+PATH_MOTHERBOX_BACKUPS="${PATH_MOTHERBOX_CONFIG}/backups"
+
+################################################################################
+#                            LOGGING & DISPLAY
+################################################################################
+# Provides colored console output for informational, warning, error, and
+# success messages. All log functions write to stdout except log_warn and
+# log_error which write to stderr.
+#
+# Functions:
+#   log_info <message>     - Blue informational message
+#   log_warn <message>     - Yellow warning (stderr)
+#   log_error <message>    - Red error (stderr)
+#   log_success <message>  - Green success message
+#   fail <message>         - Log error and exit 1
+#   print_heading <text>   - Cyan section heading
+################################################################################
+
 LOG_TAG="setup"
 
 # Color codes for readability.
-CLR_RESET=$'\033[0m'   # reset / default
-CLR_INFO=$'\033[1;34m' # bright blue for informational messages
-CLR_WARN=$'\033[1;33m' # bright yellow for warnings
+CLR_RESET=$'\033[0m'    # reset / default
+CLR_INFO=$'\033[1;34m'  # bright blue for informational messages
+CLR_WARN=$'\033[1;33m'  # bright yellow for warnings
 CLR_ERROR=$'\033[1;31m' # bright red for errors
 CLR_SUCCESS=$'\033[1;32m' # bright green for success messages
-CLR_BOLD=$'\033[1m'    # bold text
-CLR_CYAN=$'\033[1;36m' # bright cyan for headings
+CLR_BOLD=$'\033[1m'     # bold text
+CLR_CYAN=$'\033[1;36m'  # bright cyan for headings
 
 log_info() {
   printf "%s[%s] %s%s\n" "${CLR_INFO}" "${LOG_TAG}" "$*" "${CLR_RESET}"
@@ -41,16 +63,26 @@ fail() {
   exit 1
 }
 
-# =============================================================================
-# Configuration Management
-# =============================================================================
-# Config file: ~/.config/motherbox/config
-# Format: Shell variables that can be sourced
+print_heading() {
+  local text="$1"
+  printf "\n\033[1;36m==> %s\033[0m\n" "$text"
+}
+
+################################################################################
+#                         CONFIGURATION MANAGEMENT
+################################################################################
+# Manages persistent configuration stored in ~/.config/motherbox/config.
+# Config file uses shell variable format that can be sourced.
 #
 # Default values:
 #   BACKUP_RETENTION_DAYS=60
 #   SETUP_MODE=           (empty, set by run/setup.sh)
-# =============================================================================
+#
+# Functions:
+#   ensure_config              - Create config file with defaults if missing
+#   get_config <key>           - Get a config value (stdout)
+#   set_config <key> <value>   - Set a config value
+################################################################################
 
 # _config_defaults returns default config values as shell assignments
 _config_defaults() {
@@ -114,9 +146,20 @@ set_config() {
   mv "${tmp_file}" "${PATH_MOTHERBOX_CONFIG_FILE}"
 }
 
-# =============================================================================
+################################################################################
+#                           REQUIREMENT GUARDS
+################################################################################
+# Guard functions that verify prerequisites are met before proceeding.
+# All guards call fail() if the requirement is not satisfied.
+#
+# Functions:
+#   require_command <cmd>      - Ensure binary is in PATH
+#   require_file <path>        - Ensure file exists
+#   require_directory <path>   - Ensure directory exists
+#   check_rosetta              - Check if Rosetta 2 is running (returns 0/1)
+#   require_rosetta            - Ensure Rosetta 2 is installed
+################################################################################
 
-# require_command ensures a binary is available before we call it.
 require_command() {
   local cmd="$1"
   if ! command -v "$cmd" >/dev/null 2>&1; then
@@ -124,7 +167,6 @@ require_command() {
   fi
 }
 
-# require_file guards against missing manifest/config files.
 require_file() {
   local path="$1"
   if [[ ! -f "$path" ]]; then
@@ -132,7 +174,6 @@ require_file() {
   fi
 }
 
-# require_directory guards against missing directories.
 require_directory() {
   local path="$1"
   if [[ ! -d "$path" ]]; then
@@ -140,10 +181,38 @@ require_directory() {
   fi
 }
 
+check_rosetta() {
+  if ! pgrep -q oahd; then
+    return 1
+  fi
+  return 0
+}
+
+require_rosetta() {
+  if ! check_rosetta; then
+    log_error "Rosetta 2 is not installed but is required"
+    log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
+    fail "Rosetta 2 installation required"
+  fi
+}
+
+################################################################################
+#                           BACKUP MANAGEMENT
+################################################################################
+# Manages file backups in ~/.config/motherbox/backups/.
+# Backups are organized by date and app name, with automatic pruning of
+# files older than BACKUP_RETENTION_DAYS (default: 60).
+#
+# Directory structure:
+#   ~/.config/motherbox/backups/<YYYYMMDD>/<app_name>/<filename>.<timestamp>
+#
+# Functions:
+#   prune_backups                        - Remove backups older than retention
+#   backup_file <path> <app_name>        - Move file to backup location
+################################################################################
+
 # prune_backups removes backup files older than BACKUP_RETENTION_DAYS.
-# Usage: prune_backups
 # Cleans up empty directories after pruning.
-# Retention period is read from config (default: 60 days).
 prune_backups() {
   if [[ ! -d "${PATH_MOTHERBOX_BACKUPS}" ]]; then
     return 0
@@ -164,9 +233,7 @@ prune_backups() {
 }
 
 # backup_file moves a file to the Mother Box backups directory.
-# Usage: backup_file <file_path> <app_name>
-# Creates: ~/.config/motherbox/backups/<datetime>/<app_name>/<filename>.<timestamp>
-# Triggers pruning of backups older than 60 days.
+# Triggers pruning of backups older than retention period.
 backup_file() {
   local file_path="$1"
   local app_name="$2"
@@ -195,34 +262,22 @@ backup_file() {
   prune_backups
 }
 
-print_heading() {
-  local text="$1"
-  printf "\n\033[1;36m==> %s\033[0m\n" "$text"
-}
-
-# check_rosetta verifies Rosetta 2 is installed on Apple Silicon.
-check_rosetta() {
-  if ! pgrep -q oahd; then
-    return 1
-  fi
-  return 0
-}
-
-# require_rosetta ensures Rosetta 2 is installed, failing with instructions if not.
-require_rosetta() {
-  if ! check_rosetta; then
-    log_error "Rosetta 2 is not installed but is required"
-    log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
-    fail "Rosetta 2 installation required"
-  fi
-}
+################################################################################
+#                            FILE OPERATIONS
+################################################################################
+# Functions for creating symlinks and copying files with automatic backup
+# of existing files. Use link_file when the target app follows symlinks;
+# use copy_file when it doesn't.
+#
+# Functions:
+#   link_file <src> <dest> <app_name>  - Create/update symlink with backup
+#   copy_file <src> <dest> <app_name>  - Copy file with backup
+################################################################################
 
 # link_file creates or updates a symlink, backing up existing files if needed.
-# Usage: link_file <source> <destination> <app_name>
 # - If destination is already a correct symlink, does nothing
 # - If destination is a different symlink, replaces it (no backup needed)
 # - If destination is a regular file, backs it up using backup_file
-# - app_name is REQUIRED
 link_file() {
     local src="$1"
     local dest="$2"
@@ -250,10 +305,8 @@ link_file() {
 }
 
 # copy_file copies a file to destination, backing up existing files if needed.
-# Usage: copy_file <source> <destination> <app_name>
 # - If destination is a symlink, removes it and copies
 # - If destination is a regular file, backs it up using backup_file
-# - app_name is REQUIRED
 # Use this for apps that don't follow symlinks.
 copy_file() {
     local src="$1"
@@ -275,8 +328,9 @@ copy_file() {
     log_info "Copied ${src} -> ${dest}"
 }
 
-# Guard against sourcing multiple times.
-export REPO_ROOT
+################################################################################
+#                               EXPORTS
+################################################################################
 
-# Export color codes for external use
+export REPO_ROOT
 export CLR_RESET CLR_INFO CLR_WARN CLR_ERROR CLR_SUCCESS CLR_BOLD CLR_CYAN

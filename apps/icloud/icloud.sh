@@ -5,6 +5,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+# --- Paths --------------------------------------------------------------------
+PATH_ICLOUD="${HOME}/iCloud"
+PATH_ICLOUD_MOBILE_DOCUMENTS="${HOME}/Library/Mobile Documents/com~apple~CloudDocs"
+
 # --- Constants ----------------------------------------------------------------
 BRCTL="/System/Library/PrivateFrameworks/CloudDocs.framework/Versions/A/Resources/brctl"
 DIAG_TMPDIR=""

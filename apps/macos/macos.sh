@@ -5,6 +5,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+# Paths used by this script
+PATH_DOCUMENTS="${HOME}/Documents"
+PATH_SCREENSHOTS="${HOME}/Screenshots"
+
 # Global flag
 UNATTENDED=false
 
