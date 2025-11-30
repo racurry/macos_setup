@@ -2,15 +2,14 @@
 
 Airtable data extraction tools and MCP configuration.
 
-## Contents
+## Scripts
 
 - `extract-data.js` - JavaScript script for extracting data from Airtable
-- `mcp.json` - MCP (Model Context Protocol) configuration for Airtable integration
 
-## Setup
+## MCP Server
 
-Manual setup required. See below.
+`.mcp.json` - MCP (Model Context Protocol) configuration for Airtable integration
 
-## Notes
+Set the following environment variables:
 
-TODO: Document setup steps
+- `AIRTABLE_API_TOKEN` - Personal access token from Airtable

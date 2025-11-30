@@ -2,14 +2,6 @@
 
 Playwright browser automation MCP configuration.
 
-## Contents
+## MCP Server
 
-- `mcp.json` - MCP (Model Context Protocol) configuration for Playwright integration
-
-## Setup
-
-Manual setup required. See below.
-
-## Notes
-
-TODO: Document setup steps
+`.mcp.json` - MCP (Model Context Protocol) configuration for Playwright integration

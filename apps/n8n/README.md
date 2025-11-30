@@ -2,14 +2,11 @@
 
 n8n workflow automation MCP configuration.
 
-## Contents
+## MCP Server
 
-- `mcp.json` - MCP (Model Context Protocol) configuration for n8n integration
+`.mcp.json` - MCP (Model Context Protocol) configuration for n8n integration
 
-## Setup
+Set the following environment variables:
 
-Manual setup required. See below.
-
-## Notes
-
-TODO: Document setup steps
+- `N8N_API_URL` - URL of your n8n instance API
+- `N8N_API_KEY` - API key for n8n authentication
