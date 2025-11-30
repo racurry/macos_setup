@@ -1,6 +1,6 @@
 # Git
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 Git version control configuration files.
 

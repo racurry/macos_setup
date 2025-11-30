@@ -1,8 +1,8 @@
-# iTerm2
+# Alfred
 
 > ⚠️ Installed via Homebrew
 
-Terminal emulator for macOS.
+Productivity app and launcher.
 
 ## Manual Setup
 

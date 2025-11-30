@@ -49,7 +49,7 @@ fail() {
 #
 # Default values:
 #   BACKUP_RETENTION_DAYS=60
-#   SETUP_MODE=           (empty, set by setup.sh)
+#   SETUP_MODE=           (empty, set by run/setup.sh)
 # =============================================================================
 
 # _config_defaults returns default config values as shell assignments

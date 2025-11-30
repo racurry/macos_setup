@@ -17,7 +17,7 @@ apps/{app}/
 ## Apps Files
 
 - `{app}.sh`: See [bash_scripting.md](bash_scripting.md) for bash script template and conventions.
-- `test_{app}.bats`: See [testing.md](../testing.md) for BATS test templates and patterns.
+- `test_{app}.bats`: See [testing.md](../common/testing.md) for BATS test templates and patterns.
 
 ### README: `README.md`
 
@@ -51,6 +51,6 @@ When adding a new app:
 - [ ] Create `apps/{app}/` directory
 - [ ] Create `{app}.sh` with setup command based on [bash_scripting.md](bash_scripting.md)
 - [ ] Create `README.md` with contents and setup instructions
-- [ ] Create `test_{app}.bats` with basic tests _if applicable_, based on [testing.md](../testing.md)
-- [ ] Verify `./test.sh lint` passes (ShellCheck)
-- [ ] Verify `./test.sh --app {app}` passes (if tests exist)
+- [ ] Create `test_{app}.bats` with basic tests _if applicable_, based on [testing.md](../common/testing.md)
+- [ ] Verify `./run/test.sh lint` passes (ShellCheck)
+- [ ] Verify `./run/test.sh --app {app}` passes (if tests exist)

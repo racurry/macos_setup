@@ -14,13 +14,13 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 
 ## Ready
 
-- [ ] Bug: When running setup.sh on a system that doesn't already have brew installed, the whole set up fails.  It tries to run brew bundle referencing files in ~. before it calls `dotfiles.sh`.
+- [ ] Bug: When running run/setup.sh on a system that doesn't already have brew installed, the whole set up fails.  It tries to run brew bundle referencing files in ~. before it calls `dotfiles.sh`.
 - [ ] Add all VS Code user settings to apps/vscode, create script to sync/symlink as needed
   - **Clarifying questions needed:**
     1. Where are the VS Code user settings currently located? Are they at the standard location (`~/Library/Application Support/Code/User/settings.json`), already synced somewhere, or should we copy them from a specific machine?
     2. What should the sync/symlink strategy be? Should VS Code settings be symlinked (like apps/asdf/.tool-versions), copied (like MailMate keybindings), or something else?
     3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
-    4. Should this script be integrated into the main setup.sh workflow or remain manual?
+    4. Should this script be integrated into the main run/setup.sh workflow or remain manual?
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
 - [ ] create a computer specific config file for this repo that lives in ~/.everythingscomputer. Everything should be moved in there that is mutable. For example, backup files, home versus work setting, etc.
 - [ ] Figure out a way for the claudecode.sh script to merge apps/claudecode/settings.json into ~/.claude/settings.json
@@ -31,7 +31,7 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 ## Icebox
 
 - [ ] How do I get things updated to simplify for real life?  Eg getting 1password set up unlocks a lot as I can easily login to app store & github
-- [ ] Figure out how to get the install to run without having to do git clone first.  Maybe a curl pipe to bash that does the git clone and then runs setup.sh?
+- [ ] Figure out how to get the install to run without having to do git clone first.  Maybe a curl pipe to bash that does the git clone and then runs run/setup.sh?
 - [ ] Split the Brewfile up - Allow brew to install mas, and then have another script check for mas before calling mas install against the Brewfile.
 - [ ] Think about update strategies for installed apps
 - [ ] How do we clean up old dotfiles backups?

@@ -1,9 +1,10 @@
-# iTerm2
+# Keyboard Maestro
 
 > ⚠️ Installed via Homebrew
 
-Terminal emulator for macOS.
+Automation and macro tool for macOS.
 
 ## Manual Setup
 
 - [ ] Set up settings sync using Google Drive
+- [ ] Set Keyboard Maestro sync location

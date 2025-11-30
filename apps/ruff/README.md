@@ -1,6 +1,6 @@
 # Ruff
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 Ruff Python linter and formatter configuration.
 

@@ -46,7 +46,7 @@ set_config BACKUP_RETENTION_DAYS 90
 | Key | Default | Description |
 |-----|---------|-------------|
 | `BACKUP_RETENTION_DAYS` | `60` | Days to keep backups before pruning |
-| `SETUP_MODE` | *(empty)* | Set by `setup.sh` during execution |
+| `SETUP_MODE` | *(empty)* | Set by `run/setup.sh` during execution |
 
 ## CLI Access
 

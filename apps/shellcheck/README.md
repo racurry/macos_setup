@@ -1,6 +1,6 @@
 # shellcheck
 
-> Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 Shell script static analysis configuration for consistent bash scripting.
 

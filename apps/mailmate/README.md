@@ -1,6 +1,6 @@
 # MailMate
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 MailMate email client configuration and theme.
 

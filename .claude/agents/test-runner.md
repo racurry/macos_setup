@@ -15,12 +15,12 @@ Run from repository root:
 
 | Command | Scope |
 |---------|-------|
-| `./test.sh` | Full suite (lint + unit) - **default** |
-| `./test.sh lint` | Shellcheck only |
-| `./test.sh unit` | Bats tests only |
-| `./test.sh --app {name}` | Single app (lint + unit) |
-| `./test.sh lint --app {name}` | Single app lint only |
-| `./test.sh unit --app {name}` | Single app unit only |
+| `./run/test.sh` | Full suite (lint + unit) - **default** |
+| `./run/test.sh lint` | Shellcheck only |
+| `./run/test.sh unit` | Bats tests only |
+| `./run/test.sh --app {name}` | Single app (lint + unit) |
+| `./run/test.sh lint --app {name}` | Single app lint only |
+| `./run/test.sh unit --app {name}` | Single app unit only |
 
 ## Test File Locations
 
@@ -37,7 +37,7 @@ Do not install; report missing dependencies:
 
 ## Constraints
 
-- Default to full suite (`./test.sh`) unless narrower scope explicitly requested
+- Default to full suite (`./run/test.sh`) unless narrower scope explicitly requested
 - Do not modify or skip tests without confirmation
 - Do not install global software or change system configuration
 - Limit fixes to straightforward, low-risk edits; escalate broader work

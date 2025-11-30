@@ -14,10 +14,10 @@ the code they test.
 ## Running Tests
 
 ```bash
-./test.sh                    # Run all tests (lint + unit)
-./test.sh unit               # BATS tests only
-./test.sh lint               # ShellCheck only
-./test.sh --app appname      # Tests for specific app
+./run/test.sh                    # Run all tests (lint + unit)
+./run/test.sh unit               # BATS tests only
+./run/test.sh lint               # ShellCheck only
+./run/test.sh --app appname      # Tests for specific app
 ```
 
 ## Test File Template

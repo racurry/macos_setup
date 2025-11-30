@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/bash/common.sh
-source "${SCRIPT_DIR}/lib/bash/common.sh"
+# shellcheck source=../lib/bash/common.sh
+source "${SCRIPT_DIR}/../lib/bash/common.sh"
 
 # Global flags
 UNATTENDED=false
@@ -26,14 +26,14 @@ CONFIGURATION:
   Configuration is persisted to ~/.config/motherbox/config
 
 EXAMPLES:
-  # First run 
-  ./setup.sh
+  # First run
+  ./run/setup.sh
 
   # Override saved mode, persist new mode
-  ./setup.sh --mode=work
+  ./run/setup.sh --mode=work
 
   # Non-interactive setup (skip operations that need you, eg sudo)
-  ./setup.sh --unattended
+  ./run/setup.sh --unattended
 
 EOF
 }
@@ -227,7 +227,7 @@ run_phase "Runtimes"        "${STEPS_RUNTIMES[@]}"
 run_phase "File System"     "${STEPS_FILESYSTEM[@]}"
 run_phase "macOS Settings"  "${STEPS_MACOS[@]}"
 run_phase "Applications"    "${STEPS_APPS[@]}"
-manual_file="${SCRIPT_DIR}/docs/manual_todos.md"
+manual_file="${SCRIPT_DIR}/../docs/manual_todos.md"
 if [[ -f "${manual_file}" ]]; then
   echo
   log_info "Manual checklist: review ${manual_file} for remaining tasks"

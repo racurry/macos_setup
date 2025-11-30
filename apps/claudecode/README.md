@@ -1,6 +1,6 @@
 # Claude Code Configuration
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 Configuration files for Claude Code
 

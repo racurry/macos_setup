@@ -16,7 +16,7 @@ Hey, agents!  This file contains important guidelines and rules for working with
 When renaming or moving files:
 
 - ALWAYS search the codebase for references to those files and update them accordingly
-- ALWAYS run ./test.sh after changes to verify nothing broke
+- ALWAYS run ./run/test.sh after changes to verify nothing broke
 
 When writing scripts:
 
@@ -58,21 +58,21 @@ When writing tests:
 
 ```bash
 # Run the complete setup process (idempotent)
-./setup.sh
+./run/setup.sh
 
 # Run all tests (lint + unit)
-./test.sh
+./run/test.sh
 
 # Run only linting
-./test.sh lint
+./run/test.sh lint
 
 # Run only unit tests
-./test.sh unit
+./run/test.sh unit
 
 # Run tests for a specific app only
-./test.sh --app {appname}           # Lint + test specific app
-./test.sh lint --app {appname}      # Lint only specific app
-./test.sh unit --app {appname}      # Test only specific app
+./run/test.sh --app {appname}           # Lint + test specific app
+./run/test.sh lint --app {appname}      # Lint only specific app
+./run/test.sh unit --app {appname}      # Test only specific app
 
 # Run a specific app script
 ./apps/{appname}/{appname}.sh          # Or .py, .js, .rb depending on language
@@ -94,6 +94,7 @@ When writing tests:
   - Scripts that don't belong to a specific app
   - Example: mvp_system_reqs_check.sh
 - **docs/**: Documentation and manual checklists
-- **setup.sh**: Root orchestrator that calls app scripts in order
-- **test.sh**: Unified test runner (lint + unit tests)
-  - Supports `--app {appname}` flag to target specific apps
+- **run/**: Orchestration scripts
+  - **run/setup.sh**: Root orchestrator that calls app scripts in order
+  - **run/test.sh**: Unified test runner (lint + unit tests, supports `--app {appname}`)
+  - **run/maintain.sh**: Maintenance utilities (backup pruning, config management)

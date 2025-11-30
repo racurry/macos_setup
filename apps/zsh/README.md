@@ -1,6 +1,6 @@
 # Zsh
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 Zsh shell configuration files.
 

@@ -26,7 +26,7 @@ Before writing any code, read the relevant documentation to understand current p
 - **ALWAYS read** `docs/apps/bash_scripting.md` - Contains the script template, conventions table, and available functions
 - **Read if copying/symlinking files to user directories** (e.g., `~/.zshrc`) `docs/apps/copying_configs.md` - When to use `link_file` vs `copy_file`
 - **Read if using backups** `docs/apps/config_backups.md` - Understanding `backup_file` behavior
-- **Read if using config system** `docs/motherbox_configs.md` - `get_config` and `set_config` usage
+- **Read if using config system** `docs/common/` - `get_config` and `set_config` usage
 
 ### 2. Start from Template
 
@@ -100,7 +100,7 @@ retention="$(get_config BACKUP_RETENTION_DAYS)"
 set_config BACKUP_RETENTION_DAYS 90
 ```
 
-See `docs/motherbox_configs.md` for available keys and defaults.
+See `docs/common/` for available keys and defaults.
 
 ### 7. Test Script Functionality
 
@@ -152,4 +152,4 @@ Do NOT duplicate content from these docs - reference them when needed:
 - `docs/apps/bash_scripting.md` - Complete template and function reference
 - `docs/apps/copying_configs.md` - Config file deployment details
 - `docs/apps/config_backups.md` - Backup behavior and retention
-- `docs/motherbox_configs.md` - Configuration system usage
+- `docs/common/` - Configuration system usage

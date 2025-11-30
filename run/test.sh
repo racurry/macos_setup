@@ -53,10 +53,10 @@ run_lint() {
   bash_sources=()
   if [[ -n "$app_filter" ]]; then
     # Only lint scripts in the specified app directory
-    if [[ -d "${SCRIPT_DIR}/apps/${app_filter}" ]]; then
+    if [[ -d "${SCRIPT_DIR}/../apps/${app_filter}" ]]; then
       while IFS= read -r file; do
         bash_sources+=("$file")
-      done < <(find "${SCRIPT_DIR}/apps/${app_filter}" -name '*.sh' -print | sort)
+      done < <(find "${SCRIPT_DIR}/../apps/${app_filter}" -name '*.sh' -print | sort)
     else
       echo "App directory not found: apps/${app_filter}" >&2
       return 1
@@ -65,7 +65,7 @@ run_lint() {
     # Lint all scripts
     while IFS= read -r file; do
       bash_sources+=("$file")
-    done < <(find "${SCRIPT_DIR}/lib/bash" "${SCRIPT_DIR}/scripts" "${SCRIPT_DIR}/apps" -name '*.sh' -print | sort)
+    done < <(find "${SCRIPT_DIR}/../lib/bash" "${SCRIPT_DIR}/../scripts" "${SCRIPT_DIR}/../apps" -name '*.sh' -print | sort)
   fi
 
   if [ ${#bash_sources[@]} -eq 0 ]; then
@@ -74,7 +74,7 @@ run_lint() {
   fi
 
   echo "Checking ${#bash_sources[@]} bash files..."
-  shellcheck --source-path="${SCRIPT_DIR}" "${bash_sources[@]}"
+  shellcheck --source-path="${SCRIPT_DIR}/.." "${bash_sources[@]}"
   echo "✓ All bash files passed shellcheck"
 }
 
@@ -90,7 +90,7 @@ run_unit() {
     echo "Running unit tests for app: ${app_filter}..."
 
     # Find test file for the specified app
-    test_file="${SCRIPT_DIR}/apps/${app_filter}/test_${app_filter}.bats"
+    test_file="${SCRIPT_DIR}/../apps/${app_filter}/test_${app_filter}.bats"
     if [[ ! -f "$test_file" ]]; then
       echo "Test file not found: ${test_file}" >&2
       return 1
@@ -101,9 +101,9 @@ run_unit() {
     echo "Running unit tests..."
 
     # Discover all test files in apps/, scripts/, and lib/
-    bats "${SCRIPT_DIR}"/apps/*/test_*.bats \
-         "${SCRIPT_DIR}"/scripts/test_*.bats \
-         "${SCRIPT_DIR}"/lib/test_*.bats
+    bats "${SCRIPT_DIR}"/../apps/*/test_*.bats \
+         "${SCRIPT_DIR}"/../scripts/test_*.bats \
+         "${SCRIPT_DIR}"/../lib/test_*.bats
   fi
 }
 

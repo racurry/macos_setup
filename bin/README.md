@@ -5,6 +5,7 @@ This directory contains a collection of utility scripts for common file and medi
 ## Video Conversion
 
 ### avitomp4
+
 Convert AVI video files to MP4 format using ffmpeg.
 
 ```bash
@@ -18,6 +19,7 @@ avitomp4 FILE_OR_DIRECTORY
 **Requirements:** ffmpeg
 
 ### mkvtomp4
+
 Convert MKV video files to MP4 format using ffmpeg.
 
 ```bash
@@ -31,6 +33,7 @@ mkvtomp4 FILE_OR_DIRECTORY
 **Requirements:** ffmpeg
 
 ### vidmerge
+
 Merge multiple video files into a single MP4.
 
 ```bash
@@ -49,6 +52,7 @@ vidmerge --delete-originals FILE1 FILE2 ... OUTPUT_NAME
 ## Image Processing
 
 ### backgroundify
+
 Add solid color backgrounds to transparent images.
 
 ```bash
@@ -63,6 +67,7 @@ backgroundify SOURCE_DIR TARGET_DIR COLOR
 **Requirements:** ImageMagick (convert)
 
 ### iconify
+
 Create macOS .icns icon files from images.
 
 ```bash
@@ -77,6 +82,7 @@ iconify SOURCE_IMAGE
 **Requirements:** ImageMagick (convert), iconutil
 
 ### ocrify
+
 Perform OCR (Optical Character Recognition) on images or PDFs.
 
 ```bash
@@ -93,6 +99,7 @@ ocrify FILE
 ## File Organization
 
 ### folderify
+
 Move each file into its own subdirectory.
 
 ```bash
@@ -105,6 +112,7 @@ folderify DIRECTORY
 - Useful for organizing files that need individual folders
 
 ### unfolderify
+
 Flatten directory structure by moving all files to current directory.
 
 ```bash
@@ -119,6 +127,7 @@ unfolderify
 ## File Naming
 
 ### batch_rename
+
 Rename files with sequential numbering.
 
 ```bash
@@ -131,6 +140,7 @@ batch_rename DIRECTORY BASE_NAME
 - Processes all files in specified directory
 
 ### filename_fixer
+
 Clean up and standardize filenames.
 
 ```bash
@@ -138,20 +148,24 @@ filename_fixer DIRECTORY [OPTIONS]
 ```
 
 Options:
+
 - `--dedot` - Replace dots with spaces
 - `--strip-digits` - Remove all numeric characters
 
 Features:
+
 - Always removes extra whitespace
 - Always preserves file extensions
 - Can combine multiple options
 
 Example:
+
 ```bash
 filename_fixer /path/to/dir --dedot --strip-digits
 ```
 
 ### swap_extension
+
 Change file extensions in bulk.
 
 ```bash
@@ -166,6 +180,7 @@ swap_extension CURRENT_EXT NEW_EXT
 ## Claude Code Development
 
 ### ccmcps
+
 Manage Claude MCP (Model Context Protocol) servers.
 
 ```bash
@@ -193,4 +208,4 @@ scriptname --help
 
 ## Installation
 
-These scripts are automatically added to your PATH when you run `./setup.sh` from this repository. They can then be called from anywhere on your system.
+These scripts are automatically added to your PATH when you run `./run/setup.sh` from this repository. They can then be called from anywhere on your system.

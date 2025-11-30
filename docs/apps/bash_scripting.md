@@ -110,4 +110,4 @@ See [copying_configs.md](copying_configs.md) for details on `link_file` vs `copy
 
 - [copying_configs.md](copying_configs.md) - `link_file` and `copy_file` usage
 - [config_backups.md](config_backups.md) - `backup_file` and retention policy
-- [motherbox_configs.md](../motherbox_configs.md) - `get_config` and `set_config`
+- [common/](../common/) - `get_config` and `set_config`

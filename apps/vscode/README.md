@@ -1,6 +1,6 @@
 # Visual Studio Code
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 VS Code settings management and synchronization.
 
@@ -12,6 +12,6 @@ VS Code settings management and synchronization.
 
 Manual setup required. See below.
 
-## Notes
+## Manual Setup
 
-TODO: Document setup steps
+- [ ] Sync VS Code (sign in and enable Settings Sync)

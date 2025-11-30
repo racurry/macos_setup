@@ -1,6 +1,6 @@
 # markdownlint
 
-> ⚠️ Requires Homebrew
+> ⚠️ Installed via Homebrew
 
 Markdown linting configuration for consistent documentation style.
 
