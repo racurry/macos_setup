@@ -17,6 +17,15 @@ Commands:
 EOF
 }
 
+link_config_files() {
+    print_heading "Link asdf config files"
+    link_file "${SCRIPT_DIR}/.tool-versions" "${HOME}/.tool-versions" "asdf"
+    link_file "${SCRIPT_DIR}/.asdfrc" "${HOME}/.asdfrc" "asdf"
+    link_file "${SCRIPT_DIR}/.default-gems" "${HOME}/.default-gems" "asdf"
+    link_file "${SCRIPT_DIR}/.default-npm-packages" "${HOME}/.default-npm-packages" "asdf"
+    link_file "${SCRIPT_DIR}/.default-python-packages" "${HOME}/.default-python-packages" "asdf"
+}
+
 add_plugins() {
     print_heading "Add asdf plugins"
 
@@ -47,6 +56,7 @@ install_runtimes() {
 }
 
 do_setup() {
+    link_config_files
     add_plugins
     install_runtimes
 }

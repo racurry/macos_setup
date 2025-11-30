@@ -6,17 +6,26 @@ Version manager for multiple runtime versions (Node.js, Python, Ruby, etc.).
 
 ## Contents
 
-- `.asdfrc` - asdf configuration file
-- `.default-gems` - Default gems to install with new Ruby versions
-- `.default-npm-packages` - Default npm packages to install with new Node.js versions
-- `.default-python-packages` - Default pip packages to install with new Python versions
+### Scripts
+
+- `asdf.sh` - Setup script (run with `setup` command)
+
+### Config Files (symlinked to ~/)
+
 - `.tool-versions` - Global tool versions specification
-- `asdf.sh` - Setup script for asdf
+- `.asdfrc` - asdf configuration (e.g., `legacy_version_file = yes`)
+- `.default-gems` - Gems to auto-install with new Ruby versions
+- `.default-npm-packages` - npm packages to auto-install with new Node.js versions
+- `.default-python-packages` - pip packages to auto-install with new Python versions
 
 ## Setup
 
-Run `./apps/asdf/asdf.sh` to set up.
+```bash
+./apps/asdf/asdf.sh setup
+```
 
-## Notes
+This will:
 
-TODO: Document setup steps
+1. Symlink all config files to `~/`
+2. Add asdf plugins for each tool in `.tool-versions`
+3. Install the specified runtime versions
