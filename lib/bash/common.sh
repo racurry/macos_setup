@@ -153,11 +153,12 @@ set_config() {
 # All guards call fail() if the requirement is not satisfied.
 #
 # Functions:
-#   require_command <cmd>      - Ensure binary is in PATH
-#   require_file <path>        - Ensure file exists
-#   require_directory <path>   - Ensure directory exists
-#   check_rosetta              - Check if Rosetta 2 is running (returns 0/1)
-#   require_rosetta            - Ensure Rosetta 2 is installed
+#   require_command <cmd>              - Ensure binary is in PATH
+#   require_file <path>                - Ensure file exists
+#   require_directory <path>           - Ensure directory exists
+#   check_rosetta                      - Check if Rosetta 2 is running (returns 0/1)
+#   require_rosetta                    - Ensure Rosetta 2 is installed
+#   ensure_brew_package <cmd> <pkg>    - Install brew package if command missing
 ################################################################################
 
 require_command() {
@@ -194,6 +195,24 @@ require_rosetta() {
         log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
         fail "Rosetta 2 installation required"
     fi
+}
+
+# ensure_brew_package installs a Homebrew package if the command is not found.
+# Usage: ensure_brew_package <command> <package>
+#   <command> - The CLI command to check for (e.g., "claude")
+#   <package> - The Homebrew package to install (e.g., "claude-code")
+# If package is omitted, assumes package name matches command name.
+ensure_brew_package() {
+    local cmd="$1"
+    local pkg="${2:-$1}"
+
+    if command -v "${cmd}" &>/dev/null; then
+        return 0
+    fi
+
+    print_heading "Installing ${pkg}"
+    require_command brew
+    brew install "${pkg}"
 }
 
 ################################################################################

@@ -1,23 +1,40 @@
-# Claude Code Configuration
+# Claude Code
 
-> ⚠️ Installed via Homebrew
+Anthropic's CLI for Claude, providing AI assistance directly in your terminal.
 
-Configuration files for Claude Code
+## Installation
 
-## Structure
-
-`./CLAUDE.global.md` - Global configuration for Claude Code.
+```bash
+brew install claude-code
+```
 
 ## Setup
 
 ```bash
-./scripts/bash/claudecode.sh
+./apps/claudecode/claudecode.sh setup
 ```
 
-Creates symlinks:
+This configures:
 
-- `hooks/*` → `~/.claude/hooks/*`
-- `commands/**/*` → `~/.claude/commands/**/*`
-- `AGENTS.md` → `~/.claude/CLAUDE.md`
+- Links `CLAUDE.global.md` to `~/.claude/CLAUDE.md` (global rules)
+- Links `AGENTS.global.md` to `~/AGENTS.md` (agent instructions)
+- Syncs commands from `commands/` to `~/.claude/commands/` (individual symlinks)
+- Enables extended thinking and project MCP servers in `settings.json`
 
-Existing `~/.claude/CLAUDE.md` files are backed up to `CLAUDE.local.md`.
+### Subcommands
+
+Run individual parts of setup:
+
+- `rules` - link CLAUDE.md and AGENTS.md only
+- `commands` - sync commands directory only
+- `settings` - configure settings.json only
+
+## Syncing Preferences
+
+Repo sync. Global rules and commands are stored in this repo and symlinked to `~/.claude/`.
+
+Commands are linked individually (not as a directory) so you can add local-only commands to `~/.claude/commands/` without tracking them in git.
+
+## References
+
+- [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

@@ -12,24 +12,29 @@ Usage: $0 [COMMAND] [OPTIONS]
 Link Claude Code global configuration to ~/.claude.
 
 Commands:
-    setup       Run full setup (primary entry point)
+    setup       Run full setup (rules + commands + settings)
+    rules       Link CLAUDE.md and AGENTS.md files
+    commands    Sync commands to ~/.claude/commands
+    settings    Configure settings.json
     help        Show this help message (also: -h, --help)
 
 Description:
     This script creates symbolic links for Claude Code global configuration:
     - apps/claudecode/CLAUDE.global.md -> ~/.claude/CLAUDE.md
     - apps/claudecode/AGENTS.global.md -> ~/AGENTS.md
+    - apps/claudecode/commands/* -> ~/.claude/commands/* (each file separately)
 EOF
 }
 
-do_setup() {
-    print_heading "Link Claude Code configuration"
+do_rules() {
+    print_heading "Link Claude Code rules"
+
+    mkdir -p "${HOME}/.claude"
 
     # Link CLAUDE.global.md to ~/.claude/CLAUDE.md
     local claude_global_src="${REPO_ROOT}/apps/claudecode/CLAUDE.global.md"
     local claude_dest="${HOME}/.claude/CLAUDE.md"
     require_file "${claude_global_src}"
-    mkdir -p "${HOME}/.claude"
     link_file "${claude_global_src}" "${claude_dest}" "claudecode"
 
     # Link AGENTS.global.md to ~/AGENTS.md
@@ -38,10 +43,38 @@ do_setup() {
     require_file "${agents_global_src}"
     link_file "${agents_global_src}" "${agents_dest}" "claudecode"
 
-    # Configure Claude Code settings
-    local settings_file="${HOME}/.claude/settings.json"
+    log_success "Claude Code rules linked"
+}
 
-    log_info "Configuring Claude Code settings"
+do_commands() {
+    print_heading "Sync Claude Code commands"
+
+    local commands_src_dir="${REPO_ROOT}/apps/claudecode/commands"
+    local commands_dest_dir="${HOME}/.claude/commands"
+
+    if [[ ! -d "${commands_src_dir}" ]]; then
+        log_info "No commands directory found, skipping"
+        return 0
+    fi
+
+    mkdir -p "${commands_dest_dir}"
+
+    for cmd_file in "${commands_src_dir}"/*; do
+        if [[ -f "${cmd_file}" ]]; then
+            local filename
+            filename=$(basename "${cmd_file}")
+            link_file "${cmd_file}" "${commands_dest_dir}/${filename}" "claudecode"
+        fi
+    done
+
+    log_success "Claude Code commands synced"
+}
+
+do_settings() {
+    print_heading "Configure Claude Code settings"
+
+    mkdir -p "${HOME}/.claude"
+    local settings_file="${HOME}/.claude/settings.json"
 
     # Backup existing settings before modification
     backup_file "${settings_file}" "claudecode"
@@ -63,7 +96,15 @@ do_setup() {
     log_info "Set alwaysThinkingEnabled = true"
     log_info "Set enableAllProjectMcpServers = true"
 
-    log_success "Claude Code configuration linked successfully"
+    log_success "Claude Code settings configured"
+}
+
+do_setup() {
+    ensure_brew_package claude claude-code
+
+    do_rules
+    do_commands
+    do_settings
 }
 
 main() {
@@ -75,7 +116,7 @@ main() {
             show_help
             exit 0
             ;;
-        setup)
+        setup | rules | commands | settings)
             command="$1"
             shift
             ;;
@@ -89,6 +130,15 @@ main() {
     case "${command}" in
     setup)
         do_setup
+        ;;
+    rules)
+        do_rules
+        ;;
+    commands)
+        do_commands
+        ;;
+    settings)
+        do_settings
         ;;
     "")
         show_help
