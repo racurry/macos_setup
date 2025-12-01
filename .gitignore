@@ -5,3 +5,4 @@
 .out
 .ruff_cache/
 .tmp
+.local.zshrc

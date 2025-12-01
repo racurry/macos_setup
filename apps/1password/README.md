@@ -1,18 +1,42 @@
-# 1Password SSH Agent Configuration
+# 1Password
 
-> ⚠️ Installed via Homebrew
+Password manager with built-in SSH agent. [Official docs](https://developer.1password.com/docs/ssh/).
 
-Configuration files for the 1Password SSH agent.
+## Installation
 
-## Files
+1Password must be installed manually before this repo can be cloned. See the [main README](/README.md) for bootstrap instructions.
 
-- `agent.personal.toml` - Personal machine config (personal key only)
-- `agent.work.toml` - Work machine config (work key first, personal key second)
+## Setup
 
-## Usage
+```bash
+./apps/1password/1password.sh setup --mode personal  # or --mode work
+```
 
-The `1password.sh` script copies the appropriate file to `~/.config/1password/ssh/agent.toml` based on the `--mode` argument (`work` or `personal`).
+This symlinks the appropriate SSH agent config (`agent.personal.toml` or `agent.work.toml`) to `~/.config/1password/ssh/agent.toml`.
 
-## Documentation
+## Manual Setup
 
-- [1Password SSH Agent Config](https://developer.1password.com/docs/ssh/agent/config)
+Complete these steps during initial installation (before cloning this repo):
+
+1. **Download and install** - [1password.com/downloads/mac](https://1password.com/downloads/mac)
+2. **Sign in** - Add your 1Password account(s)
+3. **Enable SSH agent** - Settings > Developer > SSH Agent
+4. **Configure SSH client** - Add to `~/.ssh/config`:
+
+   ```text
+   Host *
+       IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+   ```
+
+After running the setup script:
+
+1. **Restart 1Password** - Lock and unlock to recognize the new agent.toml
+
+## Syncing Preferences
+
+Repo sync. SSH agent config (`agent.toml`) symlinked to `~/.config/1password/ssh/`. App preferences sync via 1Password account.
+
+## References
+
+- [SSH Agent Config File](https://developer.1password.com/docs/ssh/agent/config/)
+- [Get Started with SSH](https://developer.1password.com/docs/ssh/get-started/)

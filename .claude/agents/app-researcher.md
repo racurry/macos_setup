@@ -155,12 +155,22 @@ Investigate in this order of preference:
 - **Credentials**: Passwords, SSH keys, certificates
 - **Private data**: Any information not safe for public internet
 
+**For apps requiring environment variables (API tokens, secrets):**
+
+Tell users to add exports to `~/.local.zshrc`:
+
+```bash
+# Add to ~/.local.zshrc
+export APP_API_TOKEN="..."
+```
+
+This file is sourced by `.zshrc` but not tracked in git. See `apps/zsh/README.md` for details.
+
 **Document in README:**
 
+- Which environment variables the app needs
 - Files safe to publish publicly
 - Files requiring .gitignore entries
-- How to template/sanitize sensitive values
-- Warning notices for users about what to check before committing
 
 ### 7. Manual Import/Export Fallback
 
