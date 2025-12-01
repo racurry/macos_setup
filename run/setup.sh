@@ -5,9 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=../lib/bash/common.sh
 source "${SCRIPT_DIR}/../lib/bash/common.sh"
 
-# Global flags
-UNATTENDED=false
-RESET_MODE=false
+# Save original args to pass through to child scripts
+ORIGINAL_ARGS=("$@")
 
 show_help() {
   cat << EOF
@@ -19,7 +18,7 @@ applications, and system settings.
 OPTIONS:
   --unattended     Skip operations requiring human interaction
   --reset-mode     Ignore saved mode and prompt for selection
-  --mode=MODE      Set mode directly (work or personal)
+  --mode MODE      Set mode directly (work or personal)
   -h, --help       Show this help message and exit
 
 CONFIGURATION:
@@ -30,7 +29,7 @@ EXAMPLES:
   ./run/setup.sh
 
   # Override saved mode, persist new mode
-  ./run/setup.sh --mode=work
+  ./run/setup.sh --mode work
 
   # Non-interactive setup (skip operations that need you, eg sudo)
   ./run/setup.sh --unattended
@@ -38,69 +37,15 @@ EXAMPLES:
 EOF
 }
 
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --unattended)
-      UNATTENDED=true
-      shift
-      ;;
-    --reset-mode)
-      RESET_MODE=true
-      shift
-      ;;
-    --mode=*)
-      SETUP_MODE="${1#*=}"
-      shift
-      ;;
-    -h|--help)
-      show_help
-      exit 0
-      ;;
-    *)
-      fail "Unknown option: $1. Use --help for usage information"
-      ;;
+# Parse command line arguments (only handle --help, rest passed through)
+for arg in "$@"; do
+  case $arg in
+    -h|--help) show_help; exit 0 ;;
   esac
 done
 
-# Prompt user for setup mode
-prompt_setup_mode() {
-  print_heading "Setup Mode Selection"
-  echo "Please select your setup mode:"
-  echo "  1) work     - Install work-specific tools & settings"
-  echo "  2) personal - Install personal-specific tools & settings"
-  echo ""
-
-  while true; do
-    read -rp "Enter your choice (1 or 2): " choice
-    case $choice in
-      1|work)
-        SETUP_MODE="work"
-        break
-        ;;
-      2|personal)
-        SETUP_MODE="personal"
-        break
-        ;;
-      *)
-        echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
-        ;;
-    esac
-  done
-}
-
 # Determine setup mode (precedence: flag > config > prompt)
-if [[ -z "${SETUP_MODE:-}" ]] && [[ "${RESET_MODE}" != "true" ]]; then
-  SETUP_MODE="$(get_config SETUP_MODE)"
-fi
-
-if [[ -z "${SETUP_MODE:-}" ]]; then
-  prompt_setup_mode
-fi
-
-# Persist configuration
-set_config SETUP_MODE "${SETUP_MODE}"
-log_info "Setup mode: ${SETUP_MODE}"
+determine_setup_mode ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"} || exit 1
 
 # Preflight checks
 preflight_checks() {
@@ -141,70 +86,60 @@ preflight_checks() {
 # Run preflight checks before anything else
 preflight_checks
 
-# Build flags for downstream scripts
-SUDO_FLAG=""
-if [[ "${UNATTENDED}" == "true" ]]; then
-  SUDO_FLAG="--unattended"
-fi
-
-MODE_FLAG=""
-if [[ -n "${SETUP_MODE:-}" ]]; then
-  MODE_FLAG="--mode ${SETUP_MODE}"
-fi
-
 # Install all the apps - everything else depends on this
 STEPS_FOUNDATION=(
-  "apps/brew/brew.sh setup ${MODE_FLAG}"
+  "apps/brew/brew.sh"
 )
 
 # Shell & Security Configuration
 STEPS_SHELL=(
-  "apps/zsh/zsh.sh setup"
-  "apps/git/git.sh setup"
-  "apps/ohmyzsh/ohmyzsh.sh setup"
-  "apps/direnv/direnv.sh setup"
-  "apps/1password/1password.sh setup ${MODE_FLAG}"
+  "apps/zsh/zsh.sh"
+  "apps/git/git.sh"
+  "apps/ohmyzsh/ohmyzsh.sh"
+  "apps/direnv/direnv.sh"
+  "apps/1password/1password.sh"
 )
 
 # Language Runtimes (slow, requires asdf from brew bundle)
 STEPS_RUNTIMES=(
-  "apps/asdf/asdf.sh setup"
+  "apps/asdf/asdf.sh"
 )
 
 # File System Organization
 STEPS_FILESYSTEM=(
-  "apps/macos/folders.sh setup"
-  "apps/icloud/icloud.sh setup"
+  "apps/macos/folders.sh"
+  "apps/icloud/icloud.sh"
 )
 
 # System Preferences
 STEPS_MACOS=(
-  "apps/macos/macos.sh setup ${SUDO_FLAG}"
+  "apps/macos/macos.sh"
 )
 
 # Application Configuration
 STEPS_APPS=(
-  "apps/claudecode/claudecode.sh setup"
-  "apps/shellcheck/shellcheck.sh setup"
-  "apps/markdownlint/markdownlint.sh setup"
+  "apps/claudecode/claudecode.sh"
+  "apps/shellcheck/shellcheck.sh"
+  "apps/markdownlint/markdownlint.sh"
 )
 
 # Run a single step, handling exit codes
+# Passes ORIGINAL_ARGS to each script so they receive --mode, --unattended, etc.
 run_step() {
-  local step="$1"
+  local script="$1"
   set +e
-  (cd "${REPO_ROOT}" && bash ${step})
+  (cd "${REPO_ROOT}" && bash "${script}" setup ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"})
   local status=$?
   set -e
 
   case ${status} in
     0) ;;
     2)
-      log_warn "${step} requested manual follow-up; rerun once complete"
+      log_warn "${script} requested manual follow-up; rerun once complete"
       exit 2
       ;;
     *)
-      fail "${step} exited with status ${status}"
+      fail "${script} exited with status ${status}"
       ;;
   esac
 }

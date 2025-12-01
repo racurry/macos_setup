@@ -75,7 +75,8 @@ main() {
                 exit 0
                 ;;
             *)
-                fail "Unknown argument '${1}'. Run '$0 help' for usage."
+                log_warn "Ignoring unknown argument: $1"
+                shift
                 ;;
         esac
     done

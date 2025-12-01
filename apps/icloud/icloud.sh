@@ -298,7 +298,8 @@ do_diagnose() {
                 shift
                 ;;
             *)
-                fail "Unknown diagnose option '${1}'. Run '$0 help' for usage."
+                log_warn "Ignoring unknown argument: $1"
+                shift
                 ;;
         esac
     done
@@ -327,9 +328,9 @@ do_diagnose() {
 
 main() {
     local command=""
+    local diagnose_args=()
 
-    # Parse first argument as command
-    if [[ $# -gt 0 ]]; then
+    while [[ $# -gt 0 ]]; do
         case "$1" in
             help|--help|-h)
                 show_help
@@ -342,19 +343,23 @@ main() {
             diagnose)
                 command="diagnose"
                 shift
+                # Collect remaining args for diagnose
+                diagnose_args=("$@")
+                break
                 ;;
             *)
-                fail "Unknown command '${1}'. Run '$0 help' for usage."
+                log_warn "Ignoring unknown argument: $1"
+                shift
                 ;;
         esac
-    fi
+    done
 
     case "${command}" in
         setup)
             do_setup
             ;;
         diagnose)
-            do_diagnose "$@"
+            do_diagnose "${diagnose_args[@]}"
             ;;
         "")
             show_help

@@ -19,14 +19,12 @@ Commands:
     help        Show this help message (also: -h, --help)
 
 Options:
-    --mode MODE  Set to 'work' or 'personal' to install mode-specific packages
-                 from apps/brew/work.Brewfile or apps/brew/personal.Brewfile
-                 in addition to the main apps/brew/Brewfile
+    --mode MODE   Set to 'work' or 'personal' to install mode-specific packages
+                  from apps/brew/work.Brewfile or apps/brew/personal.Brewfile
+                  in addition to the main apps/brew/Brewfile
+    --unattended  Skip prompts, fail if mode unknown
 EOF
 }
-
-# Global variable for mode
-MODE=""
 
 install_homebrew() {
     print_heading "Install Homebrew"
@@ -71,17 +69,13 @@ install_bundle() {
     log_info "Installing common packages from main Brewfile"
     install_brewfile "${main_manifest}"
 
-    # Install mode-specific packages if --mode is set
-    if [[ -n "${MODE}" ]]; then
-        mode_manifest="${REPO_ROOT}/apps/brew/${MODE}.Brewfile"
-        if [[ -f "${mode_manifest}" ]]; then
-            log_info "Installing ${MODE}-specific packages from ${mode_manifest}"
-            install_brewfile "${mode_manifest}"
-        else
-            log_warn "No ${MODE}-specific Brewfile found at ${mode_manifest}"
-        fi
+    # Install mode-specific packages
+    mode_manifest="${REPO_ROOT}/apps/brew/${SETUP_MODE}.Brewfile"
+    if [[ -f "${mode_manifest}" ]]; then
+        log_info "Installing ${SETUP_MODE}-specific packages from ${mode_manifest}"
+        install_brewfile "${mode_manifest}"
     else
-        log_warn "--mode not set, skipping mode-specific packages"
+        log_warn "No ${SETUP_MODE}-specific Brewfile found at ${mode_manifest}"
     fi
 }
 
@@ -111,36 +105,21 @@ install_brewfile() {
 
 main() {
     local command=""
+    local args=("$@")
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --mode)
-                if [[ "${2:-}" =~ ^(work|personal)$ ]]; then
-                    MODE="$2"
-                    shift 2
-                else
-                    shift
-                fi
-                ;;
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            setup|install|bundle|audit)
-                command="$1"
-                shift
-                ;;
-            *)
-                echo "Error: Unknown argument '${1}'"
-                echo
-                show_help
-                exit 1
-                ;;
+            --mode) shift 2 ;;
+            --unattended) shift ;;
+            help|--help|-h) show_help; exit 0 ;;
+            setup|install|bundle|audit) command="$1"; shift ;;
+            *) log_warn "Ignoring unknown argument: $1"; shift ;;
         esac
     done
 
     case "${command}" in
         setup)
+            determine_setup_mode "${args[@]}" || exit 1
             install_homebrew
             install_bundle
             ;;
@@ -148,6 +127,7 @@ main() {
             install_homebrew
             ;;
         bundle)
+            determine_setup_mode "${args[@]}" || exit 1
             install_bundle
             ;;
         audit)

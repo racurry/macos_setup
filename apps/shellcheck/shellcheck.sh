@@ -42,19 +42,32 @@ setup_shellcheck_config() {
 }
 
 main() {
-    case "${1:-}" in
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            setup)
+                command="setup"
+                shift
+                ;;
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                log_warn "Ignoring unknown argument: $1"
+                shift
+                ;;
+        esac
+    done
+
+    case "${command}" in
         setup)
             setup_shellcheck_config
             ;;
-        help|--help|-h|"")
+        "")
             show_help
             exit 0
-            ;;
-        *)
-            echo "Error: Unknown command '${1}'" >&2
-            echo
-            show_help
-            exit 1
             ;;
     esac
 }

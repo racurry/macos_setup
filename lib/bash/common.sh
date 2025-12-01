@@ -329,6 +329,98 @@ copy_file() {
 }
 
 ################################################################################
+#                            SETUP MODE
+################################################################################
+# Determines and manages the setup mode (work/personal) for the system.
+# Mode can come from: command-line flag > config file > interactive prompt.
+#
+# Functions:
+#   prompt_setup_mode              - Interactive prompt for mode selection
+#   determine_setup_mode [options] - Resolve mode from all sources
+#
+# Options for determine_setup_mode:
+#   --reset        Ignore saved config, force prompt
+#   --unattended   Skip prompting, fail if mode unknown
+#   --mode=MODE    Pre-set mode (takes precedence)
+################################################################################
+
+# prompt_setup_mode prompts user interactively for setup mode selection.
+# Sets SETUP_MODE global variable.
+prompt_setup_mode() {
+  print_heading "Setup Mode Selection"
+  echo "Please select your setup mode:"
+  echo "  1) work     - Install work-specific tools & settings"
+  echo "  2) personal - Install personal-specific tools & settings"
+  echo ""
+
+  while true; do
+    read -rp "Enter your choice (1 or 2): " choice
+    case $choice in
+      1|work)
+        SETUP_MODE="work"
+        break
+        ;;
+      2|personal)
+        SETUP_MODE="personal"
+        break
+        ;;
+      *)
+        echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
+        ;;
+    esac
+  done
+}
+
+# determine_setup_mode resolves setup mode from flags, config, or prompt.
+# Sets SETUP_MODE global variable and persists to config.
+#
+# Usage: determine_setup_mode "$@"
+#
+# Recognized flags: --mode MODE, --reset, --reset-mode, --unattended
+# Precedence: --mode flag > config file > interactive prompt
+# Returns: 0 on success, 1 if mode could not be determined
+#
+# Ignores unrecognized arguments, so callers can pass "$@" directly.
+determine_setup_mode() {
+  local reset_mode=false
+  local unattended=false
+  local mode_override=""
+
+  # Parse arguments (ignores unrecognized args)
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --reset|--reset-mode) reset_mode=true; shift ;;
+      --unattended) unattended=true; shift ;;
+      --mode) mode_override="${2:-}"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+
+  # Check command-line override first
+  if [[ -n "${mode_override}" ]]; then
+    SETUP_MODE="${mode_override}"
+  # Check config unless reset requested
+  elif [[ "${reset_mode}" != "true" ]]; then
+    SETUP_MODE="$(get_config SETUP_MODE)"
+  fi
+
+  # Prompt if still not set
+  if [[ -z "${SETUP_MODE:-}" ]]; then
+    if [[ "${unattended}" == "true" ]]; then
+      log_error "Setup mode not set and --unattended prevents prompting"
+      log_info "Use --mode=work or --mode=personal to set mode"
+      return 1
+    fi
+    prompt_setup_mode
+  fi
+
+  # Persist and report
+  set_config SETUP_MODE "${SETUP_MODE}"
+  log_info "Setup mode: ${SETUP_MODE}"
+  return 0
+}
+
+################################################################################
 #                               EXPORTS
 ################################################################################
 

@@ -24,18 +24,15 @@ Commands:
     help        Show this help message (also: -h, --help)
 
 Options:
-    --mode MODE     Set mode to 'work' or 'personal' (default: personal)
+    --mode MODE     Set mode to 'work' or 'personal'
+    --unattended    Skip prompts, fail if mode unknown
 EOF
 }
 
 do_setup() {
-    local mode="${1:-personal}"
-
     print_heading "Configuring 1Password SSH agent"
 
-    log_info "Mode: ${mode}"
-
-    local source_file="${APPS_DIR}/agent.${mode}.toml"
+    local source_file="${APPS_DIR}/agent.${SETUP_MODE}.toml"
 
     require_file "${source_file}"
 
@@ -58,41 +55,22 @@ do_show() {
 
 main() {
     local command=""
-    local mode_arg=""
+    local args=("$@")
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --mode)
-                if [[ $# -lt 2 ]]; then
-                    fail "Option --mode requires an argument"
-                fi
-                mode_arg="$2"
-                if [[ "${mode_arg}" != "work" && "${mode_arg}" != "personal" ]]; then
-                    fail "Invalid mode '${mode_arg}'. Must be 'work' or 'personal'."
-                fi
-                shift 2
-                ;;
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="setup"
-                shift
-                ;;
-            show)
-                command="show"
-                shift
-                ;;
-            *)
-                fail "Unknown argument '${1}'. Run '$0 help' for usage."
-                ;;
+            --mode) shift 2 ;;
+            --unattended) shift ;;
+            help|--help|-h) show_help; exit 0 ;;
+            setup|show) command="$1"; shift ;;
+            *) log_warn "Ignoring unknown argument: $1"; shift ;;
         esac
     done
 
     case "${command}" in
         setup)
-            do_setup "${mode_arg}"
+            determine_setup_mode "${args[@]}" || exit 1
+            do_setup
             ;;
         show)
             do_show

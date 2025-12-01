@@ -29,16 +29,32 @@ do_setup() {
 }
 
 main() {
-    case "${1:-}" in
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            setup)
+                command="setup"
+                shift
+                ;;
+            help|--help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                log_warn "Ignoring unknown argument: $1"
+                shift
+                ;;
+        esac
+    done
+
+    case "${command}" in
         setup)
             do_setup
             ;;
-        help|--help|-h|"")
+        "")
             show_help
             exit 0
-            ;;
-        *)
-            fail "Unknown command '${1}'. Run '$0 help' for usage."
             ;;
     esac
 }

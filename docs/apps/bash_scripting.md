@@ -35,6 +35,7 @@ do_setup() {
 
 main() {
     local command=""
+    local args=("$@")
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -51,7 +52,8 @@ main() {
                 shift
                 ;;
             *)
-                fail "Unknown argument '${1}'. Run '$0 help' for usage."
+                log_warn "Ignoring unknown argument: $1"
+                shift
                 ;;
         esac
     done
@@ -72,13 +74,14 @@ main "$@"
 
 ## Conventions
 
-| Convention                            | Example                           |
-| ------------------------------------- | --------------------------------- |
-| Use `setup` as main entry point       | `./apps/myapp/myapp.sh setup`     |
-| Accept `help`, `-h`, `--help`         | All three should work             |
-| Use `fail` for errors                 | `fail "Missing config file"`      |
-| Use `$REPO_ROOT` for paths            | `${REPO_ROOT}/apps/myapp/config`  |
-| Use `--flag value` not `--flag=value` | `--mode work`                     |
+| Convention                            | Example                                    |
+| ------------------------------------- | ------------------------------------------ |
+| Use `setup` as main entry point       | `./apps/myapp/myapp.sh setup`              |
+| Accept `help`, `-h`, `--help`         | All three should work                      |
+| Use `fail` for errors                 | `fail "Missing config file"`               |
+| Use `$REPO_ROOT` for paths            | `${REPO_ROOT}/apps/myapp/config`           |
+| Use `--flag value` not `--flag=value` | `--mode work`                              |
+| Warn on unknown args, don't fail      | `log_warn "Ignoring unknown argument: $1"` |
 
 ## Available Functions (from `common.sh`)
 
