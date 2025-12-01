@@ -34,38 +34,38 @@ PATH_MOTHERBOX_BACKUPS="${PATH_MOTHERBOX_CONFIG}/backups"
 LOG_TAG="setup"
 
 # Color codes for readability.
-CLR_RESET=$'\033[0m'    # reset / default
-CLR_INFO=$'\033[1;34m'  # bright blue for informational messages
-CLR_WARN=$'\033[1;33m'  # bright yellow for warnings
-CLR_ERROR=$'\033[1;31m' # bright red for errors
+CLR_RESET=$'\033[0m'      # reset / default
+CLR_INFO=$'\033[1;34m'    # bright blue for informational messages
+CLR_WARN=$'\033[1;33m'    # bright yellow for warnings
+CLR_ERROR=$'\033[1;31m'   # bright red for errors
 CLR_SUCCESS=$'\033[1;32m' # bright green for success messages
-CLR_BOLD=$'\033[1m'     # bold text
-CLR_CYAN=$'\033[1;36m'  # bright cyan for headings
+CLR_BOLD=$'\033[1m'       # bold text
+CLR_CYAN=$'\033[1;36m'    # bright cyan for headings
 
 log_info() {
-  printf "%s[%s] %s%s\n" "${CLR_INFO}" "${LOG_TAG}" "$*" "${CLR_RESET}"
+    printf "%s[%s] %s%s\n" "${CLR_INFO}" "${LOG_TAG}" "$*" "${CLR_RESET}"
 }
 
 log_warn() {
-  printf "%s[%s] %s%s\n" "${CLR_WARN}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
+    printf "%s[%s] %s%s\n" "${CLR_WARN}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
 }
 
 log_error() {
-  printf "%s[%s] %s%s\n" "${CLR_ERROR}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
+    printf "%s[%s] %s%s\n" "${CLR_ERROR}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
 }
 
 log_success() {
-  printf "%s[%s] %s%s\n" "${CLR_SUCCESS}" "${LOG_TAG}" "$*" "${CLR_RESET}"
+    printf "%s[%s] %s%s\n" "${CLR_SUCCESS}" "${LOG_TAG}" "$*" "${CLR_RESET}"
 }
 
 fail() {
-  log_error "$*"
-  exit 1
+    log_error "$*"
+    exit 1
 }
 
 print_heading() {
-  local text="$1"
-  printf "\n\033[1;36m==> %s\033[0m\n" "$text"
+    local text="$1"
+    printf "\n\033[1;36m==> %s\033[0m\n" "$text"
 }
 
 ################################################################################
@@ -86,7 +86,7 @@ print_heading() {
 
 # _config_defaults returns default config values as shell assignments
 _config_defaults() {
-  cat << 'EOF'
+    cat <<'EOF'
 BACKUP_RETENTION_DAYS=60
 SETUP_MODE=
 EOF
@@ -96,54 +96,54 @@ EOF
 # Called automatically by get_config and set_config.
 # Silent by default to avoid disrupting output.
 ensure_config() {
-  if [[ -f "${PATH_MOTHERBOX_CONFIG_FILE}" ]]; then
-    return 0
-  fi
+    if [[ -f "${PATH_MOTHERBOX_CONFIG_FILE}" ]]; then
+        return 0
+    fi
 
-  mkdir -p "${PATH_MOTHERBOX_CONFIG}"
-  _config_defaults > "${PATH_MOTHERBOX_CONFIG_FILE}"
+    mkdir -p "${PATH_MOTHERBOX_CONFIG}"
+    _config_defaults >"${PATH_MOTHERBOX_CONFIG_FILE}"
 }
 
 # get_config retrieves a configuration value.
 # Usage: get_config <key>
 # Returns: The value via stdout, or empty string if not set
 get_config() {
-  local key="$1"
+    local key="$1"
 
-  ensure_config
+    ensure_config
 
-  # Source config in subshell and echo the requested variable
-  (
-    # shellcheck source=/dev/null
-    source "${PATH_MOTHERBOX_CONFIG_FILE}"
-    eval "echo \"\${${key}:-}\""
-  )
+    # Source config in subshell and echo the requested variable
+    (
+        # shellcheck source=/dev/null
+        source "${PATH_MOTHERBOX_CONFIG_FILE}"
+        eval "echo \"\${${key}:-}\""
+    )
 }
 
 # set_config sets a configuration value.
 # Usage: set_config <key> <value>
 # Creates config file with defaults if it doesn't exist.
 set_config() {
-  local key="$1"
-  local value="$2"
+    local key="$1"
+    local value="$2"
 
-  ensure_config
+    ensure_config
 
-  # Read current config
-  local tmp_file
-  tmp_file="$(mktemp)"
+    # Read current config
+    local tmp_file
+    tmp_file="$(mktemp)"
 
-  # Update or add the key
-  if grep -q "^${key}=" "${PATH_MOTHERBOX_CONFIG_FILE}"; then
-    # Key exists, update it
-    sed "s|^${key}=.*|${key}=${value}|" "${PATH_MOTHERBOX_CONFIG_FILE}" > "${tmp_file}"
-  else
-    # Key doesn't exist, append it
-    cat "${PATH_MOTHERBOX_CONFIG_FILE}" > "${tmp_file}"
-    echo "${key}=${value}" >> "${tmp_file}"
-  fi
+    # Update or add the key
+    if grep -q "^${key}=" "${PATH_MOTHERBOX_CONFIG_FILE}"; then
+        # Key exists, update it
+        sed "s|^${key}=.*|${key}=${value}|" "${PATH_MOTHERBOX_CONFIG_FILE}" >"${tmp_file}"
+    else
+        # Key doesn't exist, append it
+        cat "${PATH_MOTHERBOX_CONFIG_FILE}" >"${tmp_file}"
+        echo "${key}=${value}" >>"${tmp_file}"
+    fi
 
-  mv "${tmp_file}" "${PATH_MOTHERBOX_CONFIG_FILE}"
+    mv "${tmp_file}" "${PATH_MOTHERBOX_CONFIG_FILE}"
 }
 
 ################################################################################
@@ -161,39 +161,39 @@ set_config() {
 ################################################################################
 
 require_command() {
-  local cmd="$1"
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    fail "Required command '$cmd' not found in PATH"
-  fi
+    local cmd="$1"
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        fail "Required command '$cmd' not found in PATH"
+    fi
 }
 
 require_file() {
-  local path="$1"
-  if [[ ! -f "$path" ]]; then
-    fail "Required file '$path' is missing"
-  fi
+    local path="$1"
+    if [[ ! -f "$path" ]]; then
+        fail "Required file '$path' is missing"
+    fi
 }
 
 require_directory() {
-  local path="$1"
-  if [[ ! -d "$path" ]]; then
-    fail "Required directory '$path' is missing"
-  fi
+    local path="$1"
+    if [[ ! -d "$path" ]]; then
+        fail "Required directory '$path' is missing"
+    fi
 }
 
 check_rosetta() {
-  if ! pgrep -q oahd; then
-    return 1
-  fi
-  return 0
+    if ! pgrep -q oahd; then
+        return 1
+    fi
+    return 0
 }
 
 require_rosetta() {
-  if ! check_rosetta; then
-    log_error "Rosetta 2 is not installed but is required"
-    log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
-    fail "Rosetta 2 installation required"
-  fi
+    if ! check_rosetta; then
+        log_error "Rosetta 2 is not installed but is required"
+        log_info "Install with: softwareupdate --install-rosetta --agree-to-license"
+        fail "Rosetta 2 installation required"
+    fi
 }
 
 ################################################################################
@@ -214,52 +214,52 @@ require_rosetta() {
 # prune_backups removes backup files older than BACKUP_RETENTION_DAYS.
 # Cleans up empty directories after pruning.
 prune_backups() {
-  if [[ ! -d "${PATH_MOTHERBOX_BACKUPS}" ]]; then
-    return 0
-  fi
+    if [[ ! -d "${PATH_MOTHERBOX_BACKUPS}" ]]; then
+        return 0
+    fi
 
-  local retention_days
-  retention_days="$(get_config BACKUP_RETENTION_DAYS)"
-  retention_days="${retention_days:-60}"  # Fallback if empty
+    local retention_days
+    retention_days="$(get_config BACKUP_RETENTION_DAYS)"
+    retention_days="${retention_days:-60}" # Fallback if empty
 
-  # Find and delete files older than retention period, logging each deletion
-  while IFS= read -r -d '' file; do
-    log_warn "Pruning old backup: ${file}"
-    rm -f "$file"
-  done < <(find "${PATH_MOTHERBOX_BACKUPS}" -type f -mtime "+${retention_days}" -print0 2>/dev/null)
+    # Find and delete files older than retention period, logging each deletion
+    while IFS= read -r -d '' file; do
+        log_warn "Pruning old backup: ${file}"
+        rm -f "$file"
+    done < <(find "${PATH_MOTHERBOX_BACKUPS}" -type f -mtime "+${retention_days}" -print0 2>/dev/null)
 
-  # Clean up empty directories
-  find "${PATH_MOTHERBOX_BACKUPS}" -type d -empty -delete 2>/dev/null || true
+    # Clean up empty directories
+    find "${PATH_MOTHERBOX_BACKUPS}" -type d -empty -delete 2>/dev/null || true
 }
 
 # backup_file moves a file to the Mother Box backups directory.
 # Triggers pruning of backups older than retention period.
 backup_file() {
-  local file_path="$1"
-  local app_name="$2"
+    local file_path="$1"
+    local app_name="$2"
 
-  if [[ -z "$app_name" ]]; then
-    fail "backup_file requires app_name argument"
-  fi
+    if [[ -z "$app_name" ]]; then
+        fail "backup_file requires app_name argument"
+    fi
 
-  if [[ ! -e "$file_path" ]]; then
-    return 0
-  fi
+    if [[ ! -e "$file_path" ]]; then
+        return 0
+    fi
 
-  local filename datestamp timestamp backup_dir backup_path
-  filename="$(basename "$file_path")"
-  datestamp="$(date +%Y%m%d)"
-  timestamp="$(date +%Y%m%d_%H%M%S)"
-  backup_dir="${PATH_MOTHERBOX_BACKUPS}/${datestamp}/${app_name}"
-  backup_path="${backup_dir}/${filename}.${timestamp}"
+    local filename datestamp timestamp backup_dir backup_path
+    filename="$(basename "$file_path")"
+    datestamp="$(date +%Y%m%d)"
+    timestamp="$(date +%Y%m%d_%H%M%S)"
+    backup_dir="${PATH_MOTHERBOX_BACKUPS}/${datestamp}/${app_name}"
+    backup_path="${backup_dir}/${filename}.${timestamp}"
 
-  mkdir -p "$backup_dir"
-  mv "$file_path" "$backup_path"
-  touch "$backup_path"  # Reset mtime so pruning uses backup time, not original file time
-  log_warn "Backed up ${filename} to ${backup_path}"
+    mkdir -p "$backup_dir"
+    mv "$file_path" "$backup_path"
+    touch "$backup_path" # Reset mtime so pruning uses backup time, not original file time
+    log_warn "Backed up ${filename} to ${backup_path}"
 
-  # Opportunistic pruning
-  prune_backups
+    # Opportunistic pruning
+    prune_backups
 }
 
 ################################################################################
@@ -329,6 +329,47 @@ copy_file() {
 }
 
 ################################################################################
+#                         DOTFILE LINKING SUGAR
+################################################################################
+# Convenience wrappers around link_file for common patterns.
+#
+# Functions:
+#   link_home_dotfile <filepath> <app_name>  - Link file to ~/
+#   link_xdg_config <filepath> <app_name>    - Link file to ~/.config/{app_name}/
+################################################################################
+
+# link_home_dotfile links a file to the HOME directory.
+# Usage: link_home_dotfile <filepath> <app_name>
+#   Links /path/to/.gitconfig -> ~/.gitconfig
+link_home_dotfile() {
+    local src="$1"
+    local app_name="$2"
+    local filename
+    filename="$(basename "${src}")"
+    local dest="${HOME}/${filename}"
+
+    require_file "${src}"
+    link_file "${src}" "${dest}" "${app_name}"
+}
+
+# link_xdg_config links a file to ~/.config/{app_name}/.
+# Creates the target directory if it doesn't exist.
+# Usage: link_xdg_config <filepath> <app_name>
+#   Links /path/to/config.toml -> ~/.config/{app_name}/config.toml
+link_xdg_config() {
+    local src="$1"
+    local app_name="$2"
+    local filename
+    filename="$(basename "${src}")"
+    local target_dir="${HOME}/.config/${app_name}"
+    local dest="${target_dir}/${filename}"
+
+    require_file "${src}"
+    mkdir -p "${target_dir}"
+    link_file "${src}" "${dest}" "${app_name}"
+}
+
+################################################################################
 #                            SETUP MODE
 ################################################################################
 # Determines and manages the setup mode (work/personal) for the system.
@@ -347,28 +388,28 @@ copy_file() {
 # prompt_setup_mode prompts user interactively for setup mode selection.
 # Sets SETUP_MODE global variable.
 prompt_setup_mode() {
-  print_heading "Setup Mode Selection"
-  echo "Please select your setup mode:"
-  echo "  1) work     - Install work-specific tools & settings"
-  echo "  2) personal - Install personal-specific tools & settings"
-  echo ""
+    print_heading "Setup Mode Selection"
+    echo "Please select your setup mode:"
+    echo "  1) work     - Install work-specific tools & settings"
+    echo "  2) personal - Install personal-specific tools & settings"
+    echo ""
 
-  while true; do
-    read -rp "Enter your choice (1 or 2): " choice
-    case $choice in
-      1|work)
-        SETUP_MODE="work"
-        break
-        ;;
-      2|personal)
-        SETUP_MODE="personal"
-        break
-        ;;
-      *)
-        echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
-        ;;
-    esac
-  done
+    while true; do
+        read -rp "Enter your choice (1 or 2): " choice
+        case $choice in
+            1 | work)
+                SETUP_MODE="work"
+                break
+                ;;
+            2 | personal)
+                SETUP_MODE="personal"
+                break
+                ;;
+            *)
+                echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
+                ;;
+        esac
+    done
 }
 
 # determine_setup_mode resolves setup mode from flags, config, or prompt.
@@ -382,42 +423,51 @@ prompt_setup_mode() {
 #
 # Ignores unrecognized arguments, so callers can pass "$@" directly.
 determine_setup_mode() {
-  local reset_mode=false
-  local unattended=false
-  local mode_override=""
+    local reset_mode=false
+    local unattended=false
+    local mode_override=""
 
-  # Parse arguments (ignores unrecognized args)
-  while [[ $# -gt 0 ]]; do
-    case $1 in
-      --reset|--reset-mode) reset_mode=true; shift ;;
-      --unattended) unattended=true; shift ;;
-      --mode) mode_override="${2:-}"; shift 2 ;;
-      *) shift ;;
-    esac
-  done
+    # Parse arguments (ignores unrecognized args)
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --reset | --reset-mode)
+                reset_mode=true
+                shift
+                ;;
+            --unattended)
+                unattended=true
+                shift
+                ;;
+            --mode)
+                mode_override="${2:-}"
+                shift 2
+                ;;
+            *) shift ;;
+        esac
+    done
 
-  # Check command-line override first
-  if [[ -n "${mode_override}" ]]; then
-    SETUP_MODE="${mode_override}"
-  # Check config unless reset requested
-  elif [[ "${reset_mode}" != "true" ]]; then
-    SETUP_MODE="$(get_config SETUP_MODE)"
-  fi
-
-  # Prompt if still not set
-  if [[ -z "${SETUP_MODE:-}" ]]; then
-    if [[ "${unattended}" == "true" ]]; then
-      log_error "Setup mode not set and --unattended prevents prompting"
-      log_info "Use --mode=work or --mode=personal to set mode"
-      return 1
+    # Check command-line override first
+    if [[ -n "${mode_override}" ]]; then
+        SETUP_MODE="${mode_override}"
+    # Check config unless reset requested
+    elif [[ "${reset_mode}" != "true" ]]; then
+        SETUP_MODE="$(get_config SETUP_MODE)"
     fi
-    prompt_setup_mode
-  fi
 
-  # Persist and report
-  set_config SETUP_MODE "${SETUP_MODE}"
-  log_info "Setup mode: ${SETUP_MODE}"
-  return 0
+    # Prompt if still not set
+    if [[ -z "${SETUP_MODE:-}" ]]; then
+        if [[ "${unattended}" == "true" ]]; then
+            log_error "Setup mode not set and --unattended prevents prompting"
+            log_info "Use --mode=work or --mode=personal to set mode"
+            return 1
+        fi
+        prompt_setup_mode
+    fi
+
+    # Persist and report
+    set_config SETUP_MODE "${SETUP_MODE}"
+    log_info "Setup mode: ${SETUP_MODE}"
+    return 0
 }
 
 ################################################################################

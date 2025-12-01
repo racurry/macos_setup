@@ -5,8 +5,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+APP_NAME="asdf"
+
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [COMMAND]
 
 Manage asdf plugins and runtime installations.
@@ -19,11 +21,11 @@ EOF
 
 link_config_files() {
     print_heading "Link asdf config files"
-    link_file "${SCRIPT_DIR}/.tool-versions" "${HOME}/.tool-versions" "asdf"
-    link_file "${SCRIPT_DIR}/.asdfrc" "${HOME}/.asdfrc" "asdf"
-    link_file "${SCRIPT_DIR}/.default-gems" "${HOME}/.default-gems" "asdf"
-    link_file "${SCRIPT_DIR}/.default-npm-packages" "${HOME}/.default-npm-packages" "asdf"
-    link_file "${SCRIPT_DIR}/.default-python-packages" "${HOME}/.default-python-packages" "asdf"
+    link_home_dotfile "${SCRIPT_DIR}/.tool-versions" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.asdfrc" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.default-gems" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.default-npm-packages" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.default-python-packages" "${APP_NAME}"
 }
 
 add_plugins() {
@@ -42,7 +44,7 @@ add_plugins() {
         [[ -n "${plugin}" ]] || continue
         log_info "Adding '${plugin}'"
         asdf plugin add "${plugin}"
-    done <<< "${plugin_list}"
+    done <<<"${plugin_list}"
 }
 
 install_runtimes() {
@@ -70,7 +72,7 @@ main() {
                 command="setup"
                 shift
                 ;;
-            help|--help|-h)
+            help | --help | -h)
                 show_help
                 exit 0
                 ;;

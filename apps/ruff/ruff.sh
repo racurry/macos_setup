@@ -5,6 +5,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+APP_NAME="ruff"
+
 show_help() {
     cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -23,20 +25,8 @@ EOF
 setup_ruff_config() {
     print_heading "Setup ruff configuration"
 
-    local source_file="${SCRIPT_DIR}/ruff.toml"
-    local target_dir="${HOME}/.config/ruff"
-    local target_file="${target_dir}/ruff.toml"
+    link_xdg_config "${SCRIPT_DIR}/ruff.toml" "${APP_NAME}"
 
-    # Verify source file exists
-    require_file "${source_file}"
-
-    # Create target directory if it doesn't exist
-    if [[ ! -d "${target_dir}" ]]; then
-        log_info "Creating ${target_dir}"
-        mkdir -p "${target_dir}"
-    fi
-
-    link_file "${source_file}" "${target_file}" "ruff"
     log_success "Ruff configuration symlinked successfully"
 }
 

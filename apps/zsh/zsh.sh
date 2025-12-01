@@ -5,11 +5,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
-APPS_DIR="${REPO_ROOT}/apps/zsh"
 APP_NAME="zsh"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [COMMAND]
 
 Symlink zsh configuration files to home directory.
@@ -27,8 +26,8 @@ EOF
 do_setup() {
     print_heading "Setting up zsh configuration"
 
-    link_file "${APPS_DIR}/.zshrc" "${HOME}/.zshrc" "${APP_NAME}"
-    link_file "${APPS_DIR}/.galileorc" "${HOME}/.galileorc" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.zshrc" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.galileorc" "${APP_NAME}"
 
     log_success "Zsh configuration complete"
 }
@@ -38,7 +37,7 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help|--help|-h)
+            help | --help | -h)
                 show_help
                 exit 0
                 ;;

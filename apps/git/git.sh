@@ -6,10 +6,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 APP_NAME="git"
-APPS_DIR="${REPO_ROOT}/apps/${APP_NAME}"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [COMMAND]
 
 Symlink git configuration files to home directory.
@@ -25,27 +24,15 @@ Commands:
 EOF
 }
 
-link_git_file() {
-    local src="$1"
-    local dest="$2"
-
-    if [[ ! -f "$src" ]]; then
-        log_warn "Source file not found: $src"
-        return 0
-    fi
-
-    link_file "$src" "$dest" "$APP_NAME"
-}
-
 do_setup() {
     print_heading "Setting up git configuration"
 
-    link_git_file "${APPS_DIR}/.gitconfig" "${HOME}/.gitconfig"
-    link_git_file "${APPS_DIR}/.gitignore_global" "${HOME}/.gitignore_global"
+    link_home_dotfile "${SCRIPT_DIR}/.gitconfig" "${APP_NAME}"
+    link_home_dotfile "${SCRIPT_DIR}/.gitignore_global" "${APP_NAME}"
 
     # Link work-specific config if present
-    if [[ -f "${APPS_DIR}/.gitconfig_galileo" ]]; then
-        link_git_file "${APPS_DIR}/.gitconfig_galileo" "${HOME}/.gitconfig_galileo"
+    if [[ -f "${SCRIPT_DIR}/.gitconfig_galileo" ]]; then
+        link_home_dotfile "${SCRIPT_DIR}/.gitconfig_galileo" "${APP_NAME}"
     fi
 
     log_info "Git configuration complete"
@@ -56,7 +43,7 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help|--help|-h)
+            help | --help | -h)
                 show_help
                 exit 0
                 ;;

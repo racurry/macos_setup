@@ -22,13 +22,9 @@ EOF
 do_setup() {
     print_heading "Setup ${APP_NAME} configuration"
 
-    local source_file="${SCRIPT_DIR}/.editorconfig"
-    local target_file="${HOME}/.editorconfig"
+    link_home_dotfile "${SCRIPT_DIR}/.editorconfig" "${APP_NAME}"
 
-    require_file "${source_file}"
-
-    link_file "${source_file}" "${target_file}" "${APP_NAME}"
-    log_success "EditorConfig symlinked to ${target_file}"
+    log_success "EditorConfig symlinked successfully"
 }
 
 main() {

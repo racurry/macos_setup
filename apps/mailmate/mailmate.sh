@@ -5,75 +5,71 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/bash/common.sh
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
+APP_NAME="mailmate"
+
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [COMMAND]
 
 Configure MailMate keybindings and preferences.
 
 Commands:
-    install     Install custom keybindings and set preferences
-    --help      Show this help message
-
-If no command is specified, install will be run.
-
+    setup       Run full setup (primary entry point)
+    help        Show this help message (also: -h, --help)
 EOF
 }
 
-install_keybindings() {
-    print_heading "Installing MailMate keybindings and preferences"
+do_setup() {
+    print_heading "Setting up MailMate keybindings and preferences"
 
-    local source_plist="${REPO_ROOT}/apps/mailmate/Pumpkin.plist"
+    local source_plist="${SCRIPT_DIR}/MotherBox.plist"
     local target_dir="/Applications/MailMate.app/Contents/Resources/KeyBindings"
-    local target_plist="${target_dir}/Pumpkin.plist"
+    local target_plist="${target_dir}/MotherBox.plist"
 
-    # Verify source file exists
     require_file "${source_plist}"
 
-    # Check if MailMate is installed
     if [[ ! -d "/Applications/MailMate.app" ]]; then
         fail "MailMate.app not found in /Applications"
     fi
 
-    # Create target directory if it doesn't exist
-    if [[ ! -d "${target_dir}" ]]; then
-        log_info "Creating KeyBindings directory: ${target_dir}"
-        mkdir -p "${target_dir}"
-    fi
+    mkdir -p "${target_dir}"
+    copy_file "${source_plist}" "${target_plist}" "${APP_NAME}"
 
-    # Copy keybindings file (use copy_file for backup support)
-    copy_file "${source_plist}" "${target_plist}" "mailmate"
-
-    # Set message selection strategy
-    # For inbox sorted with newest at top, "previous" means select older message after delete/archive
     log_info "Setting MmMessagesOutlineMoveStrategy to 'previous'"
     defaults write com.freron.MailMate MmMessagesOutlineMoveStrategy -string "previous"
 
-    log_info "✓ MailMate configuration complete"
-    log_info "  - Keybindings: ${target_plist}"
-    log_info "  - Move strategy: previous (selects older message after delete/archive)"
-    log_info ""
+    log_success "MailMate configuration complete"
     log_info "Note: You may need to restart MailMate for changes to take effect"
 }
 
 main() {
-    case "${1:-}" in
-        install)
-            install_keybindings
-            ;;
-        help|--help|-h)
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+        help | --help | -h)
             show_help
             exit 0
             ;;
-        "")
-            install_keybindings
+        setup)
+            command="$1"
+            shift
             ;;
         *)
-            echo "Error: Unknown command '${1}'"
-            echo
-            show_help
-            exit 1
+            log_warn "Ignoring unknown argument: $1"
+            shift
             ;;
+        esac
+    done
+
+    case "${command}" in
+    setup)
+        do_setup
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 
