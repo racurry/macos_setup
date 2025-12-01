@@ -21,9 +21,6 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
     3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
     4. Should this script be integrated into the main run/setup.sh workflow or remain manual?
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
-- [ ] Figure out a way for the claudecode.sh script to merge apps/claudecode/settings.json into ~/.claude/settings.json
-- [ ] claudecode.sh should backup ~/.claude/settings.json before modifying it (use backup_file from common.sh)
-- [ ] openscad.sh should backup VS Code settings.json before modifying it (use copy_file/backup_file pattern)
 - [ ] Add a github action to periodically check for the latest asdf runtimes
 
 ## Icebox

@@ -1,87 +1,36 @@
-<!-- App README Template
-     Use this template when creating apps/{appname}/README.md files.
-     Delete sections that don't apply. -->
+# {App Name}
 
-# App Name
-
-Brief description of what this app does. [Link to official docs](url).
+One-line description. [Official docs](url).
 
 ## Setup
 
-<!-- If setup can be automated -->
-
 ```bash
-./apps/{appname}/{appname}.sh setup
+./apps/{app}/{app}.sh setup
 ```
 
-<!-- If setup is manual -->
+This installs the app (if needed) and configures:
 
-- [ ] Manual setup step 1
-- [ ] Manual setup step 2
+- Setting 1
+- Setting 2
 
-## Configuration
+## Manual Setup
 
-### Config File Location
+Complete after running setup:
 
-- **Path**: `~/.config/{app}/config.yaml` (or wherever)
-- **Format**: YAML/JSON/TOML/etc.
-- **XDG Compliant**: Yes/No
+1. **Step** - Instruction
+2. **Step** - Instruction
 
-### Environment Variables
+## Syncing Preferences
 
-| Variable | Purpose |
-|----------|---------|
-| `APP_CONFIG` | Override config path |
+{Pick one:}
 
-## Files
-
-- `config.yaml` - Main configuration file
-- `templates/` - Template files (if any)
-
-## Installation Details
-
-**Homebrew:**
-
-```bash
-brew install {app}
-```
-
-## Sync Strategy
-
-| File | Method | Notes |
-|------|--------|-------|
-| `config.yaml` | Git | User preferences |
-| `credentials.json` | iCloud | Contains API keys (not safe for public repo) |
-
-<!-- Method options:
-- Git: Default for portable, non-sensitive configs
-- iCloud/Dropbox: Real-time sync needed OR contains private data unsafe for public repos
-- Manual export: No config files, only GUI export (document steps below)
--->
-
-**Manual import/export** (if no config files, store exports in cloud drive):
-
-- Export: {App} > File > Export Settings
-- Import: {App} > File > Import Settings
-
-**Manual setup steps** (non-automatable):
-
-- Grant accessibility access: System Settings > Privacy > Accessibility
-- Sign in / activate license
-
-## Maintenance
-
-| Task | Command | Frequency |
-|------|---------|-----------|
-| Update | `brew upgrade {app}` | Weekly |
-| Cleanup | `{app} cleanup` | Monthly |
-| Health check | `{app} doctor` | As needed |
-
-## Notes
-
-Any manual steps, caveats, or important context.
+- Syncing not supported.
+- Preferences sync automatically via iCloud.
+- {App} > Preferences > Sync. Point to a cloud folder (Dropbox recommended).
+- Repo sync. Config symlinked to `~/.config/{app}/` or `~/`.
+- Store in cloud drive, symlink to `{path}`. Not in repo due to {reason}.
+- No direct sync. Export: {menu}. Import: {menu}.
 
 ## References
 
 - [Official Documentation](url)
-- [GitHub Repository](url)

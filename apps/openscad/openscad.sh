@@ -138,6 +138,9 @@ configure_vscode() {
 
     log_info "Configuring VS Code settings for OpenSCAD..."
 
+    # Backup existing settings before modification
+    backup_file "${VSCODE_SETTINGS}" "openscad"
+
     local update_script="${SCRIPT_DIR}/update_vscode_settings.py"
 
     if "${update_script}" "${VSCODE_SETTINGS}" "${openscad_binary}"; then

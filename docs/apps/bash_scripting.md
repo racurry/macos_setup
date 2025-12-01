@@ -19,7 +19,8 @@ Usage: $0 [COMMAND] [OPTIONS]
 Short description of what this script does.
 
 Commands:
-    setup       Run full setup (primary entry point)
+    setup       Run full setup (install app, then configure)
+    install     Install the app if not already installed
     help        Show this help message (also: -h, --help)
 
 Options:
@@ -27,9 +28,26 @@ Options:
 EOF
 }
 
+do_install() {
+    print_heading "Installing ${APP_NAME}"
+
+    # Skip if already installed (adjust check as needed)
+    if command -v appname >/dev/null 2>&1; then
+        log_info "${APP_NAME} already installed"
+        return 0
+    fi
+
+    # Install via brew (adjust formula/cask as needed)
+    require_command brew
+    brew install --cask appname
+    log_success "${APP_NAME} installed"
+}
+
 do_setup() {
-    print_heading "Setting up ${APP_NAME}"
-    # Setup logic here
+    do_install
+
+    print_heading "Configuring ${APP_NAME}"
+    # Configuration logic here
     log_info "Setup complete"
 }
 
@@ -47,7 +65,7 @@ main() {
                 show_help
                 exit 0
                 ;;
-            setup)
+            setup|install)
                 command="$1"
                 shift
                 ;;
@@ -61,6 +79,9 @@ main() {
     case "${command}" in
         setup)
             do_setup
+            ;;
+        install)
+            do_install
             ;;
         "")
             show_help
@@ -77,6 +98,8 @@ main "$@"
 | Convention                            | Example                                    |
 | ------------------------------------- | ------------------------------------------ |
 | Use `setup` as main entry point       | `./apps/myapp/myapp.sh setup`              |
+| `setup` calls `install` first         | `do_setup()` begins with `do_install`      |
+| `install` is idempotent               | Check if installed before installing       |
 | Accept `help`, `-h`, `--help`         | All three should work                      |
 | Use `fail` for errors                 | `fail "Missing config file"`               |
 | Use `$REPO_ROOT` for paths            | `${REPO_ROOT}/apps/myapp/config`           |

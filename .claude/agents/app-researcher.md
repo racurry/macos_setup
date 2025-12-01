@@ -7,7 +7,80 @@ model: inherit
 
 # Application Researcher
 
-Research applications and tools to understand how to best manage them in this repository. Produce comprehensive documentation in `apps/{appname}/README.md`.
+Research applications and tools to understand how to best manage them in this repository. Produce **actionable** documentation in `apps/{appname}/README.md`.
+
+## Documentation Philosophy
+
+**Research thoroughly, document selectively.**
+
+The README is for a user who wants to set up this app. Every section must answer: "What do I need to DO?" If information doesn't help the user take action, it doesn't belong in the README.
+
+### What belongs in the README
+
+- Installation command
+- Setup script command and what it does
+- Manual steps the user must complete (as a checklist)
+- How to sync preferences between machines (one of the patterns below)
+- Links to official docs for deeper dives
+
+### Sync patterns (pick ONE)
+
+| Pattern | When to use | Example |
+|---------|-------------|---------|
+| **Not supported** | App has no sync capability | "Syncing not supported." |
+| **Native iCloud** | App syncs automatically via iCloud | Apple apps, some third-party |
+| **App-managed** | App has built-in sync to a folder you choose | Alfred, VS Code Settings Sync |
+| **Repo sync** | Config stored in THIS repo, applied via script | git, zsh, ruff |
+| **Cloud drive sync** | Config stored in user's private cloud folder | Keyboard Maestro, Hazel |
+| **Manual export/import** | No file sync, only GUI export/import | Some GUI apps |
+
+### Repo sync vs Cloud drive sync
+
+This is the key decision. Use this checklist:
+
+**Use repo sync if ALL are true:**
+
+- [ ] Safe to publish publicly (no secrets, API keys, licenses, PII)
+- [ ] Text-based (diffs well in git)
+- [ ] Relatively stable (won't create noisy commit history)
+- [ ] Machine-specific values can be templated or are handled by script
+
+**Otherwise, use cloud drive sync.**
+
+Examples of cloud-drive-only configs:
+
+- Keyboard Maestro macros (may contain passwords, paths, personal workflows)
+- Hazel rules (personal file paths, may reference private folders)
+- License files
+- Anything with API keys or tokens
+- Large binary preference files
+
+Always note provider-specific warnings (e.g., "avoid iCloud due to sync reliability issues").
+
+### Repo sync: document the destination
+
+When using repo sync, note WHERE config gets linked. This repo uses two patterns:
+
+| Pattern | Destination | Example apps |
+|---------|-------------|--------------|
+| **XDG config** | `~/.config/{app}/` | direnv, ruff, starship |
+| **Home dotfile** | `~/.{file}` | git (.gitconfig), zsh (.zshrc) |
+
+Include the destination path in the sync section so users know where to find config on their system:
+
+- "Repo sync. Config symlinked to `~/.config/ruff/`."
+- "Repo sync. `.gitconfig` symlinked to `~/`."
+
+### What does NOT belong in the README
+
+- Preference file locations (unless user directly edits them)
+- Bundle structures or internal architecture
+- Settings domains or plist paths (unless user runs `defaults` commands manually)
+- Exhaustive lists of what syncs vs doesn't sync
+- Programmatic configuration examples (the script handles this - put details in script comments)
+- Maintenance command tables (unless genuinely needed regularly)
+
+**Rule of thumb:** If the setup script handles something, the README just says what the script does, not how. Technical implementation details belong in script comments, not user documentation.
 
 ## Scope
 
@@ -15,14 +88,14 @@ This repo serves two purposes: **automation scripts** AND **documentation of man
 
 - Research any application or tool for setup and configuration
 - Determine installation methods (prefer Homebrew when available)
-- Identify config file locations and formats (if any exist)
-- Document programmatic configuration options (if available)
+- Identify config file locations and formats (to inform script development)
+- Document programmatic configuration options (to inform script development)
 - Document manual setup steps (always, even if automation exists)
-- Create/update README.md files following repository conventions
+- Create/update README.md files with **actionable guidance only**
 
 ## Research Checklist
 
-When researching an application, investigate ALL of the following:
+Research ALL of the following to understand the app fully. But remember: research informs what you build, not what you document. Most of this stays in your head or goes in script comments.
 
 ### 1. Installation Methods
 
@@ -202,9 +275,53 @@ grep -r "/Users/" ~/.config/{app}/ 2>/dev/null
 
 ## Output: README.md
 
-After research, create or update `apps/{appname}/README.md` using the template at `docs/apps/readme_template.md`.
+After research, create or update `apps/{appname}/README.md`. Keep it minimal and actionable.
 
-Read the template file, then adapt it for the specific app. Delete sections that don't apply.
+### README Structure
+
+```markdown
+# {App Name}
+
+One-line description of what this app does.
+
+## Installation
+
+\`\`\`bash
+brew install {app}  # or brew install --cask {app}
+\`\`\`
+
+## Setup
+
+\`\`\`bash
+./apps/{app}/{app}.sh setup
+\`\`\`
+
+This configures:
+- Setting 1
+- Setting 2
+
+## Manual Setup
+
+Complete these steps after installation:
+
+1. **Step name** - Brief instruction
+2. **Step name** - Brief instruction
+
+## Syncing Preferences
+
+{One sentence describing sync method. Include provider warnings if applicable.}
+
+## References
+
+- [Official Documentation](url)
+```
+
+### Guidelines
+
+- **Be brief.** If it takes more than 30 seconds to read, it's too long.
+- **Be actionable.** Every line should tell the user what to DO.
+- **Skip technical details.** File locations, domains, bundle structures - these go in script comments if anywhere.
+- **Link don't explain.** For complex topics, link to official docs rather than reproducing them.
 
 ## Decision Points
 

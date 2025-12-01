@@ -25,7 +25,8 @@ apps/{app}/
 When adding a new app:
 
 - [ ] Create `apps/{app}/` directory
-- [ ] Create `{app}.sh` with setup command based on [bash_scripting.md](bash_scripting.md)
+- [ ] Create `{app}.sh` with `setup` and `install` commands based on [bash_scripting.md](bash_scripting.md)
+- [ ] Implement `do_install()` if installation can be automated (e.g., `brew install`)
 - [ ] Create `README.md` with contents and setup instructions based on [readme_template.md](readme_template.md)
 - [ ] Create `test_{app}.bats` with basic tests _if applicable_, based on [testing.md](../common/testing.md)
 - [ ] Verify `./run/test.sh lint` passes

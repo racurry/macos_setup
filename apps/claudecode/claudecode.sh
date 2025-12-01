@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [COMMAND] [OPTIONS]
 
 Link Claude Code global configuration to ~/.claude.
@@ -43,10 +43,13 @@ do_setup() {
 
     log_info "Configuring Claude Code settings"
 
+    # Backup existing settings before modification
+    backup_file "${settings_file}" "claudecode"
+
     # Ensure settings file exists
     if [[ ! -f "${settings_file}" ]]; then
         log_info "Creating new settings.json file"
-        echo '{}' > "${settings_file}"
+        echo '{}' >"${settings_file}"
     fi
 
     # Use jq to set alwaysThinkingEnabled and enableAllProjectMcpServers to true
@@ -54,7 +57,7 @@ do_setup() {
 
     local tmp_file
     tmp_file=$(mktemp)
-    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true' "${settings_file}" > "${tmp_file}"
+    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true' "${settings_file}" >"${tmp_file}"
     mv "${tmp_file}" "${settings_file}"
 
     log_info "Set alwaysThinkingEnabled = true"
@@ -68,29 +71,29 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="$1"
-                shift
-                ;;
-            *)
-                log_warn "Ignoring unknown argument: $1"
-                shift
-                ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="$1"
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            do_setup
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        do_setup
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

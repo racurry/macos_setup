@@ -36,8 +36,9 @@ Use the complete template from `docs/apps/bash_scripting.md`:
 - Required flags: `set -euo pipefail`
 - Required sourcing: `source "${SCRIPT_DIR}/../../lib/bash/common.sh"`
 - Define `APP_NAME` variable for backup organization
-- Implement `show_help()`, `do_setup()`, and `main()` functions
-- Use `setup` as primary command entry point
+- Implement `show_help()`, `do_install()`, `do_setup()`, and `main()` functions
+- Use `setup` as primary command entry point; `setup` calls `install` first
+- `install` command installs the app idempotently (check before installing)
 
 ### 3. Copying or Symlinking Files to User Directories
 
@@ -126,8 +127,9 @@ After writing:
 2. Create script: `apps/{appname}/{appname}.sh`
 3. Copy full template from `docs/apps/bash_scripting.md`
 4. Set `APP_NAME` variable to match directory name
-5. Implement `do_setup()` with app-specific logic
-6. Update `show_help()` with accurate description
+5. Implement `do_install()` if installation can be automated (e.g., `brew install`)
+6. Implement `do_setup()` which calls `do_install()` then does configuration
+7. Update `show_help()` with accurate description
 
 ### When Adding Shared Functionality
 
