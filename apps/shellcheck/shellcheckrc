@@ -1,5 +1,8 @@
 # Treat sourced files as external dependencies (most scripts rely on common.sh).
 external-sources=true
 
+# Silence warnings about unresolvable source paths (variable-based paths can't be followed).
+disable=SC1091
+
 # Default to bash when the shebang is /bin/bash.
 shell=bash

@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
 Symlink ruff.toml from apps/ruff/ to ~/.config/ruff/ruff.toml
@@ -41,19 +41,32 @@ setup_ruff_config() {
 }
 
 main() {
-    case "${1:-}" in
-        help|--help|-h)
-            show_help
-            exit 0
-            ;;
-        "")
+    local command=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            help | --help | -h)
+                show_help
+                exit 0
+                ;;
+            setup)
+                command="$1"
+                shift
+                ;;
+            *)
+                log_warn "Ignoring unknown argument: $1"
+                shift
+                ;;
+        esac
+    done
+
+    case "${command}" in
+        setup)
             setup_ruff_config
             ;;
-        *)
-            echo "Error: Unknown option '${1}'" >&2
-            echo
+        "")
             show_help
-            exit 1
+            exit 0
             ;;
     esac
 }

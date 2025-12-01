@@ -9,7 +9,7 @@ source "${SCRIPT_DIR}/../lib/bash/common.sh"
 ORIGINAL_ARGS=("$@")
 
 show_help() {
-  cat << EOF
+    cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
 Automated macOS setup script that installs and configures development tools,
@@ -39,9 +39,12 @@ EOF
 
 # Parse command line arguments (only handle --help, rest passed through)
 for arg in "$@"; do
-  case $arg in
-    -h|--help) show_help; exit 0 ;;
-  esac
+    case $arg in
+        -h | --help)
+            show_help
+            exit 0
+            ;;
+    esac
 done
 
 # Determine setup mode (precedence: flag > config > prompt)
@@ -49,121 +52,85 @@ determine_setup_mode ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"} || exit 1
 
 # Preflight checks
 preflight_checks() {
-  print_heading "System Requirements Check"
-  log_info "Running preflight checks..."
+    print_heading "System Requirements Check"
+    log_info "Running preflight checks..."
 
-  # Block running as root
-  if [[ $EUID -eq 0 ]]; then
-    fail "Run this setup as a regular user, not root"
-  fi
-
-  if [[ "$(pwd)" != "${REPO_ROOT}" ]]; then
-    log_info "Changing working directory to ${REPO_ROOT}"
-    cd "${REPO_ROOT}"
-  fi
-
-  log_info "Repository root resolved to ${REPO_ROOT}"
-  log_info "Bash version ${BASH_VERSION}"
-
-  # Xcode Command Line Tools check
-  log_info "Checking Xcode Command Line Tools..."
-  if xcode-select -p >/dev/null 2>&1; then
-    log_info "Xcode Command Line Tools already installed"
-  else
-    log_info "Triggering Xcode Command Line Tools installation"
-    if xcode-select --install; then
-      log_info "Installer launched. Complete it, then rerun this script."
-      exit 2
-    else
-      log_warn "Installer launch may have failed; verify manually and rerun."
-      exit 1
+    # Block running as root
+    if [[ $EUID -eq 0 ]]; then
+        fail "Run this setup as a regular user, not root"
     fi
-  fi
 
-  log_info "All system requirements checks passed"
+    if [[ "$(pwd)" != "${REPO_ROOT}" ]]; then
+        log_info "Changing working directory to ${REPO_ROOT}"
+        cd "${REPO_ROOT}"
+    fi
+
+    log_info "Repository root resolved to ${REPO_ROOT}"
+    log_info "Bash version ${BASH_VERSION}"
+
+    # Xcode Command Line Tools check
+    log_info "Checking Xcode Command Line Tools..."
+    if xcode-select -p >/dev/null 2>&1; then
+        log_info "Xcode Command Line Tools already installed"
+    else
+        log_info "Triggering Xcode Command Line Tools installation"
+        if xcode-select --install; then
+            log_info "Installer launched. Complete it, then rerun this script."
+            exit 2
+        else
+            log_warn "Installer launch may have failed; verify manually and rerun."
+            exit 1
+        fi
+    fi
+
+    log_info "All system requirements checks passed"
 }
 
 # Run preflight checks before anything else
 preflight_checks
 
-# Install all the apps - everything else depends on this
-STEPS_FOUNDATION=(
-  "apps/brew/brew.sh"
-)
-
-# Shell & Security Configuration
-STEPS_SHELL=(
-  "apps/zsh/zsh.sh"
-  "apps/git/git.sh"
-  "apps/ohmyzsh/ohmyzsh.sh"
-  "apps/direnv/direnv.sh"
-  "apps/1password/1password.sh"
-)
-
-# Language Runtimes (slow, requires asdf from brew bundle)
-STEPS_RUNTIMES=(
-  "apps/asdf/asdf.sh"
-)
-
-# File System Organization
-STEPS_FILESYSTEM=(
-  "apps/macos/folders.sh"
-  "apps/icloud/icloud.sh"
-)
-
-# System Preferences
-STEPS_MACOS=(
-  "apps/macos/macos.sh"
-)
-
-# Application Configuration
-STEPS_APPS=(
-  "apps/claudecode/claudecode.sh"
-  "apps/shellcheck/shellcheck.sh"
-  "apps/markdownlint/markdownlint.sh"
-)
-
-# Run a single step, handling exit codes
+# Run an app setup script, handling exit codes
 # Passes ORIGINAL_ARGS to each script so they receive --mode, --unattended, etc.
-run_step() {
-  local script="$1"
-  set +e
-  (cd "${REPO_ROOT}" && bash "${script}" setup ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"})
-  local status=$?
-  set -e
+run_app_setup() {
+    local app="$1"
+    local script="apps/${app}/${app}.sh"
+    set +e
+    (cd "${REPO_ROOT}" && bash "${script}" setup ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"})
+    local status=$?
+    set -e
 
-  case ${status} in
-    0) ;;
-    2)
-      log_warn "${script} requested manual follow-up; rerun once complete"
-      exit 2
-      ;;
-    *)
-      fail "${script} exited with status ${status}"
-      ;;
-  esac
+    case ${status} in
+        0) ;;
+        2)
+            log_warn "${app} requested manual follow-up; rerun once complete"
+            exit 2
+            ;;
+        *)
+            fail "${app} exited with status ${status}"
+            ;;
+    esac
 }
 
-# Run all steps in a phase
-run_phase() {
-  local phase_name="$1"
-  shift
-  local steps=("$@")
+print_heading "Baseline Required Apps"
+run_app_setup brew
 
-  print_heading "${phase_name}"
-  for step in "${steps[@]}"; do
-    run_step "${step}"
-  done
-}
+print_heading "Shell Settings"
+run_app_setup zsh
+run_app_setup ohmyzsh
 
-run_phase "Foundation"      "${STEPS_FOUNDATION[@]}"
-run_phase "Shell & Security" "${STEPS_SHELL[@]}"
-run_phase "Runtimes"        "${STEPS_RUNTIMES[@]}"
-run_phase "File System"     "${STEPS_FILESYSTEM[@]}"
-run_phase "macOS Settings"  "${STEPS_MACOS[@]}"
-run_phase "Applications"    "${STEPS_APPS[@]}"
-manual_file="${SCRIPT_DIR}/../docs/manual_todos.md"
-if [[ -f "${manual_file}" ]]; then
-  echo
-  log_info "Manual checklist: review ${manual_file} for remaining tasks"
-fi
+print_heading "macOS Settings"
+run_app_setup macos
+run_app_setup icloud
+
+print_heading "Dev Tools"
+run_app_setup asdf
+run_app_setup git
+run_app_setup direnv
+run_app_setup 1password
+run_app_setup shellcheck
+run_app_setup markdownlint
+run_app_setup shfmt
+run_app_setup ruff
+
+print_heading "Application Settings"
+run_app_setup claudecode
