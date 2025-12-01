@@ -11,10 +11,10 @@ All-in-one project for managing multiple macOS environments (personal and work) 
 
 ## Structure
 
-- [apps](./apps) - Application-specific configs and setup scripts, organized by app (each app has its own directory with config files, setup script, and tests)
+- [apps](./apps) - Application-specific configs and setup scripts, organized by app.  Each app has its own directory with config files & setup scripts
 - [bin](./bin) - Standalone binaries that can be run manually.  Automatically added to PATH
 - [lib](./lib) - Shared library functions and helpers
-- [run](./run) - App-agnostic utility scripts
+- [run](./run) - App-agnostic or coordination utility scripts
 - [docs](./docs) - Instructions on how to manage this repository
 
 ## Testing
