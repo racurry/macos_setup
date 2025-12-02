@@ -53,6 +53,13 @@ jobs:
           echo "| PR | Branch | Status |" >> "$GITHUB_STEP_SUMMARY"
           echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
 
+          # Helper to log to both stdout and summary
+          log_result() {
+            local pr="$1" branch="$2" status="$3"
+            echo "  → PR #$pr ($branch): $status"
+            echo "| #$pr | \`$branch\` | $status |" >> "$GITHUB_STEP_SUMMARY"
+          }
+
           if [ -z "$PRS" ]; then
             echo "No open PRs found targeting main branch"
             echo "| - | - | No open PRs found |" >> "$GITHUB_STEP_SUMMARY"
@@ -69,7 +76,7 @@ jobs:
             # Fetch only the specific branch (main already fetched by checkout)
             if ! git fetch origin "$branch_name"; then
               echo "::warning::Failed to fetch branch $branch_name for PR #$pr_number"
-              echo "| #$pr_number | \`$branch_name\` | ⚠️ Fetch failed |" >> "$GITHUB_STEP_SUMMARY"
+              log_result "$pr_number" "$branch_name" "⚠️ Fetch failed"
               continue
             fi
 
@@ -78,8 +85,7 @@ jobs:
             main_head=$(git rev-parse origin/main)
 
             if [ "$merge_base" = "$main_head" ]; then
-              echo "PR #$pr_number is already up to date"
-              echo "| #$pr_number | \`$branch_name\` | ✅ Already up to date |" >> "$GITHUB_STEP_SUMMARY"
+              log_result "$pr_number" "$branch_name" "✅ Already up to date"
               continue
             fi
 
@@ -92,13 +98,10 @@ jobs:
 
               # Push the rebased branch
               if git push origin "$branch_name" --force-with-lease; then
-                echo "| #$pr_number | \`$branch_name\` | ✅ Rebased and pushed |" >> "$GITHUB_STEP_SUMMARY"
-                # Note: Skipping success comments to reduce noise
-                # Uncomment below if you want success notifications:
-                # gh pr comment "$pr_number" --body "✅ Automatically rebased onto latest main."
+                log_result "$pr_number" "$branch_name" "✅ Rebased and pushed"
               else
                 echo "::warning::Push failed for PR #$pr_number - may need manual retry"
-                echo "| #$pr_number | \`$branch_name\` | ⚠️ Rebase ok, push failed |" >> "$GITHUB_STEP_SUMMARY"
+                log_result "$pr_number" "$branch_name" "⚠️ Rebase ok, push failed"
               fi
 
             else
@@ -127,9 +130,12 @@ jobs:
                 gh pr comment "$pr_number" --body "@claude Please rebase this PR onto main and resolve any conflicts. Preserve the intent of this PR's changes."
               fi
 
-              echo "| #$pr_number | \`$branch_name\` | ❌ Conflicts - Claude notified |" >> "$GITHUB_STEP_SUMMARY"
+              log_result "$pr_number" "$branch_name" "❌ Conflicts - Claude notified"
             fi
 
             # Return to main branch
             git checkout main
           done
+
+          echo ""
+          echo "Done processing all PRs."
