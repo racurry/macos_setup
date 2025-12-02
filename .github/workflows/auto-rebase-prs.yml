@@ -113,9 +113,17 @@ jobs:
               # Abort the rebase
               git rebase --abort
 
-              # Build detailed conflict message for Claude using heredoc
-              if [ -n "$conflicting_files" ]; then
-                gh pr comment "$pr_number" --body "$(cat <<EOF
+              # Check if we already have a pending @claude rebase comment (avoid spam)
+              existing_comment=$(gh pr view "$pr_number" --json comments \
+                --jq '.comments | map(select(.author.login == "github-actions" and (.body | contains("@claude") and contains("rebase")))) | length')
+
+              if [ "$existing_comment" -gt 0 ]; then
+                echo "  Skipping comment - already has pending @claude rebase request"
+                log_result "$pr_number" "$branch_name" "❌ Conflicts (comment already pending)"
+              else
+                # Build detailed conflict message for Claude using heredoc
+                if [ -n "$conflicting_files" ]; then
+                  gh pr comment "$pr_number" --body "$(cat <<EOF
           @claude Please rebase this PR onto main and resolve any conflicts.
 
           Conflicting files:
@@ -126,11 +134,11 @@ jobs:
           Preserve the intent of this PR's changes when resolving conflicts.
           EOF
           )"
-              else
-                gh pr comment "$pr_number" --body "@claude Please rebase this PR onto main and resolve any conflicts. Preserve the intent of this PR's changes."
+                else
+                  gh pr comment "$pr_number" --body "@claude Please rebase this PR onto main and resolve any conflicts. Preserve the intent of this PR's changes."
+                fi
+                log_result "$pr_number" "$branch_name" "❌ Conflicts - Claude notified"
               fi
-
-              log_result "$pr_number" "$branch_name" "❌ Conflicts - Claude notified"
             fi
 
             # Return to main branch
