@@ -5,6 +5,10 @@ on:
   push:
     branches: ["main"]
 
+concurrency:
+  group: auto-rebase
+  cancel-in-progress: true
+
 jobs:
   auto-rebase:
     name: Auto-rebase open PRs
@@ -28,10 +32,10 @@ jobs:
       - name: Get open PRs
         id: get-prs
         run: |
-          # Get all open PRs targeting main branch
+          # Get all open PRs targeting main branch (tab-separated for safe parsing)
           prs=$(gh pr list --base main --state open \
             --json number,headRefName \
-            --jq '.[] | "\(.number):\(.headRefName)"')
+            --jq '.[] | "\(.number)\t\(.headRefName)"')
           echo "prs<<EOF" >> $GITHUB_OUTPUT
           echo "$prs" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -39,22 +43,35 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rebase PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRS: ${{ steps.get-prs.outputs.prs }}
         run: |
-          if [ -z "${{ steps.get-prs.outputs.prs }}" ]; then
+          # Initialize summary
+          echo "## Auto-Rebase Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| PR | Branch | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|---|" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -z "$PRS" ]; then
             echo "No open PRs found targeting main branch"
+            echo "| - | - | No open PRs found |" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
-          echo "${{ steps.get-prs.outputs.prs }}" | while IFS=':' read -r pr_number branch_name; do
+          echo "$PRS" | while IFS=$'\t' read -r pr_number branch_name; do
             if [ -z "$pr_number" ] || [ -z "$branch_name" ]; then
               continue
             fi
 
-            echo "Processing PR #$pr_number"
+            echo "Processing PR #$pr_number ($branch_name)"
 
-            # Fetch the latest changes
-            git fetch origin main
-            git fetch origin "$branch_name"
+            # Fetch only the specific branch (main already fetched by checkout)
+            if ! git fetch origin "$branch_name"; then
+              echo "::warning::Failed to fetch branch $branch_name for PR #$pr_number"
+              echo "| #$pr_number | \`$branch_name\` | ⚠️ Fetch failed |" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
 
             # Check if rebase is needed
             merge_base=$(git merge-base origin/main "origin/$branch_name")
@@ -62,6 +79,7 @@ jobs:
 
             if [ "$merge_base" = "$main_head" ]; then
               echo "PR #$pr_number is already up to date"
+              echo "| #$pr_number | \`$branch_name\` | ✅ Already up to date |" >> "$GITHUB_STEP_SUMMARY"
               continue
             fi
 
@@ -73,25 +91,45 @@ jobs:
               echo "Successfully rebased PR #$pr_number"
 
               # Push the rebased branch
-              git push origin "$branch_name" --force-with-lease
-
-              # Add comment to PR about successful rebase
-              gh pr comment "$pr_number" \
-                --body "Automatically rebased onto latest main."
+              if git push origin "$branch_name" --force-with-lease; then
+                echo "| #$pr_number | \`$branch_name\` | ✅ Rebased and pushed |" >> "$GITHUB_STEP_SUMMARY"
+                # Note: Skipping success comments to reduce noise
+                # Uncomment below if you want success notifications:
+                # gh pr comment "$pr_number" --body "✅ Automatically rebased onto latest main."
+              else
+                echo "::warning::Push failed for PR #$pr_number - may need manual retry"
+                echo "| #$pr_number | \`$branch_name\` | ⚠️ Rebase ok, push failed |" >> "$GITHUB_STEP_SUMMARY"
+              fi
 
             else
-              echo "Rebase failed for PR #$pr_number"
+              echo "Rebase failed for PR #$pr_number due to conflicts"
+
+              # Capture conflicting files before aborting
+              conflicting_files=$(git diff --name-only --diff-filter=U 2>/dev/null | head -10)
 
               # Abort the rebase
               git rebase --abort
 
-              # Add comment to trigger Claude for conflict resolution
-              gh pr comment "$pr_number" --body \
-                "@claude rebase this PR with main, resolving any conflicts as needed"
+              # Build detailed conflict message for Claude using heredoc
+              if [ -n "$conflicting_files" ]; then
+                gh pr comment "$pr_number" --body "$(cat <<EOF
+          @claude Please rebase this PR onto main and resolve any conflicts.
+
+          Conflicting files:
+          \`\`\`
+          $conflicting_files
+          \`\`\`
+
+          Preserve the intent of this PR's changes when resolving conflicts.
+          EOF
+          )"
+              else
+                gh pr comment "$pr_number" --body "@claude Please rebase this PR onto main and resolve any conflicts. Preserve the intent of this PR's changes."
+              fi
+
+              echo "| #$pr_number | \`$branch_name\` | ❌ Conflicts - Claude notified |" >> "$GITHUB_STEP_SUMMARY"
             fi
 
             # Return to main branch
             git checkout main
           done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
