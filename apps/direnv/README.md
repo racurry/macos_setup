@@ -18,17 +18,13 @@ This symlinks `use_asdf.sh` to `~/.config/direnv/lib/` for asdf integration.
 
 ## Manual Setup
 
-1. **Shell hook** - Add to your shell config (already done if using this repo's zsh setup):
-
-   ```bash
-   eval "$(direnv hook zsh)"  # or bash
-   ```
-
-2. **Allow .envrc files** - When entering a directory with `.envrc`, run:
+1. **Allow .envrc files** - When entering a directory with `.envrc` for the first time:
 
    ```bash
    direnv allow
    ```
+
+   This is a security feature - you must explicitly trust each `.envrc`.
 
 ## Using with asdf
 
@@ -42,9 +38,11 @@ This loads tool versions from `.tool-versions` and auto-installs missing runtime
 
 ## Syncing Preferences
 
-Repo sync. The custom `use_asdf.sh` library is tracked in this repo and symlinked to `~/.config/direnv/lib/`.
+Repo sync. Custom library extensions tracked in this repo, symlinked to `~/.config/direnv/lib/`.
+
+Shell hook is configured in this repo's zsh setup (`.zshrc`).
 
 ## References
 
 - [Official Documentation](https://direnv.net/)
-- [Shell Hook Setup](https://direnv.net/docs/hook.html)
+- [Configuration Options (direnv.toml)](https://direnv.net/man/direnv.toml.1.html)
