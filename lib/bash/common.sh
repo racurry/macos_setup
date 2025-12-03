@@ -273,8 +273,7 @@ backup_file() {
     backup_path="${backup_dir}/${filename}.${timestamp}"
 
     mkdir -p "$backup_dir"
-    mv "$file_path" "$backup_path"
-    touch "$backup_path" # Reset mtime so pruning uses backup time, not original file time
+    cp "$file_path" "$backup_path"
     log_warn "Backed up ${filename} to ${backup_path}"
 
     # Opportunistic pruning
@@ -416,17 +415,17 @@ prompt_setup_mode() {
     while true; do
         read -rp "Enter your choice (1 or 2): " choice
         case $choice in
-            1 | work)
-                SETUP_MODE="work"
-                break
-                ;;
-            2 | personal)
-                SETUP_MODE="personal"
-                break
-                ;;
-            *)
-                echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
-                ;;
+        1 | work)
+            SETUP_MODE="work"
+            break
+            ;;
+        2 | personal)
+            SETUP_MODE="personal"
+            break
+            ;;
+        *)
+            echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
+            ;;
         esac
     done
 }
@@ -449,19 +448,19 @@ determine_setup_mode() {
     # Parse arguments (ignores unrecognized args)
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --reset | --reset-mode)
-                reset_mode=true
-                shift
-                ;;
-            --unattended)
-                unattended=true
-                shift
-                ;;
-            --mode)
-                mode_override="${2:-}"
-                shift 2
-                ;;
-            *) shift ;;
+        --reset | --reset-mode)
+            reset_mode=true
+            shift
+            ;;
+        --unattended)
+            unattended=true
+            shift
+            ;;
+        --mode)
+            mode_override="${2:-}"
+            shift 2
+            ;;
+        *) shift ;;
         esac
     done
 

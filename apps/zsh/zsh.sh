@@ -29,6 +29,25 @@ do_setup() {
     link_home_dotfile "${SCRIPT_DIR}/.zshrc" "${APP_NAME}"
     link_home_dotfile "${SCRIPT_DIR}/.galileorc" "${APP_NAME}"
 
+    # Set MOTHERBOX_ROOT in ~/.local.zshrc for use in PATH and aliases
+    local repo_root
+    repo_root="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+    local local_zshrc="$HOME/.local.zshrc"
+
+    # Create file if it doesn't exist
+    touch "$local_zshrc"
+
+    # Update or add MOTHERBOX_ROOT
+    if grep -q '^export MOTHERBOX_ROOT=' "$local_zshrc" 2>/dev/null; then
+        sed -i '' "s|^export MOTHERBOX_ROOT=.*|export MOTHERBOX_ROOT=\"${repo_root}\"|" "$local_zshrc"
+        log_info "Updated MOTHERBOX_ROOT in ~/.local.zshrc"
+    else
+        # Ensure file ends with newline before appending
+        [[ -s "$local_zshrc" && $(tail -c1 "$local_zshrc" | wc -l) -eq 0 ]] && echo >>"$local_zshrc"
+        echo "export MOTHERBOX_ROOT=\"${repo_root}\"" >>"$local_zshrc"
+        log_info "Added MOTHERBOX_ROOT to ~/.local.zshrc"
+    fi
+
     log_success "Zsh configuration complete"
 }
 
@@ -37,29 +56,29 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help | --help | -h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="$1"
-                shift
-                ;;
-            *)
-                log_warn "Ignoring unknown argument: $1"
-                shift
-                ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="$1"
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            do_setup
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        do_setup
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

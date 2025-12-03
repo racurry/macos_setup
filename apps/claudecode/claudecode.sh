@@ -12,9 +12,10 @@ Usage: $0 [COMMAND] [OPTIONS]
 Link Claude Code global configuration to ~/.claude.
 
 Commands:
-    setup       Run full setup (rules + commands + settings)
+    setup       Run full setup (rules + commands + statuslines + settings)
     rules       Link CLAUDE.md and AGENTS.md files
     commands    Sync commands to ~/.claude/commands
+    statuslines Sync statuslines to ~/.claude/statuslines
     settings    Configure settings.json
     help        Show this help message (also: -h, --help)
 
@@ -23,6 +24,7 @@ Description:
     - apps/claudecode/CLAUDE.global.md -> ~/.claude/CLAUDE.md
     - apps/claudecode/AGENTS.global.md -> ~/AGENTS.md
     - apps/claudecode/commands/* -> ~/.claude/commands/* (each file separately)
+    - apps/claudecode/statuslines/* -> ~/.claude/statuslines/* (each file separately)
 EOF
 }
 
@@ -70,14 +72,35 @@ do_commands() {
     log_success "Claude Code commands synced"
 }
 
+do_statuslines() {
+    print_heading "Sync Claude Code statuslines"
+
+    local statuslines_src_dir="${REPO_ROOT}/apps/claudecode/statuslines"
+    local statuslines_dest_dir="${HOME}/.claude/statuslines"
+
+    if [[ ! -d "${statuslines_src_dir}" ]]; then
+        log_info "No statuslines directory found, skipping"
+        return 0
+    fi
+
+    mkdir -p "${statuslines_dest_dir}"
+
+    for statusline_file in "${statuslines_src_dir}"/*; do
+        if [[ -f "${statusline_file}" ]]; then
+            local filename
+            filename=$(basename "${statusline_file}")
+            link_file "${statusline_file}" "${statuslines_dest_dir}/${filename}" "claudecode"
+        fi
+    done
+
+    log_success "Claude Code statuslines synced"
+}
+
 do_settings() {
     print_heading "Configure Claude Code settings"
 
     mkdir -p "${HOME}/.claude"
     local settings_file="${HOME}/.claude/settings.json"
-
-    # Backup existing settings before modification
-    backup_file "${settings_file}" "claudecode"
 
     # Ensure settings file exists
     if [[ ! -f "${settings_file}" ]]; then
@@ -85,16 +108,20 @@ do_settings() {
         echo '{}' >"${settings_file}"
     fi
 
+    # Backup before modification
+    backup_file "${settings_file}" "claudecode"
+
     # Use jq to set alwaysThinkingEnabled and enableAllProjectMcpServers to true
     require_command jq
 
     local tmp_file
     tmp_file=$(mktemp)
-    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true' "${settings_file}" >"${tmp_file}"
+    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true | .statusLine = {"type": "command", "command": "~/.claude/statuslines/default.sh"}' "${settings_file}" >"${tmp_file}"
     mv "${tmp_file}" "${settings_file}"
 
     log_info "Set alwaysThinkingEnabled = true"
     log_info "Set enableAllProjectMcpServers = true"
+    log_info "Set statusLine to use ~/.claude/statuslines/default.sh"
 
     log_success "Claude Code settings configured"
 }
@@ -104,6 +131,7 @@ do_setup() {
 
     do_rules
     do_commands
+    do_statuslines
     do_settings
 }
 
@@ -116,7 +144,7 @@ main() {
             show_help
             exit 0
             ;;
-        setup | rules | commands | settings)
+        setup | rules | commands | statuslines | settings)
             command="$1"
             shift
             ;;
@@ -136,6 +164,9 @@ main() {
         ;;
     commands)
         do_commands
+        ;;
+    statuslines)
+        do_statuslines
         ;;
     settings)
         do_settings

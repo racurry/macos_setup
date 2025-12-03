@@ -6,8 +6,8 @@ All-in-one project for managing multiple macOS environments (personal and work) 
 
 1. [Download 1Password](https://1password.com/downloads/mac), install, and sign in
 2. Enable SSH agent: Settings → Developer → SSH Agent
-3. Clone: `git clone git@github.com:racurry/osx_setup.git ~/workspace/infra/osx_setup`
-4. Run: `cd ~/workspace/infra/osx_setup && ./run/setup.sh`
+3. Clone: `git clone git@github.com:racurry/motherbox.git ~/workspace/infra/motherbox`
+4. Run: `cd ~/workspace/infra/motherbox && ./run/setup.sh`
 
 ## Structure
 

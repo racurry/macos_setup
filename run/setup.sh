@@ -40,10 +40,10 @@ EOF
 # Parse command line arguments (only handle --help, rest passed through)
 for arg in "$@"; do
     case $arg in
-        -h | --help)
-            show_help
-            exit 0
-            ;;
+    -h | --help)
+        show_help
+        exit 0
+        ;;
     esac
 done
 
@@ -89,6 +89,9 @@ preflight_checks() {
 # Run preflight checks before anything else
 preflight_checks
 
+# Create ~/.config/motherbox/bin symlink
+"${SCRIPT_DIR}/sync-bin.sh"
+
 # Run an app setup script, handling exit codes
 # Passes ORIGINAL_ARGS to each script so they receive --mode, --unattended, etc.
 run_app_setup() {
@@ -100,14 +103,14 @@ run_app_setup() {
     set -e
 
     case ${status} in
-        0) ;;
-        2)
-            log_warn "${app} requested manual follow-up; rerun once complete"
-            exit 2
-            ;;
-        *)
-            fail "${app} exited with status ${status}"
-            ;;
+    0) ;;
+    2)
+        log_warn "${app} requested manual follow-up; rerun once complete"
+        exit 2
+        ;;
+    *)
+        fail "${app} exited with status ${status}"
+        ;;
     esac
 }
 

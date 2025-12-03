@@ -6,7 +6,7 @@ Stuff to add to this setup
 ## Agent workflow
 
 For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent should read the entire codebase to fully understand the context of the todo.  If it is
-  clear what the problem and solution is, use `gh` to open an issue in <https://github.com/racurry/macos_setup> using gh.  Add enough
+  clear what the problem and solution is, use `gh` to open an issue in <https://github.com/racurry/motherbox> using gh.  Add enough
   detail of the problem, solution, and actions to take in the issue so that an AI agent can implement the solution.
   \
   If it is not clear, the subagent should return to the main agent a list of clarifying questions.  The main agent should add sub

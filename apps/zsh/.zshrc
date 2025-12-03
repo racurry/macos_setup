@@ -174,7 +174,7 @@ alias killport=findandkill
 # ============================================================================
 
 # PATH modifications
-export PATH="$PATH:$workspace/infra/motherbox/bin:$HOME/.local/bin"  # Personal scripts and tools
+export PATH="$PATH:$HOME/.config/motherbox/bin:$HOME/.local/bin"  # Personal scripts and tools
 export PATH="$BREW_PREFIX/opt/bison/bin:$PATH"  # Modern bison for parser generation
 export PATH="$PATH:$HOME/.lmstudio/bin" # Local Llama Studio binaries
 export PATH="$PATH:$HOME/.antigravity/antigravity/bin" # Google's Antigravity - agry
@@ -188,11 +188,11 @@ typeset -U PATH
 
 # Shell convenience
 alias rezsh="source ~/.zshrc"
-alias zshcfg="code -nw ~/workspace/infra/motherbox/data/dotfiles/.zshrc"
+alias zshcfg='code -nw "$(readlink ~/.zshrc 2>/dev/null || echo ~/.zshrc)"'
 alias omzcfg="code -nw ~/.oh-my-zsh"
 
-# macOS setup shortcuts
-alias motherbox="\"$workspace\"/infra/motherbox"
+# Motherbox repo shortcut (derived from zshrc symlink location)
+alias motherbox='cd "$(dirname "$(readlink ~/.zshrc)")"/../..'
 
 # Enhanced & tool overwrites
 command -v bat >/dev/null 2>&1 && alias cat='bat'
