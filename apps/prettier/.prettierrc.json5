@@ -1,0 +1,411 @@
+{
+  // =============================================================================
+  // PRETTIER CONFIGURATION
+  // =============================================================================
+  //
+  // Opinionated code formatter configuration for TypeScript/JavaScript projects.
+  // See: https://prettier.io/docs/options
+  //
+  // Philosophy: Prettier is intentionally opinionated to end style debates.
+  // Minimal configuration is preferred. Only override defaults when you have
+  // a strong, team-agreed reason.
+  //
+  // This config documents ALL available options (as of Prettier 3.7).
+  // Enabled options are set explicitly; disabled/default options are commented
+  // out with explanations.
+  //
+
+  // =============================================================================
+  // LINE WIDTH & INDENTATION
+  // =============================================================================
+
+  // Print Width
+  // ---------------------------------------------------------------------------
+  // The line length Prettier aims for when wrapping code.
+  //
+  // Default: 80
+  // Common alternatives: 100, 120
+  //
+  // Prettier treats this as a soft guide, not a hard limit. Long strings,
+  // imports, and test descriptions may exceed this.
+  //
+  // We set this extremely high to effectively disable line-width enforcement.
+  // Prettier has no true "never wrap" mode, but 9999 achieves this in practice.
+  // Note: Some constructs (objects, function signatures) may still wrap based
+  // on Prettier's heuristics regardless of this setting.
+  "printWidth": 9999,
+
+  // Tab Width
+  // ---------------------------------------------------------------------------
+  // Number of spaces per indentation level.
+  //
+  // Default: 2
+  // Common alternatives: 4
+  //
+  // 2 spaces is the JavaScript/TypeScript community standard. Keeps code
+  // compact while maintaining readability. Python uses 4, but for JS/TS,
+  // 2 is nearly universal.
+  "tabWidth": 2,
+
+  // Use Tabs
+  // ---------------------------------------------------------------------------
+  // Use tabs instead of spaces for indentation.
+  //
+  // Default: false
+  // Alternative: true (accessibility argument - users can set tab width)
+  //
+  // We stick with spaces. While tabs offer accessibility benefits (users can
+  // set their preferred width), spaces are more predictable across editors,
+  // terminals, and web displays. The JS ecosystem strongly favors spaces.
+  // "useTabs": false,
+
+  // =============================================================================
+  // SYNTAX STYLE
+  // =============================================================================
+
+  // Semicolons
+  // ---------------------------------------------------------------------------
+  // Add semicolons at the end of statements.
+  //
+  // Default: true
+  // Alternative: false (ASI - Automatic Semicolon Insertion)
+  //
+  // We keep semicolons. While JavaScript's ASI makes them optional, explicit
+  // semicolons prevent subtle bugs (especially with lines starting with [ or ().
+  // They also make code intent clearer and avoid the "prepend semicolon" style.
+  // "semi": true,
+
+  // Single Quotes
+  // ---------------------------------------------------------------------------
+  // Use single quotes instead of double quotes for strings.
+  //
+  // Default: false (double quotes)
+  // Alternative: true (single quotes)
+  //
+  // We use single quotes. Single quotes are dominant in the JavaScript
+  // community, require fewer keystrokes (no shift key), and leave double
+  // quotes available for HTML attributes in JSX. Prettier will still use
+  // double quotes when the string contains single quotes to minimize escapes.
+  "singleQuote": true,
+
+  // JSX Single Quotes
+  // ---------------------------------------------------------------------------
+  // Use single quotes in JSX instead of double quotes.
+  //
+  // Default: false (double quotes in JSX)
+  //
+  // We keep double quotes in JSX. HTML convention uses double quotes for
+  // attributes, and JSX inherits this. Keeping JSX consistent with HTML
+  // improves readability and follows React community standards.
+  // "jsxSingleQuote": false,
+
+  // Quote Props
+  // ---------------------------------------------------------------------------
+  // When to add quotes around object property names.
+  //
+  // Default: "as-needed"
+  // Options:
+  //   - "as-needed": Only quote properties that require it (e.g., "foo-bar")
+  //   - "consistent": If any property needs quotes, quote all properties
+  //   - "preserve": Keep quotes as-is from input
+  //
+  // "as-needed" is cleanest - only add quotes when JavaScript syntax requires.
+  // "quoteProps": "as-needed",
+
+  // =============================================================================
+  // TRAILING SYNTAX
+  // =============================================================================
+
+  // Trailing Commas
+  // ---------------------------------------------------------------------------
+  // Where to add trailing commas in multi-line constructs.
+  //
+  // Default: "all" (since Prettier 3.0)
+  // Options:
+  //   - "all": Trailing commas everywhere (objects, arrays, function params)
+  //   - "es5": Only where valid in ES5 (objects, arrays; not function params)
+  //   - "none": No trailing commas anywhere
+  //
+  // Trailing commas are great for cleaner git diffs - adding a new item only
+  // shows one line changed instead of two. "all" is the modern default and
+  // works in all current browsers and Node.js versions.
+  // "trailingComma": "all",
+
+  // =============================================================================
+  // SPACING & BRACKETS
+  // =============================================================================
+
+  // Bracket Spacing
+  // ---------------------------------------------------------------------------
+  // Print spaces between brackets in object literals.
+  //
+  // Default: true
+  // Example with true:  { foo: bar }
+  // Example with false: {foo: bar}
+  //
+  // Spaces improve readability. This is the community standard.
+  // "bracketSpacing": true,
+
+  // Object Wrap (New in Prettier 3.5)
+  // ---------------------------------------------------------------------------
+  // How Prettier handles multi-line object formatting.
+  //
+  // Default: "preserve"
+  // Options:
+  //   - "preserve": Keep objects multi-line if source has newline after {
+  //   - "collapse": Always collapse objects to single line if they fit
+  //
+  // "preserve" respects developer intent - if you formatted something across
+  // multiple lines for readability, Prettier won't collapse it. Use "collapse"
+  // if you want Prettier to always minimize line count.
+  // "objectWrap": "preserve",
+
+  // Bracket Same Line
+  // ---------------------------------------------------------------------------
+  // Put the closing > of a multi-line HTML/JSX element on the same line as
+  // the last attribute instead of on a new line.
+  //
+  // Default: false
+  // Example with false:
+  //   <button
+  //     className="foo"
+  //   >
+  //
+  // Example with true:
+  //   <button
+  //     className="foo">
+  //
+  // Putting > on its own line makes the structure clearer and diffs cleaner.
+  // "bracketSameLine": false,
+
+  // =============================================================================
+  // ARROW FUNCTIONS
+  // =============================================================================
+
+  // Arrow Function Parentheses
+  // ---------------------------------------------------------------------------
+  // Include parentheses around arrow function parameters.
+  //
+  // Default: "always"
+  // Options:
+  //   - "always": Always include parens: (x) => x
+  //   - "avoid": Omit when possible: x => x
+  //
+  // "always" is the safer choice:
+  //   1. Adding type annotations or default values doesn't require changes
+  //   2. Prevents confusion with >= comparisons
+  //   3. Consistent style regardless of parameter count
+  // "arrowParens": "always",
+
+  // =============================================================================
+  // HTML & MARKUP
+  // =============================================================================
+
+  // HTML Whitespace Sensitivity
+  // ---------------------------------------------------------------------------
+  // How Prettier handles whitespace in HTML/Vue/Angular templates.
+  //
+  // Default: "css"
+  // Options:
+  //   - "css": Respect CSS display property (inline elements preserve whitespace)
+  //   - "strict": Whitespace around ALL tags is significant (no reformatting)
+  //   - "ignore": Whitespace around all tags is insignificant (full reformatting)
+  //
+  // "css" is the smart default - it understands that <span> tags are inline
+  // (whitespace matters) while <div> tags are block (whitespace doesn't matter).
+  // Use "ignore" for more aggressive formatting if you don't care about whitespace.
+  // "htmlWhitespaceSensitivity": "css",
+
+  // Single Attribute Per Line
+  // ---------------------------------------------------------------------------
+  // Enforce single attribute per line in HTML, Vue, and JSX.
+  //
+  // Default: false
+  // When true: Each attribute gets its own line if element is multi-line
+  //
+  // We enable this for cleaner diffs and better readability in complex
+  // components. When you have multiple attributes, one per line makes
+  // changes more visible in code review.
+  "singleAttributePerLine": true,
+
+  // Vue Indent Script and Style
+  // ---------------------------------------------------------------------------
+  // Indent code inside <script> and <style> tags in Vue files.
+  //
+  // Default: false
+  //
+  // With false, the code inside script/style starts at column 0, saving
+  // indentation levels. This is the Vue community standard.
+  // "vueIndentScriptAndStyle": false,
+
+  // =============================================================================
+  // PROSE & MARKDOWN
+  // =============================================================================
+
+  // Prose Wrap
+  // ---------------------------------------------------------------------------
+  // How to wrap prose in Markdown and other text files.
+  //
+  // Default: "preserve"
+  // Options:
+  //   - "always": Wrap prose at printWidth
+  //   - "never": Unwrap prose into long lines
+  //   - "preserve": Keep prose wrapped as-is
+  //
+  // "preserve" respects the author's line breaks. Some prefer "always" for
+  // consistent wrapping, but this can cause noisy diffs when prose is edited.
+  // "proseWrap": "preserve",
+
+  // =============================================================================
+  // END OF LINE
+  // =============================================================================
+
+  // End of Line
+  // ---------------------------------------------------------------------------
+  // Line ending style.
+  //
+  // Default: "lf"
+  // Options:
+  //   - "lf": Line feed only (\n) - Linux/macOS/Git standard
+  //   - "crlf": Carriage return + line feed (\r\n) - Windows
+  //   - "cr": Carriage return only (\r) - Classic Mac (rare)
+  //   - "auto": Use existing line endings (mixed files = first line wins)
+  //
+  // "lf" is the universal standard for source control. Git handles conversion
+  // for Windows users via core.autocrlf. Never use "auto" - it can cause issues.
+  // "endOfLine": "lf",
+
+  // =============================================================================
+  // EMBEDDED LANGUAGES
+  // =============================================================================
+
+  // Embedded Language Formatting
+  // ---------------------------------------------------------------------------
+  // Format code embedded in template literals and other contexts.
+  //
+  // Default: "auto"
+  // Options:
+  //   - "auto": Format embedded code when Prettier can identify the language
+  //   - "off": Never format embedded code
+  //
+  // "auto" enables formatting of GraphQL in tagged templates, CSS in styled-
+  // components, etc. Only disable if you have specific compatibility issues.
+  // "embeddedLanguageFormatting": "auto",
+
+  // =============================================================================
+  // EXPERIMENTAL OPTIONS
+  // =============================================================================
+  // These options may change in future versions. Use with caution.
+
+  // Experimental Ternaries
+  // ---------------------------------------------------------------------------
+  // Try new ternary formatting with question mark after condition.
+  //
+  // Default: false
+  // Status: EXPERIMENTAL - may change or be removed
+  //
+  // This places the ? on a line with the condition for "curious ternary" style.
+  // Not recommended for production until it stabilizes.
+  // "experimentalTernaries": false,
+
+  // Experimental Operator Position (New in Prettier 3.5)
+  // ---------------------------------------------------------------------------
+  // Where to place binary operators in multi-line expressions.
+  //
+  // Default: "end"
+  // Options:
+  //   - "end": Operators at end of line (current behavior)
+  //   - "start": Operators at start of continuation lines
+  //
+  // Status: EXPERIMENTAL - may change or be removed
+  //
+  // "start" puts operators at the beginning of wrapped lines, making them
+  // more visible. Some find this easier to scan. Not recommended until stable.
+  // "experimentalOperatorPosition": "end",
+
+  // =============================================================================
+  // PRAGMA OPTIONS
+  // =============================================================================
+  // These control which files Prettier processes. Useful for gradual adoption.
+
+  // Require Pragma
+  // ---------------------------------------------------------------------------
+  // Only format files containing a /** @format */ or /** @prettier */ comment.
+  //
+  // Default: false
+  //
+  // Useful when migrating large codebases - only format files that have been
+  // explicitly marked. Set to true, then add pragma to files as you clean them.
+  // "requirePragma": false,
+
+  // Insert Pragma
+  // ---------------------------------------------------------------------------
+  // Insert a /** @format */ comment at the top of formatted files.
+  //
+  // Default: false
+  //
+  // Works with requirePragma for gradual adoption. After formatting a file,
+  // Prettier adds the pragma so future runs know to format it.
+  // "insertPragma": false,
+
+  // Check Ignore Pragma
+  // ---------------------------------------------------------------------------
+  // Skip formatting files containing /** @noprettier */ or /** @noformat */.
+  //
+  // Default: false
+  //
+  // Lets authors mark specific files to exclude from formatting, even if they
+  // match .prettierrc patterns. Useful for generated code or special files.
+  // "checkIgnorePragma": false,
+
+  // =============================================================================
+  // PARSER OPTIONS
+  // =============================================================================
+  // These are typically set via overrides, not globally.
+
+  // Parser
+  // ---------------------------------------------------------------------------
+  // Specify which parser to use. Usually auto-detected from file extension.
+  //
+  // Options: babel, babel-flow, babel-ts, typescript, css, less, scss, json,
+  //          json5, jsonc, graphql, markdown, mdx, yaml, html, vue, angular, etc.
+  //
+  // Only set in overrides for edge cases like .mjs files or custom extensions.
+  // "parser": undefined,
+
+  // =============================================================================
+  // RANGE OPTIONS
+  // =============================================================================
+  // For formatting only part of a file. CLI/API only - not used in config.
+
+  // Range Start / Range End
+  // ---------------------------------------------------------------------------
+  // Format only the code between character offsets.
+  //
+  // "rangeStart": 0,
+  // "rangeEnd": Infinity,
+  //
+  // Used by editor integrations to format selections. Not useful in config.
+
+  // =============================================================================
+  // OVERRIDES
+  // =============================================================================
+  // Apply different settings to specific file patterns.
+  //
+  // Example:
+  // "overrides": [
+  //   {
+  //     "files": "*.md",
+  //     "options": {
+  //       "proseWrap": "always",
+  //       "printWidth": 80
+  //     }
+  //   },
+  //   {
+  //     "files": ["*.json", "*.jsonc"],
+  //     "options": {
+  //       "tabWidth": 2
+  //     }
+  //   }
+  // ]
+}

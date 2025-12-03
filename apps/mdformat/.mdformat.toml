@@ -1,0 +1,77 @@
+# mdformat configuration
+# https://mdformat.readthedocs.io/en/stable/users/configuration_file.html
+#
+# This file is discovered by searching upward from the formatted file's
+# location. When formatting stdin, the search begins from the current
+# working directory. Command-line arguments take precedence over this file.
+
+################################################################################
+# LINE WRAPPING
+################################################################################
+
+# wrap: Controls how lines are wrapped
+#   "keep"  - Preserve existing line breaks (default)
+#   "no"    - Remove soft line breaks, join paragraphs into single lines
+#   INTEGER - Wrap at specified column (e.g., 80)
+#
+# We use "keep" to preserve semantic line breaks. This philosophy puts each
+# sentence or clause on its own line, making diffs cleaner and prose easier
+# to reorganize. See https://rhodesmill.org/brandon/2012/one-sentence-per-line/
+wrap = "keep"
+
+################################################################################
+# LINE ENDINGS
+################################################################################
+
+# end_of_line: Line ending style
+#   "lf"   - Unix-style \n (default)
+#   "crlf" - Windows-style \r\n
+#   "keep" - Preserve existing line endings
+end_of_line = "lf"
+
+################################################################################
+# LIST NUMBERING
+################################################################################
+
+# number: How to number ordered list items
+#   false - Use "1." for all items (default)
+#   true  - Use consecutive numbering (1., 2., 3., ...)
+#
+# Using "1." everywhere is the CommonMark standard approach and makes it easy
+# to reorder items without renumbering.
+# number = false
+
+################################################################################
+# PARSER VALIDATION
+################################################################################
+
+# validate: Validate that formatting doesn't alter document semantics
+#   true  - Parse before and after, ensure they match (default)
+#   false - Skip validation (faster, but riskier)
+#
+# Keep this enabled unless you have performance issues with large documents.
+# validate = true
+
+################################################################################
+# PLUGINS
+################################################################################
+
+# extensions: Enable/disable parser extension plugins
+# By default, all installed extensions are enabled. Uncomment to be explicit:
+# extensions = ["gfm", "frontmatter"]
+
+# codeformatters: Enable/disable code formatter plugins
+# By default, all installed formatters are enabled. Uncomment to limit:
+# codeformatters = []
+
+################################################################################
+# EXCLUSIONS (Python 3.13+ only)
+################################################################################
+
+# exclude: Glob patterns for files to skip
+# This option requires Python 3.13 or later.
+# exclude = [
+#     "node_modules/**",
+#     ".git/**",
+#     "vendor/**",
+# ]

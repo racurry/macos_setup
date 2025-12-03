@@ -35,6 +35,10 @@
       "style": "fenced"
     },
 
+    // MD034/no-bare-urls - Bare URLs without angle brackets (disabled)
+    // Disabled because mdformat strips "redundant" angle brackets, causing conflicts
+    "MD034": false,
+
     // MD060/table-column-style - Table column style (disabled)
     "MD060": false
   },
