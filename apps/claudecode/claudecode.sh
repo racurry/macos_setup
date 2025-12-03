@@ -116,7 +116,7 @@ do_settings() {
 
     local tmp_file
     tmp_file=$(mktemp)
-    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true | .statusLine = {"type": "command", "command": "~/.claude/statuslines/default.py"}' "${settings_file}" >"${tmp_file}"
+    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true | .statusLine = {"type": "command", "command": "~/.claude/statuslines/statusline.py"}' "${settings_file}" >"${tmp_file}"
     mv "${tmp_file}" "${settings_file}"
 
     log_info "Set alwaysThinkingEnabled = true"
