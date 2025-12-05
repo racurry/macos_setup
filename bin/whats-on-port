@@ -1,0 +1,136 @@
+#!/usr/bin/env -S uv run --quiet --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
+
+"""
+Check what process is running on a given port.
+Usage: whats-on-port <port>
+"""
+
+import subprocess
+import sys
+import re
+from typing import Optional
+
+
+def get_processes_on_port(port: int) -> list[dict]:
+    """Get list of processes listening on the specified port."""
+    try:
+        result = subprocess.run(
+            ["lsof", "-i", f":{port}"],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        
+        if result.returncode != 0:
+            return []
+        
+        lines = result.stdout.strip().split("\n")
+        if len(lines) <= 1:
+            return []
+        
+        processes = []
+        for line in lines[1:]:  # Skip header
+            parts = line.split()
+            if len(parts) >= 2:
+                processes.append({
+                    "command": parts[0],
+                    "pid": int(parts[1]),
+                    "user": parts[2] if len(parts) > 2 else "unknown"
+                })
+        
+        return processes
+    except Exception as e:
+        print(f"Error running lsof: {e}", file=sys.stderr)
+        return []
+
+
+def get_process_details(pid: int) -> Optional[dict]:
+    """Get detailed information about a process."""
+    try:
+        result = subprocess.run(
+            ["ps", "-fp", str(pid)],
+            capture_output=True,
+            text=True,
+            check=False
+        )
+        
+        if result.returncode != 0:
+            return None
+        
+        lines = result.stdout.strip().split("\n")
+        if len(lines) <= 1:
+            return None
+        
+        # Parse the process line
+        process_line = lines[1]
+        parts = process_line.split(None, 7)  # Split into max 8 parts
+        
+        if len(parts) < 8:
+            return None
+        
+        return {
+            "pid": int(parts[1]),
+            "ppid": int(parts[2]),
+            "start_time": parts[4],
+            "command": parts[7]
+        }
+    except Exception as e:
+        print(f"Error getting process details for PID {pid}: {e}", file=sys.stderr)
+        return None
+
+
+def format_output(port: int, processes: list[dict], details: dict[int, dict]):
+    """Format and print the output."""
+    if not processes:
+        print(f"No processes found listening on port {port}")
+        return
+    
+    print(f"Port {port} is in use by {len(processes)} process(es):\n")
+    
+    for proc in processes:
+        pid = proc["pid"]
+        print(f"PID: {pid}")
+        print(f"Command: {proc['command']}")
+        print(f"User: {proc['user']}")
+        
+        if pid in details and details[pid]:
+            detail = details[pid]
+            print(f"Parent PID: {detail['ppid']}")
+            print(f"Started: {detail['start_time']}")
+            print(f"Full command: {detail['command']}")
+        
+        print()
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: whats-on-port <port>", file=sys.stderr)
+        sys.exit(1)
+    
+    try:
+        port = int(sys.argv[1])
+        if port < 1 or port > 65535:
+            raise ValueError("Port must be between 1 and 65535")
+    except ValueError as e:
+        print(f"Invalid port: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Get processes on the port
+    processes = get_processes_on_port(port)
+    
+    # Get detailed info for each process
+    details = {}
+    for proc in processes:
+        pid = proc["pid"]
+        details[pid] = get_process_details(pid)
+    
+    # Format and display
+    format_output(port, processes, details)
+
+
+if __name__ == "__main__":
+    main()
