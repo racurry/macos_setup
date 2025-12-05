@@ -16,8 +16,8 @@ brew install claude-code
 
 This configures:
 
-- Links `CLAUDE.global.md` to `~/.claude/CLAUDE.md` (global rules)
-- Links `AGENTS.global.md` to `~/AGENTS.md` (agent instructions)
+- Links `CLAUDE.global.md` to `~/.claude/CLAUDE.md` (Claude-specific rules)
+- Links `apps/_shared/AGENTS.global.md` to `~/AGENTS.md` (shared agent instructions)
 - Syncs commands from `commands/` to `~/.claude/commands/` (individual symlinks)
 - Enables extended thinking and project MCP servers in `settings.json`
 

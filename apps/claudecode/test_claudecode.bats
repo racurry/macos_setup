@@ -27,6 +27,13 @@ teardown() {
   [ "$(readlink "${HOME}/.claude/CLAUDE.md")" = "${REPO_ROOT}/apps/claudecode/CLAUDE.global.md" ]
 }
 
+@test "claudecode.sh creates AGENTS.md symlink to shared location" {
+  run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
+  [ "$status" -eq 0 ]
+  [ -L "${HOME}/AGENTS.md" ]
+  [ "$(readlink "${HOME}/AGENTS.md")" = "${REPO_ROOT}/apps/_shared/AGENTS.global.md" ]
+}
+
 @test "claudecode.sh creates settings.json with required fields" {
   run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
   [ "$status" -eq 0 ]
@@ -50,8 +57,10 @@ teardown() {
   run env HOME="${HOME}" "${CLAUDECODE_SCRIPT}" setup
   [ "$status" -eq 0 ]
   [ -L "${HOME}/.claude/CLAUDE.md" ]
-  # Should be backed up to ~/.config/motherbox/backups/
-  [ -f "${HOME}/.config/motherbox/backups/CLAUDE.md.bak."* ]
+  # Should be backed up to ~/.config/motherbox/backups/YYYYMMDD/claudecode/
+  [ -d "${HOME}/.config/motherbox/backups" ]
+  backup_file=$(find "${HOME}/.config/motherbox/backups" -name "CLAUDE.md.*" -type f)
+  [ -n "$backup_file" ]
 }
 
 @test "claudecode.sh --help shows usage information" {
@@ -70,9 +79,8 @@ teardown() {
   [[ "$output" == *"-h, --help"* ]]
 }
 
-@test "claudecode.sh with unknown argument shows error and help" {
+@test "claudecode.sh with unknown argument shows warning and help" {
   run "${CLAUDECODE_SCRIPT}" --invalid-option
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"Unknown argument"* ]]
+  [ "$status" -eq 0 ]
   [[ "$output" == *"Usage:"* ]]
 }

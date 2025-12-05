@@ -316,6 +316,7 @@ link_file() {
         rm "${dest}"
     elif [[ -e "${dest}" ]]; then
         backup_file "${dest}" "${app_name}"
+        rm "${dest}"
     fi
 
     ln -s "${src}" "${dest}"

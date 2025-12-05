@@ -22,7 +22,7 @@ Commands:
 Description:
     This script creates symbolic links for Claude Code global configuration:
     - apps/claudecode/CLAUDE.global.md -> ~/.claude/CLAUDE.md
-    - apps/claudecode/AGENTS.global.md -> ~/AGENTS.md
+    - apps/_shared/AGENTS.global.md -> ~/AGENTS.md
     - apps/claudecode/commands/* -> ~/.claude/commands/* (each file separately)
     - apps/claudecode/statuslines/* -> ~/.claude/statuslines/* (each file separately)
 EOF
@@ -40,10 +40,10 @@ do_rules() {
     link_file "${claude_global_src}" "${claude_dest}" "claudecode"
 
     # Link AGENTS.global.md to ~/AGENTS.md
-    local agents_global_src="${REPO_ROOT}/apps/claudecode/AGENTS.global.md"
+    local agents_global_src="${REPO_ROOT}/apps/_shared/AGENTS.global.md"
     local agents_dest="${HOME}/AGENTS.md"
     require_file "${agents_global_src}"
-    link_file "${agents_global_src}" "${agents_dest}" "claudecode"
+    link_file "${agents_global_src}" "${agents_dest}" "shared"
 
     log_success "Claude Code rules linked"
 }
