@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [COMMAND] [OPTIONS]
 
 Manage Homebrew installation and package management.
@@ -19,8 +19,8 @@ Commands:
     help        Show this help message (also: -h, --help)
 
 Options:
-    --mode MODE   Set to 'work' or 'personal' to install mode-specific packages
-                  from apps/brew/work.Brewfile or apps/brew/personal.Brewfile
+    --mode MODE   Set to 'galileo' or 'personal' to install mode-specific packages
+                  from apps/brew/galileo.Brewfile or apps/brew/personal.Brewfile
                   in addition to the main apps/brew/Brewfile
     --unattended  Skip prompts, fail if mode unknown
 EOF
@@ -109,34 +109,43 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --mode) shift 2 ;;
-            --unattended) shift ;;
-            help|--help|-h) show_help; exit 0 ;;
-            setup|install|bundle|audit) command="$1"; shift ;;
-            *) log_warn "Ignoring unknown argument: $1"; shift ;;
+        --mode) shift 2 ;;
+        --unattended) shift ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup | install | bundle | audit)
+            command="$1"
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            determine_setup_mode "${args[@]}" || exit 1
-            install_homebrew
-            install_bundle
-            ;;
-        install)
-            install_homebrew
-            ;;
-        bundle)
-            determine_setup_mode "${args[@]}" || exit 1
-            install_bundle
-            ;;
-        audit)
-            "${SCRIPT_DIR}/audit_apps.py"
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        determine_setup_mode "${args[@]}" || exit 1
+        install_homebrew
+        install_bundle
+        ;;
+    install)
+        install_homebrew
+        ;;
+    bundle)
+        determine_setup_mode "${args[@]}" || exit 1
+        install_bundle
+        ;;
+    audit)
+        "${SCRIPT_DIR}/audit_apps.py"
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

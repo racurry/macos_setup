@@ -7,16 +7,29 @@ source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 # Paths used by this script
 PATH_DOCUMENTS="${HOME}/Documents"
+PATH_WORKSPACE="${HOME}/workspace"
 
 show_help() {
-    cat << EOF
-Usage: $0 [COMMAND]
+    cat <<EOF
+Usage: $0 [COMMAND] [OPTIONS]
 
-Create organizational folder structure in Documents directory.
+Create organizational folder structure.
 
 Commands:
     setup       Run full setup (primary entry point)
     help        Show this help message (also: -h, --help)
+
+Options:
+    --mode MODE     Set mode to 'galileo' or 'personal'
+    --unattended    Skip prompts, fail if mode unknown
+
+Folders created in ${PATH_WORKSPACE}:
+    infra           Infrastructure projects (including this repo)
+    sandbox         Experimental/throwaway projects
+
+Additional folders created in galileo mode:
+    galileo/        Galileo work projects
+    galileo/sandbox Galileo experimental projects
 
 Folders created in ${PATH_DOCUMENTS}:
     @auto           Automated/scripted content
@@ -34,18 +47,44 @@ Examples:
 EOF
 }
 
+ensure_folder() {
+    local target="$1"
+    if [[ -d "${target}" ]]; then
+        log_info "Folder already exists: ${target}"
+    else
+        log_info "Creating folder: ${target}"
+        mkdir -p "${target}"
+    fi
+}
+
 do_setup() {
     print_heading "Make folders how I like em"
 
-    log_info "Parent directory: ${PATH_DOCUMENTS}"
+    # Workspace folders (always created)
+    log_info "Creating workspace folders in ${PATH_WORKSPACE}"
+    local workspace_folders=(
+        "infra"
+        "sandbox"
+    )
+    for folder in "${workspace_folders[@]}"; do
+        ensure_folder "${PATH_WORKSPACE}/${folder}"
+    done
 
-    # Create parent directory if needed
-    if [[ ! -d "${PATH_DOCUMENTS}" ]]; then
-        log_info "Creating parent directory: ${PATH_DOCUMENTS}"
-        mkdir -p "${PATH_DOCUMENTS}"
+    # Galileo-specific workspace folders
+    if [[ "${SETUP_MODE}" == "galileo" ]]; then
+        log_info "Creating galileo workspace folders"
+        local galileo_folders=(
+            "galileo"
+            "galileo/sandbox"
+        )
+        for folder in "${galileo_folders[@]}"; do
+            ensure_folder "${PATH_WORKSPACE}/${folder}"
+        done
     fi
 
-    local folders=(
+    # Documents folders
+    log_info "Creating documents folders in ${PATH_DOCUMENTS}"
+    local documents_folders=(
         "@auto"
         "000_Inbox"
         "100_Life"
@@ -56,16 +95,8 @@ do_setup() {
         "800_Posterity"
         "999_Meta"
     )
-
-    local folder target
-    for folder in "${folders[@]}"; do
-        target="${PATH_DOCUMENTS}/${folder}"
-        if [[ -d "${target}" ]]; then
-            log_info "Folder already exists: ${target}"
-        else
-            log_info "Creating folder: ${target}"
-            mkdir -p "${target}"
-        fi
+    for folder in "${documents_folders[@]}"; do
+        ensure_folder "${PATH_DOCUMENTS}/${folder}"
     done
 
     log_info "Created the folders we like"
@@ -73,32 +104,36 @@ do_setup() {
 
 main() {
     local command=""
+    local args=("$@")
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="$1"
-                shift
-                ;;
-            *)
-                log_warn "Ignoring unknown argument: $1"
-                shift
-                ;;
+        --mode) shift 2 ;;
+        --unattended) shift ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="$1"
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            do_setup
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        determine_setup_mode "${args[@]}" || exit 1
+        do_setup
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

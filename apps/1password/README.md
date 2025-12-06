@@ -9,10 +9,10 @@ Password manager with built-in SSH agent. [Official docs](https://developer.1pas
 ## Setup
 
 ```bash
-./apps/1password/1password.sh setup --mode personal  # or --mode work
+./apps/1password/1password.sh setup --mode personal  # or --mode galileo
 ```
 
-This symlinks the appropriate SSH agent config (`agent.personal.toml` or `agent.work.toml`) to `~/.config/1password/ssh/agent.toml`.
+This symlinks the appropriate SSH agent config (`agent.personal.toml` or `agent.galileo.toml`) to `~/.config/1password/ssh/agent.toml`.
 
 ## Manual Setup
 

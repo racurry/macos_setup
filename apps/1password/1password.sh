@@ -1,6 +1,6 @@
 #!/bin/bash
 # 1Password SSH agent configuration
-# Copies the appropriate agent.toml based on mode (work or personal)
+# Copies the appropriate agent.toml based on mode (galileo or personal)
 
 set -euo pipefail
 
@@ -13,7 +13,7 @@ CONFIG_DIR="${HOME}/.config/1password/ssh"
 AGENT_TOML="${CONFIG_DIR}/agent.toml"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $(basename "$0") [COMMAND] [OPTIONS]
 
 Configure 1Password SSH agent.
@@ -24,7 +24,7 @@ Commands:
     help        Show this help message (also: -h, --help)
 
 Options:
-    --mode MODE     Set mode to 'work' or 'personal'
+    --mode MODE     Set mode to 'galileo' or 'personal'
     --unattended    Skip prompts, fail if mode unknown
 EOF
 }
@@ -59,26 +59,35 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --mode) shift 2 ;;
-            --unattended) shift ;;
-            help|--help|-h) show_help; exit 0 ;;
-            setup|show) command="$1"; shift ;;
-            *) log_warn "Ignoring unknown argument: $1"; shift ;;
+        --mode) shift 2 ;;
+        --unattended) shift ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup | show)
+            command="$1"
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            determine_setup_mode "${args[@]}" || exit 1
-            do_setup
-            ;;
-        show)
-            do_show
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        determine_setup_mode "${args[@]}" || exit 1
+        do_setup
+        ;;
+    show)
+        do_show
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

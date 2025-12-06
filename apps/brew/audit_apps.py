@@ -11,7 +11,7 @@ from datetime import datetime
 
 def check_dependencies():
     """Check that required commands are available."""
-    required_commands = ['brew', 'mas', 'code']
+    required_commands = ["brew", "mas", "code"]
     for cmd in required_commands:
         if not shutil.which(cmd):
             print(f"{cmd} command is required", file=sys.stderr)
@@ -37,7 +37,7 @@ def parse_brewfile(path: pathlib.Path):
 
     for line in path.read_text().splitlines():
         line = line.strip()
-        if not line or line.startswith('#'):
+        if not line or line.startswith("#"):
             continue
 
         m = brew_pattern.match(line)
@@ -93,19 +93,19 @@ def format_items(items, formatter):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Audit installed applications against Brewfile manifests.',
+        description="Audit installed applications against Brewfile manifests.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='''
+        epilog="""
 This script compares installed packages (brew formulas, casks, and Mac App Store apps)
 against the declared packages in Brewfile manifests. It generates a markdown report at
 .tmp/APP_AUDIT.md with the following information:
 
   - Installed packages not tracked in any Brewfile (consider adding or uninstalling)
   - Declared packages not installed (install or remove from Brewfile)
-  - Status of optional Brewfile entries (work.Brewfile, personal.Brewfile)
+  - Status of optional Brewfile entries (galileo.Brewfile, personal.Brewfile)
 
 Required commands: brew, mas
-        '''
+        """,
     )
     parser.parse_args()
 
@@ -117,7 +117,7 @@ Required commands: brew, mas
     audit_path = tmp_dir / "APP_AUDIT.md"
     brewfile = repo_root / "apps" / "brew" / "Brewfile"
     optional_personal = repo_root / "apps" / "brew" / "personal.Brewfile"
-    optional_work = repo_root / "apps" / "brew" / "work.Brewfile"
+    optional_work = repo_root / "apps" / "brew" / "galileo.Brewfile"
 
     if not brewfile.exists():
         raise SystemExit(f"Missing Brewfile at {brewfile}")
@@ -153,7 +153,7 @@ Required commands: brew, mas
         if len(parts) < 2:
             continue
         app_id, rest = parts
-        name = rest.rsplit('(', 1)[0].rstrip()
+        name = rest.rsplit("(", 1)[0].rstrip()
         mas_installed[name] = app_id
 
     # Get installed VSCode extensions

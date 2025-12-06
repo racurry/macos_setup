@@ -8,7 +8,7 @@ Package manager for macOS with Brewfile definitions.
 - `brew.sh` - Setup script for Homebrew and bundle installation
 - `Brewfile` - Main Brewfile with common packages
 - `personal.Brewfile` - Personal machine packages
-- `work.Brewfile` - Work machine packages
+- `galileo.Brewfile` - Galileo work machine packages
 
 ## Setup
 

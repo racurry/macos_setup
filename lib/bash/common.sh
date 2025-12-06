@@ -403,7 +403,7 @@ link_xdg_config() {
 ################################################################################
 #                            SETUP MODE
 ################################################################################
-# Determines and manages the setup mode (work/personal) for the system.
+# Determines and manages the setup mode (galileo/personal) for the system.
 # Mode can come from: command-line flag > config file > interactive prompt.
 #
 # Functions:
@@ -421,15 +421,15 @@ link_xdg_config() {
 prompt_setup_mode() {
     print_heading "Setup Mode Selection"
     echo "Please select your setup mode:"
-    echo "  1) work     - Install work-specific tools & settings"
+    echo "  1) galileo  - Install Galileo work-specific tools & settings"
     echo "  2) personal - Install personal-specific tools & settings"
     echo ""
 
     while true; do
         read -rp "Enter your choice (1 or 2): " choice
         case $choice in
-        1 | work)
-            SETUP_MODE="work"
+        1 | galileo)
+            SETUP_MODE="galileo"
             break
             ;;
         2 | personal)
@@ -437,7 +437,7 @@ prompt_setup_mode() {
             break
             ;;
         *)
-            echo "Invalid choice. Please enter 1 (work) or 2 (personal)"
+            echo "Invalid choice. Please enter 1 (galileo) or 2 (personal)"
             ;;
         esac
     done

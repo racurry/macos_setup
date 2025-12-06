@@ -18,7 +18,7 @@ applications, and system settings.
 OPTIONS:
   --unattended     Skip operations requiring human interaction
   --reset-mode     Ignore saved mode and prompt for selection
-  --mode MODE      Set mode directly (work or personal)
+  --mode MODE      Set mode directly (galileo or personal)
   -h, --help       Show this help message and exit
 
 CONFIGURATION:
