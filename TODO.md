@@ -23,8 +23,6 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
 - [ ] Add a github action to periodically check for the latest asdf runtimes
 - [ ] Fix the sudo check - i actually want to just do it once for setup
-- [x] Replace mode with actual workplace checks?  'galileo' (DONE: renamed 'work' mode to 'galileo')
-- [ ] Define a global package set for uv tools, add to uv script (i have one used somewhere, i forget where)
 - [ ] Add default opinionated configs for all linters
 - [ ] Get mcp logic set up for gemini, codex
 

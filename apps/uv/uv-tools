@@ -1,0 +1,10 @@
+# UV global tools manifest
+# Format: tool "package[@version]" [--with dep1] [--with dep2] ...
+#
+# Examples:
+#   tool "ruff"
+#   tool "black@24.0.0"
+#   tool "mdformat" --with mdformat-gfm --with mdformat-frontmatter
+
+# Markdown formatting with GFM and frontmatter support
+tool "mdformat" --with mdformat-gfm --with mdformat-frontmatter
