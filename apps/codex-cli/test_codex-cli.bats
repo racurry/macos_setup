@@ -8,7 +8,7 @@ setup() {
   export HOME="${TEST_TMPDIR}/home"
   mkdir -p "${HOME}"
 
-  CODEX_SCRIPT="${BATS_TEST_DIRNAME}/codex.sh"
+  CODEX_SCRIPT="${BATS_TEST_DIRNAME}/codex-cli.sh"
 }
 
 teardown() {

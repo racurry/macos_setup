@@ -127,7 +127,7 @@ do_settings() {
 }
 
 do_setup() {
-    ensure_brew_package claude claude-code
+    ensure_brew_package claude claude-code cask
 
     do_rules
     do_commands

@@ -46,6 +46,9 @@ source_brew_plugin "share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"  
 
 unset -f source_brew_plugin
 
+# Only auto-update Homebrew once per day (86400 seconds)
+export HOMEBREW_AUTO_UPDATE_SECS=86400
+
 # Initialize direnv if available
 if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"

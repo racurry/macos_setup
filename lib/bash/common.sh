@@ -158,7 +158,7 @@ set_config() {
 #   require_directory <path>           - Ensure directory exists
 #   check_rosetta                      - Check if Rosetta 2 is running (returns 0/1)
 #   require_rosetta                    - Ensure Rosetta 2 is installed
-#   ensure_brew_package <cmd> <pkg>    - Install brew package if command missing
+#   ensure_brew_package <cmd> [pkg] [type] - Install brew package if cmd missing
 ################################################################################
 
 require_command() {
@@ -198,13 +198,14 @@ require_rosetta() {
 }
 
 # ensure_brew_package installs a Homebrew package if the command is not found.
-# Usage: ensure_brew_package <command> <package>
+# Usage: ensure_brew_package <command> [package] [type]
 #   <command> - The CLI command to check for (e.g., "claude")
-#   <package> - The Homebrew package to install (e.g., "claude-code")
-# If package is omitted, assumes package name matches command name.
+#   [package] - The Homebrew package to install (default: same as command)
+#   [type]    - Package type: "cask", "formula", or omit for auto-detect
 ensure_brew_package() {
     local cmd="$1"
     local pkg="${2:-$1}"
+    local pkg_type="${3:-}"
 
     if command -v "${cmd}" &>/dev/null; then
         return 0
@@ -212,7 +213,18 @@ ensure_brew_package() {
 
     print_heading "Installing ${pkg}"
     require_command brew
-    brew install "${pkg}"
+
+    case "${pkg_type}" in
+    cask)
+        brew install --cask "${pkg}"
+        ;;
+    formula)
+        brew install --formula "${pkg}"
+        ;;
+    *)
+        brew install "${pkg}"
+        ;;
+    esac
 }
 
 ################################################################################

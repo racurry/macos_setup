@@ -11,7 +11,7 @@ brew install --cask codex
 ## Setup
 
 ```bash
-./apps/codex-cli/codex.sh setup
+./apps/codex-cli/codex-cli.sh setup
 ```
 
 This configures:

@@ -35,13 +35,13 @@ do_rules() {
 }
 
 do_setup() {
-    ensure_brew_cask codex
+    ensure_brew_package codex codex cask
 
     do_rules
 
     cat <<EOF
 
-${GREEN}Codex CLI setup complete!${RESET}
+${CLR_SUCCESS}Codex CLI setup complete!${CLR_RESET}
 
 Next steps:
   1. Run 'codex' to authenticate with your OpenAI account
