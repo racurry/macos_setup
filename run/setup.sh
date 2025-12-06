@@ -137,3 +137,5 @@ run_app_setup ruff
 
 print_heading "Application Settings"
 run_app_setup claudecode
+run_app_setup gemini-cli
+run_app_setup codex

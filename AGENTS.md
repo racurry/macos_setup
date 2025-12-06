@@ -43,6 +43,7 @@ When writing scripts:
   - No arguments should show help text
 - Bash scripts should source lib/bash/common.sh for shared utilities
 - Non-bash scripts should be executable with appropriate shebang (#!/usr/bin/env python3, etc.)
+- ALWAYS run new scripts after creating them to verify they work
 
 When writing tests:
 

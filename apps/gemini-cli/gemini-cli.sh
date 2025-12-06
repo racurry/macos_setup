@@ -41,7 +41,7 @@ do_setup() {
 
     cat <<EOF
 
-${GREEN}Gemini CLI setup complete!${RESET}
+${CLR_SUCCESS}Gemini CLI setup complete!${CLR_RESET}
 
 Next steps:
   1. Run 'gemini' to authenticate with your Google account
