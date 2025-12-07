@@ -48,6 +48,7 @@ unset -f source_brew_plugin
 
 # Only auto-update Homebrew once per day (86400 seconds)
 export HOMEBREW_AUTO_UPDATE_SECS=86400
+export HOMEBREW_NO_ENV_HINTS=1
 
 # Initialize direnv if available
 if command -v direnv >/dev/null 2>&1; then
