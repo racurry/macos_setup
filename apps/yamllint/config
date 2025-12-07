@@ -1,0 +1,72 @@
+# yamllint configuration
+# See: https://yamllint.readthedocs.io/en/stable/rules.html
+
+extends: default
+
+yaml-files:
+  - "*.yaml"
+  - "*.yml"
+  - ".yamllint"
+
+# Ignore patterns (gitignore style)
+ignore: |
+  .git/
+  node_modules/
+  vendor/
+  .venv/
+  venv/
+  dist/
+  build/
+
+rules:
+  # Line length - allow longer lines for readability
+  line-length:
+    max: 300
+    level: warning
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+
+  # Document markers - don't require explicit document start/end
+  document-start: disable
+  document-end: disable
+
+  # Indentation - enforce 2 spaces
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+
+  # Truthy values - warn on ambiguous booleans like yes/no/on/off
+  # Allow "on" for GitHub Actions workflow triggers (on: push, on: pull_request)
+  truthy:
+    level: warning
+    allowed-values:
+      - "true"
+      - "false"
+      - "on"
+
+  # Comments - require space after #
+  comments:
+    require-starting-space: true
+    ignore-shebangs: true
+    min-spaces-from-content: 1
+
+  # Braces - allow compact inline mappings
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
+
+  # Brackets - allow compact inline sequences
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: 0
+    max-spaces-inside-empty: 0
+
+  # Empty lines - allow up to 2 consecutive blank lines
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1

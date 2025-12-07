@@ -408,4 +408,14 @@
   //     }
   //   }
   // ]
+
+  // YAML files - use a more reasonable line width than the global 9999
+  "overrides": [
+    {
+      "files": ["*.yaml", "*.yml"],
+      "options": {
+        "printWidth": 300
+      }
+    }
+  ]
 }
