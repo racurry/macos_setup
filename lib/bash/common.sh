@@ -534,6 +534,54 @@ determine_setup_mode() {
 }
 
 ################################################################################
+#                         ARGUMENT PARSING HELPERS
+################################################################################
+# Helpers for parsing command-line arguments consistently across scripts.
+#
+# Functions:
+#   check_global_flag "$@" - Check if arg is a known global flag
+#                           Returns 0 and echoes shift count if recognized
+#                           Returns 1 if not a global flag
+#
+# Global flags recognized by run/setup.sh and passed to all scripts:
+#   --mode MODE      Setup mode (galileo/personal)
+#   --reset-mode     Reset saved mode
+#   --unattended     Skip interactive operations
+#   --debug          Enable debug output
+#   --logging        Enable file logging
+################################################################################
+
+# check_global_flag determines if an argument is a known global flag.
+# Returns 0 and outputs shift count if recognized, returns 1 otherwise.
+# Usage:
+#   if shift_count=$(check_global_flag "$@"); then
+#       shift $shift_count
+#   else
+#       # handle unknown arg
+#   fi
+check_global_flag() {
+    case $1 in
+    --mode)
+        # Flag takes a value, consume both
+        if [[ $# -ge 2 ]]; then
+            echo 2
+        else
+            echo 1
+        fi
+        return 0
+        ;;
+    --reset-mode | --unattended | --debug | --logging)
+        # Boolean flags, consume one arg
+        echo 1
+        return 0
+        ;;
+    *)
+        return 1
+        ;;
+    esac
+}
+
+################################################################################
 #                               EXPORTS
 ################################################################################
 

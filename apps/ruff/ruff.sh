@@ -35,29 +35,34 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help | --help | -h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="$1"
-                shift
-                ;;
-            *)
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="$1"
+            shift
+            ;;
+        *)
+            # Check if it's a global flag from run/setup.sh
+            if shift_count=$(check_global_flag "$@"); then
+                shift "$shift_count"
+            else
                 log_warn "Ignoring unknown argument: $1"
                 shift
-                ;;
+            fi
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            setup_ruff_config
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        setup_ruff_config
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

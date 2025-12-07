@@ -60,8 +60,13 @@ main() {
             exit 0
             ;;
         *)
-            log_warn "Ignoring unknown argument: $1"
-            shift
+            # Check if it's a global flag from run/setup.sh
+            if shift_count=$(check_global_flag "$@"); then
+                shift "$shift_count"
+            else
+                log_warn "Ignoring unknown argument: $1"
+                shift
+            fi
             ;;
         esac
     done

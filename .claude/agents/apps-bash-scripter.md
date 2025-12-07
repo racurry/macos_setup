@@ -69,6 +69,7 @@ From the conventions table in `docs/apps/bash_scripting.md`:
 - Use `fail` function for error handling (not `echo` + `exit`)
 - Use `$REPO_ROOT` for all repository paths (not relative paths)
 - Use `--flag value` format (not `--flag=value`)
+- Use `check_global_flag()` in default case to handle global flags from `run/setup.sh`
 
 ### 5. Use Available Functions
 
@@ -77,6 +78,7 @@ Reference the functions table in `docs/apps/bash_scripting.md` for:
 - **Output:** `print_heading`, `log_info`, `log_warn`, `log_success`
 - **Guards:** `require_command`, `require_file`, `require_directory`
 - **Deployment:** `link_file`, `copy_file`
+- **Argument parsing:** `check_global_flag` - Handles global flags passed from `run/setup.sh`
 
 Use path variables from `common.sh`:
 
@@ -84,6 +86,8 @@ Use path variables from `common.sh`:
 - `$PATH_MOTHERBOX_CONFIG` - User config directory
 - `$PATH_MOTHERBOX_CONFIG_FILE` - Config file path
 - `$PATH_MOTHERBOX_BACKUPS` - Backup directory
+
+**Global flag handling:** Scripts receive flags like `--mode`, `--unattended`, `--debug`, and `--logging` from `run/setup.sh`. Always use `check_global_flag()` in the default case of argument parsing to consume these silently. This prevents warnings about known pass-through flags while still alerting on truly unknown arguments.
 
 ### 6. Handle Configuration Settings
 

@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $(basename "$0") <command>
 
 Symlink shellcheckrc from apps/shellcheck/ to ~/.config/shellcheckrc
@@ -46,29 +46,34 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            setup)
-                command="setup"
-                shift
-                ;;
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            *)
+        setup)
+            command="setup"
+            shift
+            ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        *)
+            # Check if it's a global flag from run/setup.sh
+            if shift_count=$(check_global_flag "$@"); then
+                shift "$shift_count"
+            else
                 log_warn "Ignoring unknown argument: $1"
                 shift
-                ;;
+            fi
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            setup_shellcheck_config
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        setup_shellcheck_config
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

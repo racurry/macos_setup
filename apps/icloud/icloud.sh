@@ -16,7 +16,7 @@ DIAG_STATUS_FILE=""
 DIAG_LOG_FILE=""
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $0 COMMAND [OPTIONS]
 
 Manage iCloud Drive symlink and diagnose sync issues.
@@ -138,12 +138,18 @@ diag_status() {
 
     print_heading "Quick counters from status"
     {
-        printf "Uploading:   "; grep -Eic 'upload(ing| pending)?' "${DIAG_STATUS_FILE}" || echo "0"
-        printf "Downloading: "; grep -Eic 'download(ing| pending)?' "${DIAG_STATUS_FILE}" || echo "0"
-        printf "Conflicts:   "; grep -Eic 'conflict' "${DIAG_STATUS_FILE}" || echo "0"
-        printf "Errors:      "; grep -Eic 'error|failed|denied|forbidden|nospace|quota' "${DIAG_STATUS_FILE}" || echo "0"
-        printf "Evicted:     "; grep -Eic 'evict(ed)?' "${DIAG_STATUS_FILE}" || echo "0"
-        printf "Waiting:     "; grep -Eic 'waiting|queued|pending' "${DIAG_STATUS_FILE}" || echo "0"
+        printf "Uploading:   "
+        grep -Eic 'upload(ing| pending)?' "${DIAG_STATUS_FILE}" || echo "0"
+        printf "Downloading: "
+        grep -Eic 'download(ing| pending)?' "${DIAG_STATUS_FILE}" || echo "0"
+        printf "Conflicts:   "
+        grep -Eic 'conflict' "${DIAG_STATUS_FILE}" || echo "0"
+        printf "Errors:      "
+        grep -Eic 'error|failed|denied|forbidden|nospace|quota' "${DIAG_STATUS_FILE}" || echo "0"
+        printf "Evicted:     "
+        grep -Eic 'evict(ed)?' "${DIAG_STATUS_FILE}" || echo "0"
+        printf "Waiting:     "
+        grep -Eic 'waiting|queued|pending' "${DIAG_STATUS_FILE}" || echo "0"
     } | column -t
 }
 
@@ -151,10 +157,10 @@ diag_logs() {
     [[ ! -x "${BRCTL}" ]] && return 0
 
     print_heading "Recent CloudDocs log (last ~500 lines, error-filtered)"
-    "${BRCTL}" log --shorten 2>&1 | tail -n 500 > "${DIAG_LOG_FILE}" || true
+    "${BRCTL}" log --shorten 2>&1 | tail -n 500 >"${DIAG_LOG_FILE}" || true
 
-    if ! grep -Ei 'error|fail|denied|forbidden|quota|nospace|timeout|unreachable|auth' "${DIAG_LOG_FILE}" \
-        | sed 's/^/  * /'; then
+    if ! grep -Ei 'error|fail|denied|forbidden|quota|nospace|timeout|unreachable|auth' "${DIAG_LOG_FILE}" |
+        sed 's/^/  * /'; then
         log_info "No obvious errors in recent brctl log"
     fi
 }
@@ -173,11 +179,11 @@ diag_problem_files() {
     done < <(
         awk '
             match($0, /\/Users\/[^ ]*\/Library\/Mobile Documents\/com~apple~CloudDocs\/[^ ]+/, m) { print m[0] }
-        ' "${DIAG_STATUS_FILE}" "${DIAG_LOG_FILE}" 2>/dev/null \
-        | sed 's/\\ / /g' \
-        | sed 's/^.*com~apple~CloudDocs\///' \
-        | sed "s|^|${PATH_ICLOUD_MOBILE_DOCUMENTS}/|" \
-        | sort -u
+        ' "${DIAG_STATUS_FILE}" "${DIAG_LOG_FILE}" 2>/dev/null |
+            sed 's/\\ / /g' |
+            sed 's/^.*com~apple~CloudDocs\///' |
+            sed "s|^|${PATH_ICLOUD_MOBILE_DOCUMENTS}/|" |
+            sort -u
     )
 
     if [[ "${found_files}" == "false" ]]; then
@@ -191,11 +197,11 @@ diag_filename_sanity() {
     print_heading "Filename / path sanity checks (common iCloud gotchas)"
 
     log_info "Checking for very long names (> 200 chars):"
-    find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f -print0 2>/dev/null \
-        | while IFS= read -r -d '' f; do
+    find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f -print0 2>/dev/null |
+        while IFS= read -r -d '' f; do
             base="$(basename "$f")"
             [[ ${#base} -gt 200 ]] && echo "  * $f"
-          done || true
+        done || true
 
     log_info "Checking for suspicious temp/cache artifacts:"
     find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f \
@@ -203,12 +209,12 @@ diag_filename_sanity() {
         -print 2>/dev/null | sed 's/^/  * /' || true
 
     log_info "Checking for huge files (> 15 GB) that can stall uploads:"
-    find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f -size +15G -print 2>/dev/null \
-        | sed 's/^/  * /' || true
+    find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f -size +15G -print 2>/dev/null |
+        sed 's/^/  * /' || true
 
     log_info "Checking for files not yet downloaded locally (*.icloud stubs):"
-    find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f -name "*.icloud" -print 2>/dev/null \
-        | sed 's/^/  * /' || true
+    find "${PATH_ICLOUD_MOBILE_DOCUMENTS}" -type f -name "*.icloud" -print 2>/dev/null |
+        sed 's/^/  * /' || true
 }
 
 diag_permissions() {
@@ -221,7 +227,7 @@ diag_permissions() {
 
 diag_remediation_tips() {
     print_heading "If things look stuck (safe actions)"
-    cat << 'EOF'
+    cat <<'EOF'
 1) Restart iCloud agents (safe):
    killall bird cloudd 2>/dev/null; sleep 2; open -R "$HOME/Library/Mobile Documents/com~apple~CloudDocs"
 
@@ -263,44 +269,44 @@ do_diagnose() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --all)
-                run_all=true
-                shift
-                ;;
-            --processes)
-                run_all=false
-                run_processes=true
-                shift
-                ;;
-            --status)
-                run_all=false
-                run_status=true
-                shift
-                ;;
-            --logs)
-                run_all=false
-                run_logs=true
-                shift
-                ;;
-            --files)
-                run_all=false
-                run_files=true
-                shift
-                ;;
-            --permissions)
-                run_all=false
-                run_permissions=true
-                shift
-                ;;
-            --tips)
-                run_all=false
-                run_tips=true
-                shift
-                ;;
-            *)
-                log_warn "Ignoring unknown argument: $1"
-                shift
-                ;;
+        --all)
+            run_all=true
+            shift
+            ;;
+        --processes)
+            run_all=false
+            run_processes=true
+            shift
+            ;;
+        --status)
+            run_all=false
+            run_status=true
+            shift
+            ;;
+        --logs)
+            run_all=false
+            run_logs=true
+            shift
+            ;;
+        --files)
+            run_all=false
+            run_files=true
+            shift
+            ;;
+        --permissions)
+            run_all=false
+            run_permissions=true
+            shift
+            ;;
+        --tips)
+            run_all=false
+            run_tips=true
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
@@ -315,7 +321,12 @@ do_diagnose() {
         [[ "${run_processes}" == "true" ]] && diag_processes
         [[ "${run_status}" == "true" ]] && diag_status
         [[ "${run_logs}" == "true" ]] && diag_logs
-        [[ "${run_files}" == "true" ]] && { diag_status >/dev/null 2>&1 || true; diag_logs >/dev/null 2>&1 || true; diag_problem_files; diag_filename_sanity; }
+        [[ "${run_files}" == "true" ]] && {
+            diag_status >/dev/null 2>&1 || true
+            diag_logs >/dev/null 2>&1 || true
+            diag_problem_files
+            diag_filename_sanity
+        }
         [[ "${run_permissions}" == "true" ]] && diag_permissions
         [[ "${run_tips}" == "true" ]] && diag_remediation_tips
 
@@ -332,39 +343,44 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="setup"
-                shift
-                ;;
-            diagnose)
-                command="diagnose"
-                shift
-                # Collect remaining args for diagnose
-                diagnose_args=("$@")
-                break
-                ;;
-            *)
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="setup"
+            shift
+            ;;
+        diagnose)
+            command="diagnose"
+            shift
+            # Collect remaining args for diagnose
+            diagnose_args=("$@")
+            break
+            ;;
+        *)
+            # Check if it's a global flag from run/setup.sh
+            if shift_count=$(check_global_flag "$@"); then
+                shift "$shift_count"
+            else
                 log_warn "Ignoring unknown argument: $1"
                 shift
-                ;;
+            fi
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            do_setup
-            ;;
-        diagnose)
-            do_diagnose "${diagnose_args[@]}"
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        do_setup
+        ;;
+    diagnose)
+        do_diagnose "${diagnose_args[@]}"
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 

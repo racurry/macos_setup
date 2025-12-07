@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../../lib/bash/common.sh"
 
 show_help() {
-    cat << EOF
+    cat <<EOF
 Usage: $(basename "$0") [COMMAND]
 
 Install Oh My Zsh shell framework if not already present.
@@ -35,8 +35,7 @@ do_setup() {
 
     log_info "Installing Oh My Zsh"
     if RUNZSH=no KEEP_ZSHRC=yes CHSH=no \
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null
-    then
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" >/dev/null; then
         log_info "Oh My Zsh installed. Open a new shell session to pick it up."
     else
         fail "Oh My Zsh installer failed"
@@ -48,29 +47,34 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            help|--help|-h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="$1"
-                shift
-                ;;
-            *)
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="$1"
+            shift
+            ;;
+        *)
+            # Check if it's a global flag from run/setup.sh
+            if shift_count=$(check_global_flag "$@"); then
+                shift "$shift_count"
+            else
                 log_warn "Ignoring unknown argument: $1"
                 shift
-                ;;
+            fi
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            do_setup
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        do_setup
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 
