@@ -36,19 +36,8 @@ do_rules() {
 
 do_setup() {
     ensure_brew_package codex codex cask
-
     do_rules
-
-    cat <<EOF
-
-${CLR_SUCCESS}Codex CLI setup complete!${CLR_RESET}
-
-Next steps:
-  1. Run 'codex' to authenticate with your OpenAI account
-     (requires ChatGPT Plus, Pro, Team, Edu, or Enterprise plan)
-  2. Configure as needed in ~/.codex/config.toml
-
-EOF
+    log_success "Codex CLI setup complete"
 }
 
 main() {

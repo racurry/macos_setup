@@ -36,19 +36,8 @@ do_rules() {
 
 do_setup() {
     ensure_brew_package gemini-cli
-
     do_rules
-
-    cat <<EOF
-
-${CLR_SUCCESS}Gemini CLI setup complete!${CLR_RESET}
-
-Next steps:
-  1. Run 'gemini' to authenticate with your Google account
-     (free tier: 60 requests/min with personal Google account)
-  2. Configure as needed in ~/.gemini/settings.json
-
-EOF
+    log_success "Gemini CLI setup complete"
 }
 
 main() {

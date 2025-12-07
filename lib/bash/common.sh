@@ -27,11 +27,23 @@ PATH_MOTHERBOX_BACKUPS="${PATH_MOTHERBOX_CONFIG}/backups"
 #   log_warn <message>     - Yellow warning (stderr)
 #   log_error <message>    - Red error (stderr)
 #   log_success <message>  - Green success message
+#   log_debug <message>    - Purple debug message
 #   fail <message>         - Log error and exit 1
 #   print_heading <text>   - Cyan section heading
+#
+# Configuration:
+#   LOG_FILE         - Path for log file (default: ~/.config/motherbox/setup.log)
+#   LOG_FILE_ENABLED - Set to "true" to enable file logging
+#   LOG_DEBUG        - Set to "true" to enable debug output to console
+#   UNATTENDED       - Set to "true" to skip interactive operations
 ################################################################################
 
-LOG_TAG="setup"
+# Global configuration defaults (only set if not already defined)
+: "${LOG_TAG:=}"
+: "${LOG_FILE:=${HOME}/.config/motherbox/setup.log}"
+: "${LOG_FILE_ENABLED:=false}"
+: "${LOG_DEBUG:=false}"
+: "${UNATTENDED:=false}"
 
 # Color codes for readability.
 CLR_RESET=$'\033[0m'      # reset / default
@@ -41,21 +53,40 @@ CLR_ERROR=$'\033[1;31m'   # bright red for errors
 CLR_SUCCESS=$'\033[1;32m' # bright green for success messages
 CLR_BOLD=$'\033[1m'       # bold text
 CLR_CYAN=$'\033[1;36m'    # bright cyan for headings
+CLR_DEBUG=$'\033[1;35m'   # bright magenta/purple for debug messages
+
+# Internal helper to write to log file if enabled
+_log_to_file() {
+    if [[ "${LOG_FILE_ENABLED}" == "true" ]]; then
+        printf "[%s] %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >>"${LOG_FILE}"
+    fi
+}
 
 log_info() {
     printf "%s[%s] %s%s\n" "${CLR_INFO}" "${LOG_TAG}" "$*" "${CLR_RESET}"
+    _log_to_file "[INFO] $*"
 }
 
 log_warn() {
     printf "%s[%s] %s%s\n" "${CLR_WARN}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
+    _log_to_file "[WARN] $*"
 }
 
 log_error() {
     printf "%s[%s] %s%s\n" "${CLR_ERROR}" "${LOG_TAG}" "$*" "${CLR_RESET}" >&2
+    _log_to_file "[ERROR] $*"
 }
 
 log_success() {
     printf "%s[%s] %s%s\n" "${CLR_SUCCESS}" "${LOG_TAG}" "$*" "${CLR_RESET}"
+    _log_to_file "[SUCCESS] $*"
+}
+
+log_debug() {
+    if [[ "${LOG_DEBUG}" == "true" ]]; then
+        printf "%s[%s] %s%s\n" "${CLR_DEBUG}" "${LOG_TAG}" "$*" "${CLR_RESET}"
+    fi
+    _log_to_file "[DEBUG] $*"
 }
 
 fail() {
@@ -66,6 +97,7 @@ fail() {
 print_heading() {
     local text="$1"
     printf "\n\033[1;36m==> %s\033[0m\n" "$text"
+    _log_to_file "==> $text"
 }
 
 ################################################################################

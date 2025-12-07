@@ -41,8 +41,6 @@ do_setup() {
     link_file "${source_file}" "${AGENT_TOML}" "1password"
 
     log_success "1Password SSH agent configured"
-    echo ""
-    cat "${AGENT_TOML}"
 }
 
 do_show() {

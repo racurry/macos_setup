@@ -19,6 +19,8 @@ OPTIONS:
   --unattended     Skip operations requiring human interaction
   --reset-mode     Ignore saved mode and prompt for selection
   --mode MODE      Set mode directly (galileo or personal)
+  --debug          Enable debug output
+  --logging        Enable logging to ~/.config/motherbox/setup.log
   -h, --help       Show this help message and exit
 
 CONFIGURATION:
@@ -29,7 +31,7 @@ EXAMPLES:
   ./run/setup.sh
 
   # Override saved mode, persist new mode
-  ./run/setup.sh --mode work
+  ./run/setup.sh --mode galileo
 
   # Non-interactive setup (skip operations that need you, eg sudo)
   ./run/setup.sh --unattended
@@ -37,15 +39,34 @@ EXAMPLES:
 EOF
 }
 
-# Parse command line arguments (only handle --help, rest passed through)
+# Override common.sh defaults and export for child scripts
+export LOG_TAG="setup"
+export LOG_FILE="${HOME}/.config/motherbox/setup.log"
+
+# Parse command line arguments (may override defaults above)
 for arg in "$@"; do
     case $arg in
     -h | --help)
         show_help
         exit 0
         ;;
+    --unattended)
+        export UNATTENDED=true
+        ;;
+    --debug)
+        export LOG_DEBUG=true
+        ;;
+    --logging)
+        export LOG_FILE_ENABLED=true
+        ;;
     esac
 done
+
+# Initialize log file if logging is enabled
+if [[ "${LOG_FILE_ENABLED}" == "true" ]]; then
+    mkdir -p "$(dirname "${LOG_FILE}")"
+    echo "=== Setup started at $(date) ===" >"${LOG_FILE}"
+fi
 
 # Determine setup mode (precedence: flag > config > prompt)
 determine_setup_mode ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"} || exit 1
@@ -68,22 +89,10 @@ preflight_checks() {
     log_info "Repository root resolved to ${REPO_ROOT}"
     log_info "Bash version ${BASH_VERSION}"
 
-    # Xcode Command Line Tools check
-    log_info "Checking Xcode Command Line Tools..."
-    if xcode-select -p >/dev/null 2>&1; then
-        log_info "Xcode Command Line Tools already installed"
-    else
-        log_info "Triggering Xcode Command Line Tools installation"
-        if xcode-select --install; then
-            log_info "Installer launched. Complete it, then rerun this script."
-            exit 2
-        else
-            log_warn "Installer launch may have failed; verify manually and rerun."
-            exit 1
-        fi
-    fi
+    # Xcode Command Line Tools are required for everything else
+    "${REPO_ROOT}/apps/xcodecli/xcodecli.sh" setup
 
-    log_info "All system requirements checks passed"
+    log_info "All preflight checks passed"
 }
 
 # Run preflight checks before anything else
@@ -96,9 +105,9 @@ preflight_checks
 # Passes ORIGINAL_ARGS to each script so they receive --mode, --unattended, etc.
 run_app_setup() {
     local app="$1"
-    local script="apps/${app}/${app}.sh"
+    local script="${REPO_ROOT}/apps/${app}/${app}.sh"
     set +e
-    (cd "${REPO_ROOT}" && bash "${script}" setup ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"})
+    "${script}" setup ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"}
     local status=$?
     set -e
 
