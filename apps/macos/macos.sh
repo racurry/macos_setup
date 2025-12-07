@@ -12,26 +12,6 @@ PATH_SCREENSHOTS="${HOME}/Screenshots"
 # Global flag
 UNATTENDED=false
 
-ensure_sudo_cached() {
-    if [[ "${UNATTENDED}" == "true" ]]; then
-        log_warn "Skipping sudo operations (--unattended flag set)"
-        return 0
-    fi
-
-    require_command sudo
-
-    if sudo -n true 2>/dev/null; then
-        return 0
-    fi
-
-    log_info "Refreshing sudo credentials"
-    if sudo -v; then
-        return 0
-    fi
-
-    fail "sudo authentication failed"
-}
-
 show_help() {
     cat <<EOF
 Usage: $0 [COMMAND] [OPTIONS]
@@ -55,8 +35,6 @@ apply_global_settings() {
     print_heading "Apply global macOS defaults"
 
     require_command defaults
-
-    ensure_sudo_cached
 
     log_info "Always show scrollbars"
     defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
@@ -211,8 +189,6 @@ apply_misc_settings() {
 
     require_command defaults
 
-    ensure_sudo_cached
-
     log_info "Ensure Screenshots directory exists"
     mkdir -p "${PATH_SCREENSHOTS}"
 
@@ -263,33 +239,33 @@ main() {
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            --unattended)
-                UNATTENDED=true
-                shift
-                ;;
-            help | --help | -h)
-                show_help
-                exit 0
-                ;;
-            setup)
-                command="$1"
-                shift
-                ;;
-            *)
-                log_warn "Ignoring unknown argument: $1"
-                shift
-                ;;
+        --unattended)
+            UNATTENDED=true
+            shift
+            ;;
+        help | --help | -h)
+            show_help
+            exit 0
+            ;;
+        setup)
+            command="$1"
+            shift
+            ;;
+        *)
+            log_warn "Ignoring unknown argument: $1"
+            shift
+            ;;
         esac
     done
 
     case "${command}" in
-        setup)
-            do_setup
-            ;;
-        "")
-            show_help
-            exit 0
-            ;;
+    setup)
+        do_setup
+        ;;
+    "")
+        show_help
+        exit 0
+        ;;
     esac
 }
 
