@@ -25,6 +25,8 @@ export api=~/workspace/galileo/api/
 export ios=~/workspace/galileo/health-ios/
 export android=~/workspace/galileo/health-android/
 export core=~/workspace/galileo/core-api/
+export core-api=~/workspace/galileo/core-api/
+export sandbox=~/workspace/galileo/sandbox/
 
 # dbt
 alias dbt="python3 -m dbt.cli.main"
