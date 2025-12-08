@@ -19,13 +19,14 @@ if [ -f "$DOTFILES_DIR/bootstrap.sh" ]; then
 fi
 
 # Galileo projects
+export gal=~/workspace/galileo/
 export galileo=~/workspace/galileo/
 export gdots=~/workspace/galileo/dotfiles/
 export api=~/workspace/galileo/api/
 export ios=~/workspace/galileo/health-ios/
 export android=~/workspace/galileo/health-android/
 export core=~/workspace/galileo/core-api/
-export core-api=~/workspace/galileo/core-api/
+export coreapi=~/workspace/galileo/core-api/
 export sandbox=~/workspace/galileo/sandbox/
 
 # dbt
