@@ -143,6 +143,7 @@ run_app_setup shellcheck
 run_app_setup markdownlint
 run_app_setup shfmt
 run_app_setup ruff
+run_app_setup uv
 
 print_heading "Application Settings"
 run_app_setup claudecode
