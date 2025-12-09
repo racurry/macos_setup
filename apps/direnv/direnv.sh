@@ -11,7 +11,7 @@ show_help() {
     cat <<EOF
 Usage: $0 [COMMAND]
 
-Symlink use_asdf.sh to ~/.config/direnv/lib/
+Symlink direnv library files (use_asdf.sh, use_nvm.sh) to ~/.config/direnv/lib/
 
 Commands:
     setup       Run full setup (symlink library files)
@@ -28,6 +28,7 @@ do_setup() {
     mkdir -p "${target_dir}"
 
     link_file "${SCRIPT_DIR}/use_asdf.sh" "${target_dir}/use_asdf.sh" "${APP_NAME}"
+    link_file "${SCRIPT_DIR}/use_nvm.sh" "${target_dir}/use_nvm.sh" "${APP_NAME}"
 
     log_success "direnv library setup complete"
 }
