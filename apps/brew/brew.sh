@@ -97,7 +97,7 @@ maintain_brew() {
     log_info "Cleaning up old versions and cache"
     brew cleanup
 
-    log_info "Homebrew maintenance complete"
+    log_success "Homebrew maintenance complete"
 }
 
 install_brewfile() {
