@@ -18,6 +18,15 @@ if [ -f "$DOTFILES_DIR/bootstrap.sh" ]; then
   source "$DOTFILES_DIR/bootstrap.sh"
 fi
 
+# Auto-refresh AWS CodeArtifact if token is expired (>11 hours old)
+if [[ -f ~/.config/pip/pip.conf ]]; then
+  pip_age=$(($(date +%s) - $(stat -f %m ~/.config/pip/pip.conf)))
+  if (( pip_age > 39600 )); then
+    echo "Refreshing AWS CodeArtifact credentials..."
+    aws-codeartifact
+  fi
+fi
+
 # Galileo projects
 export gal=~/workspace/galileo/
 export galileo=~/workspace/galileo/
