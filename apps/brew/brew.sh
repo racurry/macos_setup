@@ -16,6 +16,7 @@ Commands:
     install     Install Homebrew if not already installed
     bundle      Install packages from Brewfile(s)
     audit       Audit installed apps against Brewfile definitions
+    maintain    Run regular Homebrew maintenance (update, upgrade, cleanup)
     help        Show this help message (also: -h, --help)
 
 Options:
@@ -79,6 +80,26 @@ install_bundle() {
     fi
 }
 
+maintain_brew() {
+    print_heading "Homebrew Maintenance"
+
+    require_command brew
+
+    log_info "Updating Homebrew"
+    brew update
+
+    log_info "Upgrading installed packages"
+    brew upgrade
+
+    log_info "Removing unused dependencies"
+    brew autoremove
+
+    log_info "Cleaning up old versions and cache"
+    brew cleanup
+
+    log_success "Homebrew maintenance complete"
+}
+
 install_brewfile() {
     local manifest="$1"
 
@@ -113,7 +134,7 @@ main() {
             show_help
             exit 0
             ;;
-        setup | install | bundle | audit)
+        setup | install | bundle | audit | maintain)
             command="$1"
             shift
             ;;
@@ -144,6 +165,9 @@ main() {
         ;;
     audit)
         "${SCRIPT_DIR}/audit_apps.py"
+        ;;
+    maintain)
+        maintain_brew
         ;;
     "")
         show_help

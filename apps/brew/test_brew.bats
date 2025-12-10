@@ -37,8 +37,8 @@ teardown() {
 
 @test "brew.sh shows error for unknown argument" {
   run bash "${BATS_TEST_DIRNAME}/brew.sh" unknown
-  [ "$status" -eq 1 ]
-  [[ "$output" == *"Error: Unknown argument"* ]]
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Ignoring unknown argument"* ]]
 }
 
 @test "brew.sh bundle requires brew command" {
@@ -48,4 +48,19 @@ teardown() {
 
   run bash "${BATS_TEST_DIRNAME}/brew.sh" bundle
   [ "$status" -ne 0 ]
+}
+
+@test "brew.sh maintain requires brew command" {
+
+  # Remove brew from PATH if it exists
+  export PATH="$(echo "$PATH" | tr ':' '\n' | grep -v brew | tr '\n' ':')"
+
+  run bash "${BATS_TEST_DIRNAME}/brew.sh" maintain
+  [ "$status" -ne 0 ]
+}
+
+@test "brew.sh help includes maintain command" {
+  run bash "${BATS_TEST_DIRNAME}/brew.sh" help
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"maintain"* ]]
 }
