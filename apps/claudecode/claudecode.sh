@@ -116,12 +116,13 @@ do_settings() {
 
     local tmp_file
     tmp_file=$(mktemp)
-    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true | .statusLine = {"type": "command", "command": "~/.claude/statuslines/statusline.py"}' "${settings_file}" >"${tmp_file}"
+    jq '.alwaysThinkingEnabled = true | .enableAllProjectMcpServers = true | .statusLine = {"type": "command", "command": "~/.claude/statuslines/statusline.py"} | .permissions.defaultMode = "acceptEdits"' "${settings_file}" >"${tmp_file}"
     mv "${tmp_file}" "${settings_file}"
 
     log_info "Set alwaysThinkingEnabled = true"
     log_info "Set enableAllProjectMcpServers = true"
-    log_info "Set statusLine to use ~/.claude/statuslines/default.sh"
+    log_info "Set statusLine to use ~/.claude/statuslines/statusline.py"
+    log_info "Set permissions.defaultMode = acceptEdits"
 
     log_success "Claude Code settings configured"
 }

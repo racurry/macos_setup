@@ -224,6 +224,14 @@ alias please='sudo $(fc -ln -1)'
 # Cleanup
 alias mdlint='markdownlint-cli2 --config ~/.markdownlint-cli2.jsonc'
 
+# Claude helpers
+alias cld='claude'
+alias cldup='brew upgrade claude-code'
+alias clddanger='claude --allow-dangerously-skip-permissions'
+alias cldc='claude --continue'
+alias cldr='claude --resume'
+alias cldp='claude --print'
+
 # ============================================================================
 # GIT SHORTHANDS
 # ============================================================================
