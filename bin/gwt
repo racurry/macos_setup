@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# gwt - Git Worktree helper
+# Creates worktrees with predictable naming: ../<repo>__<branch>
+#
+# Usage:
+#   gwt <branch-name>           Create worktree with new branch, open in VS Code
+#   gwt -e <branch-name>        Create from existing branch (no -b flag)
+#   gwt list                    List all worktrees
+#   gwt remove <branch-name>    Remove worktree by branch name
+#
+# Examples:
+#   gwt clean-direnv            Creates ../frontend-monorepo__clean-direnv
+#   gwt -e main                 Creates worktree from existing main branch
+
+set -euo pipefail
+
+main() {
+    local repo_name existing_branch=false
+
+    # Get repo name from current directory or git remote
+    repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+    if [[ -z "$repo_name" ]]; then
+        echo "Error: Not in a git repository" >&2
+        exit 1
+    fi
+
+    # Handle subcommands
+    case "$1" in
+    list | ls)
+        git worktree list
+        exit $?
+        ;;
+    remove | rm)
+        if [[ -z "${2:-}" ]]; then
+            echo "Usage: gwt remove <branch-name>" >&2
+            exit 1
+        fi
+        local wt_path="../${repo_name}__${2}"
+        git worktree remove "$wt_path"
+        exit $?
+        ;;
+    -e | --existing)
+        existing_branch=true
+        shift
+        ;;
+    -h | --help | help)
+        echo "gwt - Git Worktree helper"
+        echo ""
+        echo "Usage:"
+        echo "  gwt <branch-name>           Create worktree with new branch, open in VS Code"
+        echo "  gwt -e <branch-name>        Create from existing branch (no -b flag)"
+        echo "  gwt list                    List all worktrees"
+        echo "  gwt remove <branch-name>    Remove worktree by branch name"
+        exit 0
+        ;;
+    esac
+
+    local branch="${1:-}"
+    if [[ -z "$branch" ]]; then
+        echo "Usage: gwt <branch-name>" >&2
+        echo "       gwt -e <existing-branch>" >&2
+        echo "       gwt list" >&2
+        echo "       gwt remove <branch-name>" >&2
+        exit 1
+    fi
+
+    local wt_path="../${repo_name}__${branch}"
+
+    if [[ "$existing_branch" == true ]]; then
+        git worktree add "$wt_path" "$branch" && code "$wt_path"
+    else
+        git worktree add "$wt_path" -b "$branch" && code "$wt_path"
+    fi
+}
+
+main "$@"
