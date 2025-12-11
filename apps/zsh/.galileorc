@@ -44,7 +44,7 @@ export api=~/workspace/galileo/api/
 # Clients
 export ios=~/workspace/galileo/health-ios/
 export android=~/workspace/galileo/health-android/
-export android=~/workspace/galileo/frontend-monorepo/
+export zodiac=~/workspace/galileo/frontend-monorepo/
 export web=~/workspace/galileo/health-web/
 
 # dbt
