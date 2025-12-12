@@ -11,8 +11,37 @@
 # Examples:
 #   gwt clean-direnv            Creates ../frontend-monorepo__clean-direnv
 #   gwt -e main                 Creates worktree from existing main branch
+#
+# After creating a worktree, copies gitignored .env* files and .claude/ directory
 
 set -euo pipefail
+
+# Copy gitignored environment files to new worktree
+copy_gitignored_files() {
+    local dest="$1"
+    local src_root
+    src_root=$(git rev-parse --show-toplevel)
+    local copied=0
+
+    # Get all gitignored files, filter for .env or .claude patterns
+    while IFS= read -r file; do
+        [[ -n "$file" ]] || continue
+
+        # Match .env files anywhere, or anything in .claude/
+        if [[ "$file" == *".env"* ]] || [[ "$file" == ".claude/"* ]]; then
+            local dest_dir
+            dest_dir="$dest/$(dirname "$file")"
+            mkdir -p "$dest_dir"
+            cp "$src_root/$file" "$dest/$file"
+            echo "  Copied $file"
+            ((copied++)) || true
+        fi
+    done < <(git ls-files --others --ignored --exclude-standard)
+
+    if [[ $copied -gt 0 ]]; then
+        echo "Copied $copied gitignored file(s) to worktree"
+    fi
+}
 
 main() {
     local repo_name existing_branch=false
@@ -67,10 +96,13 @@ main() {
     local wt_path="../${repo_name}__${branch}"
 
     if [[ "$existing_branch" == true ]]; then
-        git worktree add "$wt_path" "$branch" && code "$wt_path"
+        git worktree add "$wt_path" "$branch"
     else
-        git worktree add "$wt_path" -b "$branch" && code "$wt_path"
+        git worktree add "$wt_path" -b "$branch"
     fi
+
+    copy_gitignored_files "$wt_path"
+    code "$wt_path"
 }
 
 main "$@"
