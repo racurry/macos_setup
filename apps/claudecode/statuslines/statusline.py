@@ -73,58 +73,94 @@ import subprocess
 import sys
 from dataclasses import dataclass
 
-# ANSI escape codes
-# Reset
-RESET = "\033[0m"
+# =============================================================================
+# ANSI STYLING
+# =============================================================================
+_RESET = "\033[0m"
 
 # Text attributes
-BOLD = "\033[1m"
-DIM = "\033[2m"
-ITALIC = "\033[3m"
-UNDERLINE = "\033[4m"
-BLINK = "\033[5m"
-REVERSE = "\033[7m"
-STRIKETHROUGH = "\033[9m"
+_STYLES = {
+    "bold": "\033[1m",
+    "dim": "\033[2m",
+    "italic": "\033[3m",
+    "underline": "\033[4m",
+    "blink": "\033[5m",
+    "reverse": "\033[7m",
+    "hidden": "\033[8m",
+    "strikethrough": "\033[9m",
+}
 
-# Standard foreground colors (30-37)
-BLACK = "\033[30m"
-RED = "\033[31m"
-GREEN = "\033[32m"
-YELLOW = "\033[33m"
-BLUE = "\033[34m"
-MAGENTA = "\033[35m"
-CYAN = "\033[36m"
-WHITE = "\033[37m"
+# Foreground colors (standard 30-37, bright 90-97)
+_FG = {
+    "black": "\033[30m",
+    "red": "\033[31m",
+    "green": "\033[32m",
+    "yellow": "\033[33m",
+    "blue": "\033[34m",
+    "magenta": "\033[35m",
+    "cyan": "\033[36m",
+    "white": "\033[37m",
+    "bright_black": "\033[90m",
+    "bright_red": "\033[91m",
+    "bright_green": "\033[92m",
+    "bright_yellow": "\033[93m",
+    "bright_blue": "\033[94m",
+    "bright_magenta": "\033[95m",
+    "bright_cyan": "\033[96m",
+    "bright_white": "\033[97m",
+}
 
-# Standard background colors (40-47)
-BG_BLACK = "\033[40m"
-BG_RED = "\033[41m"
-BG_GREEN = "\033[42m"
-BG_YELLOW = "\033[43m"
-BG_BLUE = "\033[44m"
-BG_MAGENTA = "\033[45m"
-BG_CYAN = "\033[46m"
-BG_WHITE = "\033[47m"
+# Background colors (standard 40-47, bright 100-107)
+_BG = {
+    "black": "\033[40m",
+    "red": "\033[41m",
+    "green": "\033[42m",
+    "yellow": "\033[43m",
+    "blue": "\033[44m",
+    "magenta": "\033[45m",
+    "cyan": "\033[46m",
+    "white": "\033[47m",
+    "bright_black": "\033[100m",
+    "bright_red": "\033[101m",
+    "bright_green": "\033[102m",
+    "bright_yellow": "\033[103m",
+    "bright_blue": "\033[104m",
+    "bright_magenta": "\033[105m",
+    "bright_cyan": "\033[106m",
+    "bright_white": "\033[107m",
+}
 
-# Bright foreground colors (90-97)
-BRIGHT_BLACK = "\033[90m"  # gray
-BRIGHT_RED = "\033[91m"
-BRIGHT_GREEN = "\033[92m"
-BRIGHT_YELLOW = "\033[93m"
-BRIGHT_BLUE = "\033[94m"
-BRIGHT_MAGENTA = "\033[95m"
-BRIGHT_CYAN = "\033[96m"
-BRIGHT_WHITE = "\033[97m"
 
-# Bright background colors (100-107)
-BG_BRIGHT_BLACK = "\033[100m"
-BG_BRIGHT_RED = "\033[101m"
-BG_BRIGHT_GREEN = "\033[102m"
-BG_BRIGHT_YELLOW = "\033[103m"
-BG_BRIGHT_BLUE = "\033[104m"
-BG_BRIGHT_MAGENTA = "\033[105m"
-BG_BRIGHT_CYAN = "\033[106m"
-BG_BRIGHT_WHITE = "\033[107m"
+def styled(
+    text: str,
+    fg: str | None = None,
+    bg: str | None = None,
+    style: str | None = None,
+) -> str:
+    """
+    Apply ANSI styling to text with a single reset.
+
+    Args:
+        text: The text to style
+        fg: Foreground color (e.g., "red", "bright_blue")
+        bg: Background color (e.g., "black", "bright_magenta")
+        style: Text style (e.g., "bold", "dim")
+
+    Examples:
+        styled("error", fg="red")
+        styled(" main ", fg="black", bg="bright_blue")
+        styled("│", style="dim")
+    """
+    codes = []
+    if style:
+        codes.append(_STYLES[style])
+    if fg:
+        codes.append(_FG[fg])
+    if bg:
+        codes.append(_BG[bg])
+    if not codes:
+        return text
+    return f"{''.join(codes)}{text}{_RESET}"
 
 
 # Schema discovery logging - see log_stdin_sample() docstring for usage
@@ -271,27 +307,27 @@ def format_tokens(tokens: int) -> str:
 
 
 def context_color(percentage: float) -> str:
-    """Get color code based on context usage percentage."""
+    """Get color name based on context usage percentage."""
     if percentage >= 85:
-        return RED
+        return "bright_red"
     elif percentage >= 70:
-        return YELLOW
-    return GREEN
+        return "bright_yellow"
+    return "bright_green"
 
 
 def _format_git_inline(git: GitInfo) -> str:
     """Git status with per-element coloring (used by most styles)."""
-    parts = [f"{BLUE}{git.branch}{RESET}"]
+    parts = [styled(git.branch, fg="blue")]
     if git.ahead:
-        parts.append(f"{GREEN}↑{git.ahead}{RESET}")
+        parts.append(styled(f"↑{git.ahead}", fg="green"))
     if git.behind:
-        parts.append(f"{RED}↓{git.behind}{RESET}")
+        parts.append(styled(f"↓{git.behind}", fg="red"))
     if git.has_staged:
-        parts.append(f"{GREEN}●{RESET}")
+        parts.append(styled("●", fg="green"))
     if git.has_unstaged:
-        parts.append(f"{YELLOW}○{RESET}")
+        parts.append(styled("○", fg="yellow"))
     if git.branch != "detached" and not git.has_upstream:
-        parts.append(f"{RED}⚠{RESET}")
+        parts.append(styled("⚠", fg="red"))
     return " ".join(parts)
 
 
@@ -308,7 +344,7 @@ def _format_git_powerline(git: GitInfo) -> str:
         s += " ○"
     if git.branch != "detached" and not git.has_upstream:
         s += " ⚠"
-    return f"{BG_BRIGHT_BLUE}{BLACK}{s} {RESET}"
+    return styled(f"{s} ", fg="black", bg="bright_blue")
 
 
 @dataclass
@@ -316,40 +352,44 @@ class Style:
     """Configuration for a status line style."""
 
     sep: str  # Separator between sections
-    model_fmt: str  # Format string for model (use {model})
-    ctx_fmt: str  # Format string for context (use {tokens}, {pct})
+    model_fg: str  # Foreground color for model
+    ctx_template: str  # Format string for context (use {tokens}, {pct})
+    model_bg: str | None = None  # Background color for model (powerline)
+    model_prefix: str = ""  # Optional prefix before model (e.g., "model:")
     ctx_prefix: str = ""  # Optional prefix before context (e.g., "ctx:")
     powerline: bool = False  # Use background colors for context
 
 
-# Style definitions - adding a new style is just one line
+# Style definitions
 STYLES: dict[str, Style] = {
     "pipes": Style(
-        sep=f" {DIM}│{RESET} ",
-        model_fmt=f"{WHITE}{{model}}{RESET}",
-        ctx_fmt="{tokens} ({pct}%)",
+        sep=f" {styled('│', style='dim')} ",
+        model_fg="white",
+        ctx_template="{tokens} ({pct}%)",
     ),
     "diamonds": Style(
-        sep=f" {DIM}◆{RESET} ",
-        model_fmt=f"{WHITE}{{model}}{RESET}",
-        ctx_fmt="{tokens}/{pct}%",
+        sep=f" {styled('◆', style='dim')} ",
+        model_fg="white",
+        ctx_template="{tokens}/{pct}%",
     ),
     "labeled": Style(
         sep="  ",
-        model_fmt=f"{DIM}model:{RESET}{WHITE}{{model}}{RESET}",
-        ctx_fmt="{tokens}/{pct}%",
-        ctx_prefix=f"{DIM}ctx:{RESET}",
+        model_fg="white",
+        ctx_template="{tokens}/{pct}%",
+        model_prefix=styled("model:", style="dim"),
+        ctx_prefix=styled("ctx:", style="dim"),
     ),
     "powerline": Style(
         sep="",
-        model_fmt=f"{BG_BRIGHT_MAGENTA}{BLACK} {{model}} {RESET}",
-        ctx_fmt=" {tokens} {pct}% ",
+        model_fg="black",
+        model_bg="bright_magenta",
+        ctx_template=" {tokens} {pct}% ",
         powerline=True,
     ),
     "dots": Style(
-        sep=f" {DIM}·{RESET} ",
-        model_fmt=f"{WHITE}{{model}}{RESET}",
-        ctx_fmt="{tokens} ({pct}%)",
+        sep=f" {styled('·', style='dim')} ",
+        model_fg="white",
+        ctx_template="{tokens} ({pct}%)",
     ),
 }
 
@@ -368,30 +408,22 @@ def format_status(
         else:
             parts.append(_format_git_inline(git))
 
-    # Model section
-    parts.append(style.model_fmt.format(model=model))
+    # Model section (powerline adds padding)
+    model_text = f" {model} " if style.powerline else model
+    model_styled = styled(model_text, fg=style.model_fg, bg=style.model_bg)
+    parts.append(f"{style.model_prefix}{model_styled}")
 
     # Context section
     if ctx:
         pct_str = f"{ctx.percentage:.0f}"
         tokens_str = format_tokens(ctx.tokens)
-
+        formatted = style.ctx_template.format(tokens=tokens_str, pct=pct_str)
+        ctx_col = context_color(ctx.percentage)
         if style.powerline:
-            # Background color based on usage
-            if ctx.percentage >= 85:
-                bg = BG_BRIGHT_RED
-            elif ctx.percentage >= 70:
-                bg = BG_BRIGHT_YELLOW
-            else:
-                bg = BG_BRIGHT_GREEN
-            parts.append(
-                f"{bg}{BLACK}{style.ctx_fmt.format(tokens=tokens_str, pct=pct_str)}{RESET}"
-            )
+            ctx_styled = styled(formatted, fg="black", bg=ctx_col)
         else:
-            color = context_color(ctx.percentage)
-            parts.append(
-                f"{style.ctx_prefix}{color}{style.ctx_fmt.format(tokens=tokens_str, pct=pct_str)}{RESET}"
-            )
+            ctx_styled = styled(formatted, fg=ctx_col)
+        parts.append(f"{style.ctx_prefix}{ctx_styled}")
 
     return style.sep.join(parts)
 
@@ -424,7 +456,7 @@ def main() -> None:
     model = data.get("model", {}).get("display_name", "unknown")
 
     git = get_git_info(cwd)
-    ctx = get_context_usage(data)  # Uses undocumented context_window field
+    ctx = get_context_usage(data)
 
     print(format_status(git, model, ctx, args.style))
 
