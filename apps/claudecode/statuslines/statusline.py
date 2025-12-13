@@ -279,169 +279,121 @@ def context_color(percentage: float) -> str:
     return GREEN
 
 
-def format_style_pipes(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
-    """Style: Minimal separators with │"""
-    parts = []
-
-    # Git section
-    if git:
-        git_parts = [f"{BLUE}{git.branch}{RESET}"]
-        if git.ahead:
-            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
-        if git.behind:
-            git_parts.append(f"{RED}↓{git.behind}{RESET}")
-        if git.has_staged:
-            git_parts.append(f"{GREEN}●{RESET}")
-        if git.has_unstaged:
-            git_parts.append(f"{YELLOW}○{RESET}")
-        if git.branch != "detached" and not git.has_upstream:
-            git_parts.append(f"{RED}⚠{RESET}")
-        parts.append(" ".join(git_parts))
-
-    # Model section
-    parts.append(f"{WHITE}{model}{RESET}")
-
-    # Context section
-    if ctx:
-        color = context_color(ctx.percentage)
-        parts.append(f"{color}{format_tokens(ctx.tokens)} ({ctx.percentage:.0f}%){RESET}")
-
-    return f" {DIM}│{RESET} ".join(parts)
+def _format_git_inline(git: GitInfo) -> str:
+    """Git status with per-element coloring (used by most styles)."""
+    parts = [f"{BLUE}{git.branch}{RESET}"]
+    if git.ahead:
+        parts.append(f"{GREEN}↑{git.ahead}{RESET}")
+    if git.behind:
+        parts.append(f"{RED}↓{git.behind}{RESET}")
+    if git.has_staged:
+        parts.append(f"{GREEN}●{RESET}")
+    if git.has_unstaged:
+        parts.append(f"{YELLOW}○{RESET}")
+    if git.branch != "detached" and not git.has_upstream:
+        parts.append(f"{RED}⚠{RESET}")
+    return " ".join(parts)
 
 
-def format_style_diamonds(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
-    """Style: Symbol-heavy separators with ◆"""
-    parts = []
-
-    # Git section
-    if git:
-        git_parts = [f"{BLUE}{git.branch}{RESET}"]
-        if git.ahead:
-            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
-        if git.behind:
-            git_parts.append(f"{RED}↓{git.behind}{RESET}")
-        if git.has_staged:
-            git_parts.append(f"{GREEN}●{RESET}")
-        if git.has_unstaged:
-            git_parts.append(f"{YELLOW}○{RESET}")
-        if git.branch != "detached" and not git.has_upstream:
-            git_parts.append(f"{RED}⚠{RESET}")
-        parts.append(" ".join(git_parts))
-
-    # Model section
-    parts.append(f"{WHITE}{model}{RESET}")
-
-    # Context section
-    if ctx:
-        color = context_color(ctx.percentage)
-        parts.append(f"{color}{format_tokens(ctx.tokens)}/{ctx.percentage:.0f}%{RESET}")
-
-    return f" {DIM}◆{RESET} ".join(parts)
+def _format_git_powerline(git: GitInfo) -> str:
+    """Git status with single background (powerline style)."""
+    s = f" {git.branch}"
+    if git.ahead:
+        s += f" ↑{git.ahead}"
+    if git.behind:
+        s += f" ↓{git.behind}"
+    if git.has_staged:
+        s += " ●"
+    if git.has_unstaged:
+        s += " ○"
+    if git.branch != "detached" and not git.has_upstream:
+        s += " ⚠"
+    return f"{BG_BRIGHT_BLUE}{BLACK}{s} {RESET}"
 
 
-def format_style_labeled(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
-    """Style: Compact with dimmed labels"""
-    parts = []
+@dataclass
+class Style:
+    """Configuration for a status line style."""
 
-    # Git section (no label, it's obvious)
-    if git:
-        git_parts = [f"{BLUE}{git.branch}{RESET}"]
-        if git.ahead:
-            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
-        if git.behind:
-            git_parts.append(f"{RED}↓{git.behind}{RESET}")
-        if git.has_staged:
-            git_parts.append(f"{GREEN}●{RESET}")
-        if git.has_unstaged:
-            git_parts.append(f"{YELLOW}○{RESET}")
-        if git.branch != "detached" and not git.has_upstream:
-            git_parts.append(f"{RED}⚠{RESET}")
-        parts.append(" ".join(git_parts))
-
-    # Model section with label
-    parts.append(f"{DIM}model:{RESET}{WHITE}{model}{RESET}")
-
-    # Context section with label
-    if ctx:
-        color = context_color(ctx.percentage)
-        parts.append(f"{DIM}ctx:{RESET}{color}{format_tokens(ctx.tokens)}/{ctx.percentage:.0f}%{RESET}")
-
-    return "  ".join(parts)
+    sep: str  # Separator between sections
+    model_fmt: str  # Format string for model (use {model})
+    ctx_fmt: str  # Format string for context (use {tokens}, {pct})
+    ctx_prefix: str = ""  # Optional prefix before context (e.g., "ctx:")
+    powerline: bool = False  # Use background colors for context
 
 
-def format_style_powerline(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
-    """Style: Powerline-style colored backgrounds"""
-    parts = []
-
-    # Git section - blue background, black text
-    if git:
-        git_str = f" {git.branch}"
-        if git.ahead:
-            git_str += f" ↑{git.ahead}"
-        if git.behind:
-            git_str += f" ↓{git.behind}"
-        if git.has_staged:
-            git_str += " ●"
-        if git.has_unstaged:
-            git_str += " ○"
-        if git.branch != "detached" and not git.has_upstream:
-            git_str += " ⚠"
-        git_str += " "
-        parts.append(f"{BG_BRIGHT_BLUE}{BLACK}{git_str}{RESET}")
-
-    # Model section - magenta background, black text
-    parts.append(f"{BG_BRIGHT_MAGENTA}{BLACK} {model} {RESET}")
-
-    # Context section - colored background based on usage, black text
-    if ctx:
-        if ctx.percentage >= 85:
-            bg = BG_BRIGHT_RED
-        elif ctx.percentage >= 70:
-            bg = BG_BRIGHT_YELLOW
-        else:
-            bg = BG_BRIGHT_GREEN
-        parts.append(f"{bg}{BLACK} {format_tokens(ctx.tokens)} {ctx.percentage:.0f}% {RESET}")
-
-    return "".join(parts)
-
-
-def format_style_dots(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
-    """Style: Subtle dot separators (·)"""
-    parts = []
-
-    # Git section
-    if git:
-        git_parts = [f"{BLUE}{git.branch}{RESET}"]
-        if git.ahead:
-            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
-        if git.behind:
-            git_parts.append(f"{RED}↓{git.behind}{RESET}")
-        if git.has_staged:
-            git_parts.append(f"{GREEN}●{RESET}")
-        if git.has_unstaged:
-            git_parts.append(f"{YELLOW}○{RESET}")
-        if git.branch != "detached" and not git.has_upstream:
-            git_parts.append(f"{RED}⚠{RESET}")
-        parts.append(" ".join(git_parts))
-
-    # Model section
-    parts.append(f"{WHITE}{model}{RESET}")
-
-    # Context section
-    if ctx:
-        color = context_color(ctx.percentage)
-        parts.append(f"{color}{format_tokens(ctx.tokens)} ({ctx.percentage:.0f}%){RESET}")
-
-    return f" {DIM}·{RESET} ".join(parts)
-
-
-FORMATTERS = {
-    "pipes": format_style_pipes,
-    "diamonds": format_style_diamonds,
-    "labeled": format_style_labeled,
-    "powerline": format_style_powerline,
-    "dots": format_style_dots,
+# Style definitions - adding a new style is just one line
+STYLES: dict[str, Style] = {
+    "pipes": Style(
+        sep=f" {DIM}│{RESET} ",
+        model_fmt=f"{WHITE}{{model}}{RESET}",
+        ctx_fmt="{tokens} ({pct}%)",
+    ),
+    "diamonds": Style(
+        sep=f" {DIM}◆{RESET} ",
+        model_fmt=f"{WHITE}{{model}}{RESET}",
+        ctx_fmt="{tokens}/{pct}%",
+    ),
+    "labeled": Style(
+        sep="  ",
+        model_fmt=f"{DIM}model:{RESET}{WHITE}{{model}}{RESET}",
+        ctx_fmt="{tokens}/{pct}%",
+        ctx_prefix=f"{DIM}ctx:{RESET}",
+    ),
+    "powerline": Style(
+        sep="",
+        model_fmt=f"{BG_BRIGHT_MAGENTA}{BLACK} {{model}} {RESET}",
+        ctx_fmt=" {tokens} {pct}% ",
+        powerline=True,
+    ),
+    "dots": Style(
+        sep=f" {DIM}·{RESET} ",
+        model_fmt=f"{WHITE}{{model}}{RESET}",
+        ctx_fmt="{tokens} ({pct}%)",
+    ),
 }
+
+
+def format_status(
+    git: GitInfo | None, model: str, ctx: ContextInfo | None, style_name: str
+) -> str:
+    """Format status line using the specified style."""
+    style = STYLES[style_name]
+    parts = []
+
+    # Git section
+    if git:
+        if style.powerline:
+            parts.append(_format_git_powerline(git))
+        else:
+            parts.append(_format_git_inline(git))
+
+    # Model section
+    parts.append(style.model_fmt.format(model=model))
+
+    # Context section
+    if ctx:
+        pct_str = f"{ctx.percentage:.0f}"
+        tokens_str = format_tokens(ctx.tokens)
+
+        if style.powerline:
+            # Background color based on usage
+            if ctx.percentage >= 85:
+                bg = BG_BRIGHT_RED
+            elif ctx.percentage >= 70:
+                bg = BG_BRIGHT_YELLOW
+            else:
+                bg = BG_BRIGHT_GREEN
+            parts.append(
+                f"{bg}{BLACK}{style.ctx_fmt.format(tokens=tokens_str, pct=pct_str)}{RESET}"
+            )
+        else:
+            color = context_color(ctx.percentage)
+            parts.append(
+                f"{style.ctx_prefix}{color}{style.ctx_fmt.format(tokens=tokens_str, pct=pct_str)}{RESET}"
+            )
+
+    return style.sep.join(parts)
 
 
 # =============================================================================
@@ -452,7 +404,7 @@ def main() -> None:
     parser.add_argument(
         "--style",
         "-s",
-        choices=list(FORMATTERS.keys()),
+        choices=list(STYLES.keys()),
         default=DEFAULT_STYLE,
         help=f"Status line style (default: {DEFAULT_STYLE})",
     )
@@ -474,8 +426,7 @@ def main() -> None:
     git = get_git_info(cwd)
     ctx = get_context_usage(data)  # Uses undocumented context_window field
 
-    formatter = FORMATTERS[args.style]
-    print(formatter(git, model, ctx))
+    print(format_status(git, model, ctx, args.style))
 
 
 if __name__ == "__main__":
