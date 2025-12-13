@@ -26,7 +26,7 @@ DEFAULT_STYLE = "powerline"
 #   "session_id": "uuid-string",           # Current session identifier
 #   "transcript_path": "/path/to/x.jsonl", # Full path to session transcript
 #   "cwd": "/current/working/directory",   # Current working directory
-#   "version": "2.0.57",                   # Claude Code version
+#   "version": "2.0.67",                   # Claude Code version
 #
 #   "model": {
 #     "id": "claude-opus-4-5-20251101",    # Full model identifier
@@ -50,7 +50,17 @@ DEFAULT_STYLE = "powerline"
 #     "total_lines_removed": 1             # Lines removed this session
 #   },
 #
-#   "exceeds_200k_tokens": false           # UNDOCUMENTED: context size warning
+#   # --- UNDOCUMENTED FIELDS (discovered via schema logging) -----------------
+#   # These fields are not in official docs but appear in actual hook data.
+#   # Use --log to discover new fields as Claude Code evolves.
+#
+#   "context_window": {
+#     "total_input_tokens": 32501,         # Input tokens used
+#     "total_output_tokens": 34054,        # Output tokens used
+#     "context_window_size": 200000        # Max context window size
+#   },
+#
+#   "exceeds_200k_tokens": false           # Context exhaustion warning
 # }
 #
 # Note: "hook_event_name": "Status" appears in docs but not in actual data.
@@ -62,9 +72,6 @@ import os
 import subprocess
 import sys
 from dataclasses import dataclass
-
-# Token limit for context window (Claude models)
-MAX_CONTEXT_TOKENS = 200_000
 
 # ANSI escape codes
 # Reset
@@ -118,6 +125,54 @@ BG_BRIGHT_BLUE = "\033[104m"
 BG_BRIGHT_MAGENTA = "\033[105m"
 BG_BRIGHT_CYAN = "\033[106m"
 BG_BRIGHT_WHITE = "\033[107m"
+
+
+# Schema discovery logging - see log_stdin_sample() docstring for usage
+LOG_PATH = "/tmp/claude_status_samples.jsonl"
+LOG_SAMPLES = 10
+
+
+def log_stdin_sample(raw_input: str) -> None:
+    """
+    Log raw status hook stdin to file for schema discovery.
+
+    Claude Code's status hook JSON contains undocumented fields that can be
+    useful for status line display. This function captures samples so we can
+    discover new fields as Claude Code evolves.
+
+    The workflow:
+      1. Enable with --log flag in hooks.json statusline config
+      2. Samples collect at /tmp/claude_status_samples.jsonl
+      3. After using Claude Code, inspect: cat <LOG_PATH> | python3 -m json.tool
+      4. Compare against https://code.claude.com/docs/en/statusline
+      5. Undocumented fields = new features we can use!
+
+    Examples of fields discovered this way:
+      - context_window.total_input_tokens (direct token count!)
+      - context_window.context_window_size (dynamic, not hardcoded)
+
+    Limits to LOG_SAMPLES entries to avoid unbounded growth.
+    Silently fails to never break the status line display.
+    """
+    import datetime
+
+    try:
+        # Count existing samples
+        sample_count = 0
+        if os.path.exists(LOG_PATH):
+            with open(LOG_PATH) as f:
+                sample_count = sum(1 for _ in f)
+
+        # Only log up to LOG_SAMPLES
+        if sample_count < LOG_SAMPLES:
+            with open(LOG_PATH, "a") as f:
+                entry = {
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "data": json.loads(raw_input),
+                }
+                f.write(json.dumps(entry) + "\n")
+    except Exception:
+        pass  # Silently fail - don't break status line
 
 
 # =============================================================================
@@ -181,40 +236,28 @@ def get_git_info(cwd: str) -> GitInfo | None:
     return info
 
 
-def get_context_usage(transcript_path: str) -> ContextInfo | None:
-    """Calculate token usage from transcript file."""
-    if not transcript_path or not os.path.exists(transcript_path):
+def get_context_usage(data: dict) -> ContextInfo | None:
+    """
+    Extract context window usage from status hook data.
+
+    Uses the undocumented 'context_window' field which provides direct token
+    counts - no need to parse the transcript file! Discovered via schema logging.
+
+    Args:
+        data: The full status hook JSON data dict
+
+    Returns:
+        ContextInfo with token count and percentage, or None if unavailable
+    """
+    ctx = data.get("context_window")
+    if not ctx:
         return None
 
-    latest_usage = None
-    latest_timestamp = ""
+    tokens = ctx.get("total_input_tokens", 0)
+    max_tokens = ctx.get("context_window_size", 200_000)  # Fallback if missing
 
-    try:
-        with open(transcript_path) as f:
-            for line in f:
-                try:
-                    entry = json.loads(line)
-                    if entry.get("isSidechain") or entry.get("isApiErrorMessage"):
-                        continue
-                    usage = entry.get("message", {}).get("usage")
-                    if not usage:
-                        continue
-                    timestamp = entry.get("timestamp", "")
-                    if timestamp >= latest_timestamp:
-                        latest_timestamp = timestamp
-                        latest_usage = usage
-                except json.JSONDecodeError:
-                    continue
-
-        if latest_usage:
-            total = (
-                latest_usage.get("input_tokens", 0)
-                + latest_usage.get("cache_read_input_tokens", 0)
-                + latest_usage.get("cache_creation_input_tokens", 0)
-            )
-            return ContextInfo(tokens=total, percentage=(total / MAX_CONTEXT_TOKENS) * 100)
-    except Exception:
-        pass
+    if tokens and max_tokens:
+        return ContextInfo(tokens=tokens, percentage=(tokens / max_tokens) * 100)
 
     return None
 
@@ -413,17 +456,23 @@ def main() -> None:
         default=DEFAULT_STYLE,
         help=f"Status line style (default: {DEFAULT_STYLE})",
     )
+    parser.add_argument(
+        "--log",
+        action="store_true",
+        help=f"Log stdin samples to {LOG_PATH} for schema discovery",
+    )
     args = parser.parse_args()
 
     raw_input = sys.stdin.read()
+    if args.log:
+        log_stdin_sample(raw_input)
     data = json.loads(raw_input)
 
     cwd = data.get("workspace", {}).get("current_dir", os.getcwd())
     model = data.get("model", {}).get("display_name", "unknown")
-    transcript_path = data.get("transcript_path", "")
 
     git = get_git_info(cwd)
-    ctx = get_context_usage(transcript_path)
+    ctx = get_context_usage(data)  # Uses undocumented context_window field
 
     formatter = FORMATTERS[args.style]
     print(formatter(git, model, ctx))
