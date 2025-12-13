@@ -3,7 +3,18 @@
 # requires-python = ">=3.11"
 # dependencies = []
 # ///
-"""Claude Code status line"""
+"""Claude Code status line with rich git info."""
+
+# =============================================================================
+# CONFIGURATION
+# =============================================================================
+# Style options: "pipes", "diamonds", "labeled", "powerline", "dots"
+#   pipes:     Minimal separators (│)
+#   diamonds:  Symbol-heavy separators (◆)
+#   labeled:   Compact with dimmed labels
+#   powerline: Colored background segments
+#   dots:      Subtle dot separators (·)
+DEFAULT_STYLE = "powerline"
 
 # =============================================================================
 # STATUS HOOK INPUT SCHEMA
@@ -45,10 +56,12 @@
 # Note: "hook_event_name": "Status" appears in docs but not in actual data.
 # =============================================================================
 
+import argparse
 import json
 import os
 import subprocess
 import sys
+from dataclasses import dataclass
 
 # Token limit for context window (Claude models)
 MAX_CONTEXT_TOKENS = 200_000
@@ -106,50 +119,70 @@ BG_BRIGHT_MAGENTA = "\033[105m"
 BG_BRIGHT_CYAN = "\033[106m"
 BG_BRIGHT_WHITE = "\033[107m"
 
+
 # =============================================================================
-# SCHEMA DISCOVERY LOGGING (disabled)
+# DATA STRUCTURES
 # =============================================================================
-# To discover new/undocumented fields in the status hook data:
-#   1. Uncomment the LOG_PATH, LOG_SAMPLES, and log_stdin_sample() below
-#   2. Uncomment the log_stdin_sample(raw_input) call in main()
-#   3. Use Claude Code normally - samples will collect at LOG_PATH
-#   4. Inspect with: cat /tmp/claude_status_samples.jsonl | python3 -m json.tool
-#   5. Delete log file to collect fresh samples: rm /tmp/claude_status_samples.jsonl
-#
-# LOG_PATH = "/tmp/claude_status_samples.jsonl"
-# LOG_SAMPLES = 10  # Number of samples to collect before stopping
-#
-#
-# def log_stdin_sample(raw_input: str) -> None:
-#     """Log raw stdin to file for discovering available fields."""
-#     try:
-#         # Count existing samples
-#         sample_count = 0
-#         if os.path.exists(LOG_PATH):
-#             with open(LOG_PATH) as f:
-#                 sample_count = sum(1 for _ in f)
-#
-#         # Only log up to LOG_SAMPLES
-#         if sample_count < LOG_SAMPLES:
-#             with open(LOG_PATH, "a") as f:
-#                 entry = {
-#                     "timestamp": datetime.datetime.now().isoformat(),
-#                     "data": json.loads(raw_input),
-#                 }
-#                 f.write(json.dumps(entry) + "\n")
-#     except Exception:
-#         pass  # Silently fail - don't break status line
+@dataclass
+class GitInfo:
+    """Raw git repository state."""
+
+    branch: str = "detached"
+    ahead: int = 0
+    behind: int = 0
+    has_upstream: bool = False
+    has_staged: bool = False
+    has_unstaged: bool = False
 
 
-def get_context_usage(transcript_path: str) -> tuple[int, float] | None:
-    """
-    Calculate token usage from transcript file.
+@dataclass
+class ContextInfo:
+    """Context window usage."""
 
-    Reads the transcript JSONL and finds the most recent main-chain entry
-    with usage data. Returns (total_tokens, percentage) or None if unavailable.
+    tokens: int = 0
+    percentage: float = 0.0
 
-    Based on: https://codelynx.dev/posts/calculate-claude-code-context
-    """
+
+# =============================================================================
+# DATA COLLECTION
+# =============================================================================
+def get_git_info(cwd: str) -> GitInfo | None:
+    """Get git repository state using single porcelain call."""
+    result = subprocess.run(
+        ["git", "-C", cwd, "status", "--porcelain=v2", "--branch"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+
+    info = GitInfo()
+
+    for line in result.stdout.splitlines():
+        if line.startswith("# branch.head "):
+            info.branch = line[14:] or "detached"
+        elif line.startswith("# branch.upstream "):
+            info.has_upstream = True
+        elif line.startswith("# branch.ab "):
+            parts = line[12:].split()
+            if len(parts) >= 2:
+                info.ahead = int(parts[0].lstrip("+"))
+                info.behind = abs(int(parts[1]))
+        elif line and not line.startswith("#"):
+            if line.startswith("? "):
+                info.has_unstaged = True
+            elif len(line) > 4:
+                xy = line[2:4]
+                if xy[0] != ".":
+                    info.has_staged = True
+                if xy[1] != ".":
+                    info.has_unstaged = True
+
+    return info
+
+
+def get_context_usage(transcript_path: str) -> ContextInfo | None:
+    """Calculate token usage from transcript file."""
     if not transcript_path or not os.path.exists(transcript_path):
         return None
 
@@ -161,120 +194,239 @@ def get_context_usage(transcript_path: str) -> tuple[int, float] | None:
             for line in f:
                 try:
                     entry = json.loads(line)
-
-                    # Skip non-main-chain entries
-                    if entry.get("isSidechain"):
+                    if entry.get("isSidechain") or entry.get("isApiErrorMessage"):
                         continue
-                    if entry.get("isApiErrorMessage"):
-                        continue
-
-                    # Get usage data from message
                     usage = entry.get("message", {}).get("usage")
                     if not usage:
                         continue
-
-                    # Track most recent by timestamp
                     timestamp = entry.get("timestamp", "")
                     if timestamp >= latest_timestamp:
                         latest_timestamp = timestamp
                         latest_usage = usage
-
                 except json.JSONDecodeError:
                     continue
 
         if latest_usage:
-            # Sum all token types that count toward context
             total = (
                 latest_usage.get("input_tokens", 0)
                 + latest_usage.get("cache_read_input_tokens", 0)
                 + latest_usage.get("cache_creation_input_tokens", 0)
             )
-            percentage = (total / MAX_CONTEXT_TOKENS) * 100
-            return total, percentage
-
+            return ContextInfo(tokens=total, percentage=(total / MAX_CONTEXT_TOKENS) * 100)
     except Exception:
         pass
 
     return None
 
 
-def format_context_display(tokens: int, percentage: float) -> str:
-    """Format context usage with color coding based on utilization."""
-    # Color based on usage level
+# =============================================================================
+# STYLE FORMATTERS
+# =============================================================================
+def format_tokens(tokens: int) -> str:
+    """Format token count as human-readable string."""
+    return f"{tokens // 1000}k" if tokens >= 1000 else str(tokens)
+
+
+def context_color(percentage: float) -> str:
+    """Get color code based on context usage percentage."""
     if percentage >= 85:
-        color = RED
+        return RED
     elif percentage >= 70:
-        color = YELLOW
-    else:
-        color = GREEN
-
-    # Format tokens as "123k" for readability
-    if tokens >= 1000:
-        tokens_str = f"{tokens // 1000}k"
-    else:
-        tokens_str = str(tokens)
-
-    return f"{color}{tokens_str} ({percentage:.0f}%){RESET}"
+        return YELLOW
+    return GREEN
 
 
-def get_git_info(cwd: str) -> str:
-    """Get git branch and dirty status if in a git repo."""
-    try:
-        subprocess.run(
-            ["git", "-C", cwd, "rev-parse", "--git-dir"],
-            capture_output=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError:
-        return ""
+def format_style_pipes(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
+    """Style: Minimal separators with │"""
+    parts = []
 
-    # Get branch name
-    result = subprocess.run(
-        ["git", "-C", cwd, "branch", "--show-current"],
-        capture_output=True,
-        text=True,
-    )
-    branch = result.stdout.strip() or "detached"
+    # Git section
+    if git:
+        git_parts = [f"{BLUE}{git.branch}{RESET}"]
+        if git.ahead:
+            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
+        if git.behind:
+            git_parts.append(f"{RED}↓{git.behind}{RESET}")
+        if git.has_staged:
+            git_parts.append(f"{GREEN}●{RESET}")
+        if git.has_unstaged:
+            git_parts.append(f"{YELLOW}○{RESET}")
+        if git.branch != "detached" and not git.has_upstream:
+            git_parts.append(f"{RED}⚠{RESET}")
+        parts.append(" ".join(git_parts))
 
-    # Check for uncommitted changes
-    diff_result = subprocess.run(
-        ["git", "-C", cwd, "diff", "--quiet"],
-        capture_output=True,
-    )
-    cached_result = subprocess.run(
-        ["git", "-C", cwd, "diff", "--cached", "--quiet"],
-        capture_output=True,
-    )
-    is_dirty = diff_result.returncode != 0 or cached_result.returncode != 0
-    dirty_indicator = f"{YELLOW}*{RESET}" if is_dirty else ""
+    # Model section
+    parts.append(f"{WHITE}{model}{RESET}")
 
-    return f"{BLUE}{branch}{RESET}{dirty_indicator}"
+    # Context section
+    if ctx:
+        color = context_color(ctx.percentage)
+        parts.append(f"{color}{format_tokens(ctx.tokens)} ({ctx.percentage:.0f}%){RESET}")
+
+    return f" {DIM}│{RESET} ".join(parts)
 
 
+def format_style_diamonds(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
+    """Style: Symbol-heavy separators with ◆"""
+    parts = []
+
+    # Git section
+    if git:
+        git_parts = [f"{BLUE}{git.branch}{RESET}"]
+        if git.ahead:
+            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
+        if git.behind:
+            git_parts.append(f"{RED}↓{git.behind}{RESET}")
+        if git.has_staged:
+            git_parts.append(f"{GREEN}●{RESET}")
+        if git.has_unstaged:
+            git_parts.append(f"{YELLOW}○{RESET}")
+        if git.branch != "detached" and not git.has_upstream:
+            git_parts.append(f"{RED}⚠{RESET}")
+        parts.append(" ".join(git_parts))
+
+    # Model section
+    parts.append(f"{WHITE}{model}{RESET}")
+
+    # Context section
+    if ctx:
+        color = context_color(ctx.percentage)
+        parts.append(f"{color}{format_tokens(ctx.tokens)}/{ctx.percentage:.0f}%{RESET}")
+
+    return f" {DIM}◆{RESET} ".join(parts)
+
+
+def format_style_labeled(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
+    """Style: Compact with dimmed labels"""
+    parts = []
+
+    # Git section (no label, it's obvious)
+    if git:
+        git_parts = [f"{BLUE}{git.branch}{RESET}"]
+        if git.ahead:
+            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
+        if git.behind:
+            git_parts.append(f"{RED}↓{git.behind}{RESET}")
+        if git.has_staged:
+            git_parts.append(f"{GREEN}●{RESET}")
+        if git.has_unstaged:
+            git_parts.append(f"{YELLOW}○{RESET}")
+        if git.branch != "detached" and not git.has_upstream:
+            git_parts.append(f"{RED}⚠{RESET}")
+        parts.append(" ".join(git_parts))
+
+    # Model section with label
+    parts.append(f"{DIM}model:{RESET}{WHITE}{model}{RESET}")
+
+    # Context section with label
+    if ctx:
+        color = context_color(ctx.percentage)
+        parts.append(f"{DIM}ctx:{RESET}{color}{format_tokens(ctx.tokens)}/{ctx.percentage:.0f}%{RESET}")
+
+    return "  ".join(parts)
+
+
+def format_style_powerline(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
+    """Style: Powerline-style colored backgrounds"""
+    parts = []
+
+    # Git section - blue background, black text
+    if git:
+        git_str = f" {git.branch}"
+        if git.ahead:
+            git_str += f" ↑{git.ahead}"
+        if git.behind:
+            git_str += f" ↓{git.behind}"
+        if git.has_staged:
+            git_str += " ●"
+        if git.has_unstaged:
+            git_str += " ○"
+        if git.branch != "detached" and not git.has_upstream:
+            git_str += " ⚠"
+        git_str += " "
+        parts.append(f"{BG_BRIGHT_BLUE}{BLACK}{git_str}{RESET}")
+
+    # Model section - magenta background, black text
+    parts.append(f"{BG_BRIGHT_MAGENTA}{BLACK} {model} {RESET}")
+
+    # Context section - colored background based on usage, black text
+    if ctx:
+        if ctx.percentage >= 85:
+            bg = BG_BRIGHT_RED
+        elif ctx.percentage >= 70:
+            bg = BG_BRIGHT_YELLOW
+        else:
+            bg = BG_BRIGHT_GREEN
+        parts.append(f"{bg}{BLACK} {format_tokens(ctx.tokens)} {ctx.percentage:.0f}% {RESET}")
+
+    return "".join(parts)
+
+
+def format_style_dots(git: GitInfo | None, model: str, ctx: ContextInfo | None) -> str:
+    """Style: Subtle dot separators (·)"""
+    parts = []
+
+    # Git section
+    if git:
+        git_parts = [f"{BLUE}{git.branch}{RESET}"]
+        if git.ahead:
+            git_parts.append(f"{GREEN}↑{git.ahead}{RESET}")
+        if git.behind:
+            git_parts.append(f"{RED}↓{git.behind}{RESET}")
+        if git.has_staged:
+            git_parts.append(f"{GREEN}●{RESET}")
+        if git.has_unstaged:
+            git_parts.append(f"{YELLOW}○{RESET}")
+        if git.branch != "detached" and not git.has_upstream:
+            git_parts.append(f"{RED}⚠{RESET}")
+        parts.append(" ".join(git_parts))
+
+    # Model section
+    parts.append(f"{WHITE}{model}{RESET}")
+
+    # Context section
+    if ctx:
+        color = context_color(ctx.percentage)
+        parts.append(f"{color}{format_tokens(ctx.tokens)} ({ctx.percentage:.0f}%){RESET}")
+
+    return f" {DIM}·{RESET} ".join(parts)
+
+
+FORMATTERS = {
+    "pipes": format_style_pipes,
+    "diamonds": format_style_diamonds,
+    "labeled": format_style_labeled,
+    "powerline": format_style_powerline,
+    "dots": format_style_dots,
+}
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Claude Code status line")
+    parser.add_argument(
+        "--style",
+        "-s",
+        choices=list(FORMATTERS.keys()),
+        default=DEFAULT_STYLE,
+        help=f"Status line style (default: {DEFAULT_STYLE})",
+    )
+    args = parser.parse_args()
+
     raw_input = sys.stdin.read()
-    # log_stdin_sample(raw_input)  # Uncomment to enable schema discovery logging
     data = json.loads(raw_input)
+
     cwd = data.get("workspace", {}).get("current_dir", os.getcwd())
     model = data.get("model", {}).get("display_name", "unknown")
     transcript_path = data.get("transcript_path", "")
-    git_info = get_git_info(cwd)
 
-    # Build status line components
-    parts = []
-    # Add git info (already has colors applied)
-    if git_info:
-        parts.append(git_info)
+    git = get_git_info(cwd)
+    ctx = get_context_usage(transcript_path)
 
-    parts.append(f"{WHITE}🤖{model}{RESET}")
-
-    # Add context usage if available
-    context = get_context_usage(transcript_path)
-    if context:
-        tokens, percentage = context
-        parts.append(format_context_display(tokens, percentage))
-
-    print(" ".join(parts))
+    formatter = FORMATTERS[args.style]
+    print(formatter(git, model, ctx))
 
 
 if __name__ == "__main__":
