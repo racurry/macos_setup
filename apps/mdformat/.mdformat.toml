@@ -38,8 +38,9 @@ end_of_line = "lf"
 #   true  - Use consecutive numbering (1., 2., 3., ...)
 #
 # Using "1." everywhere is the CommonMark standard approach and makes it easy
-# to reorder items without renumbering.
-# number = false
+# to reorder items without renumbering. We prefer consecutive numbering for
+# readability in rendered output.
+number = true
 
 ################################################################################
 # PARSER VALIDATION
