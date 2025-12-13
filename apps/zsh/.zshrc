@@ -116,6 +116,7 @@ export mbox=$MOTHERBOX_ROOT # comes from .local.zshrc
 export inbox=~/Documents/"000_Inbox"
 export iCloud=~/iCloud
 export icloud=~/iCloud  # Both cases for convenience - prevents typos
+export nlp=~/workspace/infra/neat-little-package
 
 # ============================================================================
 # CUSTOM FUNCTIONS

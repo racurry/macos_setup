@@ -6,3 +6,4 @@
 .ruff_cache/
 .tmp
 .local.zshrc
+__pycache__/

@@ -10,3 +10,4 @@
 - NEVER add claude co author attribution in commits
 
 Apply all rules from @~/AGENTS.md.
+- Use `git pub` to push to remote
