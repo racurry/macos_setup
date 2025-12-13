@@ -227,7 +227,7 @@ alias mdlint='markdownlint-cli2 --config ~/.markdownlint-cli2.jsonc'
 
 # Claude helpers
 alias cld='claude'
-alias cldup='brew upgrade claude-code'
+alias cldup='npm update -g @anthropic-ai/claude-code'
 alias clddanger='claude --allow-dangerously-skip-permissions'
 alias cldc='claude --continue'
 alias cldr='claude --resume'

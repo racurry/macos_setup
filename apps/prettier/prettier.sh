@@ -22,6 +22,10 @@ EOF
 do_setup() {
     print_heading "Setup prettier configuration"
 
+    # Install via npm (not brew) to avoid node version conflicts with asdf
+    # Also in apps/asdf/.default-npm-packages for new node versions
+    npm install -g prettier
+
     link_home_dotfile "${SCRIPT_DIR}/.prettierrc.json5" "${APP_NAME}"
     link_home_dotfile "${SCRIPT_DIR}/.prettierignore" "${APP_NAME}"
 

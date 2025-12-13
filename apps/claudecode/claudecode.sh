@@ -128,7 +128,9 @@ do_settings() {
 }
 
 do_setup() {
-    ensure_brew_package claude claude-code cask
+    # Install via npm (not brew) for immediate updates
+    # Also added to apps/asdf/.default-npm-packages for new node versions
+    npm install -g @anthropic-ai/claude-code
 
     do_rules
     do_commands
