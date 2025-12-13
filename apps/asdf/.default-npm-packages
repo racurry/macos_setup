@@ -1,5 +1,2 @@
 @anthropic-ai/claude-code
 @google/gemini-cli
-eslint
-markdownlint-cli2
-prettier

@@ -34,3 +34,4 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 - [ ] Pull claude code settings out into a standalone repo; this repo will need to pull that repo down and set it up
 - [ ] Is there a way to audit which vscode extensions i actually use?
 - [ ] Fucking fix vscode's tab completion!!!
+- [ ] Can we add extension syncing to vscode & cursor?

@@ -1,5 +1,5 @@
 # Work-specific packages
-# Add work-related brew/cask/mas entries here as needed.
+brew "snowflake-cli"
 
 # Example work tools (commented out - uncomment as needed)
 # brew "kubectl"

@@ -5,6 +5,7 @@ brew "bats-core"
 brew "diff-so-fancy"
 brew "direnv"
 brew "entr"
+brew "eslint"
 brew "eza"
 brew "ffmpeg"
 brew "fzf"
@@ -13,7 +14,9 @@ brew "gifsicle"
 brew "git"
 brew "hub"
 brew "imagemagick"
+brew "markdownlint-cli2"
 brew "mas"  # Required for Mac App Store apps
+brew "prettier"
 brew "pure"
 brew "qpdf"
 brew "ruff"
@@ -86,11 +89,11 @@ vscode "waderyan.gitblame"
 vscode "wmaurer.change-case"
 
 # Mac App Store apps
-mas "Actions For Obsidian", id: 1659667937
 mas "Amphetamine", id: 937984704
 mas "CARROTweather", id: 993487541
 mas "Meeter", id: 1510445899
 mas "Rapidmg", id: 6451349778
 mas "The Unarchiver", id: 425424353
 mas "Things", id: 904280696
-mas "Xcode", id: 497799835
+
+# Apps requiring sudo for upgrades are in sudo.Brewfile

@@ -22,9 +22,8 @@ EOF
 do_setup() {
     print_heading "Setup markdownlint configuration"
 
-    # Install via npm (not brew) to avoid node version conflicts with asdf
-    # Also in apps/asdf/.default-npm-packages for new node versions
-    npm install -g markdownlint-cli2
+    # Installed via Brewfile; verify it's available
+    require_command markdownlint-cli2
 
     link_home_dotfile "${SCRIPT_DIR}/.markdownlint-cli2.jsonc" "${APP_NAME}"
 
