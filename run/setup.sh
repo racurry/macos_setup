@@ -141,6 +141,7 @@ run_app_setup direnv
 run_app_setup 1password
 run_app_setup shellcheck
 run_app_setup markdownlint
+run_app_setup mdformat
 run_app_setup shfmt
 run_app_setup ruff
 run_app_setup uv
