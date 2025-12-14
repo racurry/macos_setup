@@ -5,13 +5,14 @@
 # ///
 
 """
-Check what process is running on a given port.
-Usage: whats-on-port <port>
+Check what process is running on a given port, optionally kill it.
+Usage: whats-on-port <port> [--kill]
 """
 
+import os
+import signal
 import subprocess
 import sys
-import re
 from typing import Optional
 
 
@@ -83,53 +84,87 @@ def get_process_details(pid: int) -> Optional[dict]:
         return None
 
 
+def kill_processes(processes: list[dict]) -> bool:
+    """Kill all processes in the list. Returns True if any were killed."""
+    if not processes:
+        return False
+
+    pids = list({proc["pid"] for proc in processes})
+    killed = []
+
+    for pid in pids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+            killed.append(pid)
+        except ProcessLookupError:
+            print(f"Process {pid} already terminated")
+        except PermissionError:
+            print(f"Permission denied to kill process {pid}")
+
+    if killed:
+        print(f"Killed process(es): {', '.join(map(str, killed))}")
+        return True
+    return False
+
+
 def format_output(port: int, processes: list[dict], details: dict[int, dict]):
     """Format and print the output."""
     if not processes:
         print(f"No processes found listening on port {port}")
         return
-    
+
     print(f"Port {port} is in use by {len(processes)} process(es):\n")
-    
+
     for proc in processes:
         pid = proc["pid"]
         print(f"PID: {pid}")
         print(f"Command: {proc['command']}")
         print(f"User: {proc['user']}")
-        
+
         if pid in details and details[pid]:
             detail = details[pid]
             print(f"Parent PID: {detail['ppid']}")
             print(f"Started: {detail['start_time']}")
             print(f"Full command: {detail['command']}")
-        
+
         print()
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: whats-on-port <port>", file=sys.stderr)
+    args = [a for a in sys.argv[1:] if not a.startswith("-")]
+    flags = [a for a in sys.argv[1:] if a.startswith("-")]
+
+    kill_mode = "--kill" in flags or "-k" in flags
+
+    if len(args) != 1:
+        print("Usage: whats-on-port <port> [--kill]", file=sys.stderr)
         sys.exit(1)
-    
+
     try:
-        port = int(sys.argv[1])
+        port = int(args[0])
         if port < 1 or port > 65535:
             raise ValueError("Port must be between 1 and 65535")
     except ValueError as e:
         print(f"Invalid port: {e}", file=sys.stderr)
         sys.exit(1)
-    
+
     # Get processes on the port
     processes = get_processes_on_port(port)
-    
-    # Get detailed info for each process
-    details = {}
-    for proc in processes:
-        pid = proc["pid"]
-        details[pid] = get_process_details(pid)
-    
-    # Format and display
-    format_output(port, processes, details)
+
+    if kill_mode:
+        if not processes:
+            print(f"No processes found listening on port {port}")
+            sys.exit(0)
+        kill_processes(processes)
+    else:
+        # Get detailed info for each process
+        details = {}
+        for proc in processes:
+            pid = proc["pid"]
+            details[pid] = get_process_details(pid)
+
+        # Format and display
+        format_output(port, processes, details)
 
 
 if __name__ == "__main__":

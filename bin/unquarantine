@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Remove quarantine flag from downloaded apps
+
+set -euo pipefail
+
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: unquarantine /path/to/app.app"
+  echo "Removes macOS quarantine flag from downloaded applications"
+  exit 1
+fi
+
+app_path="$1"
+
+# Check if path exists
+if [[ ! -e "$app_path" ]]; then
+  echo "Error: '$app_path' does not exist"
+  exit 1
+fi
+
+# Check if quarantine flag exists
+if xattr -l "$app_path" 2>/dev/null | grep -q "com.apple.quarantine"; then
+  echo "Removing quarantine flag from: $app_path"
+  xattr -d com.apple.quarantine "$app_path"
+  echo "Successfully unquarantined: $app_path"
+else
+  echo "No quarantine flag found on: $app_path"
+fi
