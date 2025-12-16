@@ -14,9 +14,10 @@
 [commit]
   gpgsign = true
 
-
 [alias]
-  # Command shortcuts
+  # ─────────────────────────────────────────────────────────────
+  # Shortcuts
+  # ─────────────────────────────────────────────────────────────
   a = add
   aa = add -A
   ci = commit
@@ -25,63 +26,83 @@
   st = status
   br = branch
 
+  # ─────────────────────────────────────────────────────────────
+  # Branch Info
+  # ─────────────────────────────────────────────────────────────
   # What's your default branch?
   default-branch = "!git symbolic-ref refs/remotes/origin/HEAD | cut -f4 -d/"
-
-  # What branch is this
+  brdef = !git default-branch
+  # What branch is this?
   branch-name = !git rev-parse --abbrev-ref HEAD
-
-  # Which branches have been merged
+  brname = !git branch-name
+  # Which branches have been merged?
   merged-branches = !git branch --merged
+  brmerged = !git merged-branches
 
-  # I like rebases
-  pur = pull --rebase
-
-  # Add and commit everything
-  aco = !git add -A && git commit -m
-
-  # Stash pull and reapply
-  restash = !git stash push -u -m \"Auto-stash $(date +%Y-%m-%d)\" && git pull --rebase && git stash pop
-
-  # Prettier, easier to follow logs.
+  # ─────────────────────────────────────────────────────────────
+  # Logging
+  # ─────────────────────────────────────────────────────────────
+  # Prettier, easier to follow logs
   lol = log --graph --date=relative --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ad)%Creset'
   lds = log --pretty=format:\"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]\" --decorate --date=short
 
-  # Pull the latest commit off, put leave the change staged
-  uncommit = reset --soft HEAD~1
-
-  # Don't accidentally clobber someone else's stuff
-  pushf = push --force-with-lease
-
-  # Take some of the sting out of messing up
-  amend = commit --amend --no-edit
-  oops = !git add . && git amend
-  oopspush = !git oops && git pushf
-
-  # Delete local branches that have been merged
-  cleanup-merged = !git branch --merged | grep -v -e $(git default-branch) -e '\\*' | xargs -n 1 git branch -d 2>/dev/null || true
-  cleanup-gone = !git branch --format='%(refname:short) %(upstream:track)' | grep '\\[gone\\]' | awk '{print $1}' | xargs -r git branch -D
-  cleanup = !git cleanup-merged && git cleanup-gone && git remote prune origin
-
-  # Push up changes
-  publish = !git push -u origin $(git branch-name)
-  pub = !git publish
-
-  # go to default branch, pull, cleanup
+  # ─────────────────────────────────────────────────────────────
+  # Pulling & Syncing
+  # ─────────────────────────────────────────────────────────────
+  # I like rebases
+  pur = pull --rebase
+  # Stash, pull, and reapply
+  restash = !git stash push -u -m \"Auto-stash $(date +%Y-%m-%d)\" && git pull --rebase && git stash pop
+  # Go to default branch, pull, cleanup
   reup = !git checkout $(git default-branch) && git pull --rebase && git cleanup
 
+  # ─────────────────────────────────────────────────────────────
+  # Committing
+  # ─────────────────────────────────────────────────────────────
+  # Add and commit everything
+  aco = !git add -A && git commit -m
+  # Unstage files
+  unstage = reset HEAD --
+  # Pull the latest commit off, but leave the changes staged
+  uncommit = reset --soft HEAD~1
+  # Amend without editing the message
+  amend = commit --amend --no-edit
+  # Add everything and amend
+  oops = !git add . && git amend
+  # Diff staged changes
+  diffc = diff --cached
+
+  # ─────────────────────────────────────────────────────────────
+  # Pushing
+  # ─────────────────────────────────────────────────────────────
+  # Push and set upstream
+  publish = !git push -u origin $(git branch-name)
+  pub = !git publish
+  # Don't accidentally clobber someone else's stuff
+  pushf = push --force-with-lease
+  # Oops, and force push
+  oopspush = !git oops && git pushf
   # Add, commit, rebase, then push
   gobig = !git add -A && git commit && git pull --rebase && git push
-
-  # Rebase current branch onto latest default branch and force push with lease
+  # Rebase onto latest default branch and force push
   rebase-and-push = !git fetch origin && git rebase origin/$(git default-branch) && git push --force-with-lease
+  pubf = !git rebase-and-push
 
-  # kill everything locally
+  # ─────────────────────────────────────────────────────────────
+  # Cleanup
+  # ─────────────────────────────────────────────────────────────
+  # Delete local branches that have been merged
+  cleanup-merged = !git branch --merged | grep -v -e $(git default-branch) -e '\\*' | xargs -n 1 git branch -d 2>/dev/null || true
+  # Delete local branches whose remotes are gone
+  cleanup-gone = !git branch --format='%(refname:short) %(upstream:track)' | grep '\\[gone\\]' | awk '{print $1}' | xargs -r git branch -D
+  # Run both cleanups and prune remotes
+  cleanup = !git cleanup-merged && git cleanup-gone && git remote prune origin
+
+  # ─────────────────────────────────────────────────────────────
+  # Nuclear Options
+  # ─────────────────────────────────────────────────────────────
+  # Kill everything locally
   wipe = !git reset --hard && git clean -fd
-
-  # Open a PR
-  pr = !hub pull-request
-	refresh = !git commit --amend -m \"$(git log -1 --format=%s)\"
 
 [core]
   excludesfile = ~/.gitignore_global
@@ -114,10 +135,17 @@
 	whitespace = red reverse
 [push]
 	followTags = true
-[hub]
-	protocol = ssh
 [pull]
 	rebase = true
+[fetch]
+	prune = true
+	pruneTags = true
+[rebase]
+	autostash = true
+[rerere]
+	enabled = true
+[help]
+	autocorrect = prompt
 [submodule]
 	recurse = true
 [init]
