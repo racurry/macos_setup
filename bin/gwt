@@ -38,8 +38,19 @@ copy_gitignored_files() {
         fi
     done < <(git ls-files --others --ignored --exclude-standard)
 
+    # Copy .env directories (git ls-files only lists files, not directories)
+    while IFS= read -r dir; do
+        [[ -n "$dir" ]] || continue
+        local rel_dir="${dir#"$src_root/"}"
+        local dest_dir="$dest/$(dirname "$rel_dir")"
+        mkdir -p "$dest_dir"
+        cp -r "$dir" "$dest/$rel_dir"
+        echo "  Copied $rel_dir/"
+        ((copied++)) || true
+    done < <(find "$src_root" -type d -name ".env" 2>/dev/null | grep -v "node_modules" || true)
+
     if [[ $copied -gt 0 ]]; then
-        echo "Copied $copied gitignored file(s) to worktree"
+        echo "Copied $copied gitignored file(s)/directory(s) to worktree"
     fi
 }
 
