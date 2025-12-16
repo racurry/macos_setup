@@ -164,30 +164,28 @@ update_pr() {
 }
 
 # Process a single PR and return status code:
-# 0 = updated, 1 = up-to-date, 2 = skipped, 3 = failed
+# 0 = updated, 1 = up-to-date, 2 = skipped/behind, 3 = failed
 process_pr() {
     local repo=$1
     local number=$2
     local title=$3
     local url=$4
 
-    echo ""
-    echo -e "${CYAN}${BOLD}PR #${number}${NC} - ${title}"
+    echo -e "  ${CYAN}${BOLD}PR #${number}${NC} - ${title}"
     echo -e "  ${BLUE}${url}${NC}"
-    echo -e "  Repo: ${YELLOW}${repo}${NC}"
 
     # Get PR status
     local status_json
     status_json=$(get_pr_status "$repo" "$number")
 
     if [[ -z "$status_json" || "$status_json" == "{}" ]]; then
-        log_error "  Could not fetch PR status"
+        echo -e "  ${RED}Could not fetch PR status${NC}"
+        echo ""
         return 3
     fi
 
-    local merge_state base_ref is_draft check_summary
+    local merge_state is_draft check_summary
     merge_state=$(echo "$status_json" | jq -r '.mergeStateStatus // "UNKNOWN"')
-    base_ref=$(echo "$status_json" | jq -r '.baseRefName // "unknown"')
     is_draft=$(echo "$status_json" | jq -r '.isDraft // false')
     check_summary=$(summarize_checks "$status_json")
 
@@ -211,68 +209,62 @@ process_pr() {
             ;;
     esac
 
-    echo -e "  Base: ${YELLOW}${base_ref}${NC} | Status: ${YELLOW}${merge_state}${NC} | Checks: ${check_display}${draft_indicator}"
-
-    # Determine if we should attempt update
-    # BEHIND = definitely needs update
-    # BLOCKED = might need update (branch protection doesn't tell us if behind)
-    # CLEAN = already up to date
-    # DIRTY = has conflicts, can't auto-update
+    # Determine status indicator and whether to update
+    local status_indicator=""
     local should_update=false
-    local skip_reason=""
 
     case "$merge_state" in
         BEHIND)
+            status_indicator=" | ${YELLOW}OUTDATED${NC}"
             should_update=true
             ;;
         BLOCKED)
             # BLOCKED means can't merge due to branch protection, but may still be behind
-            # Attempt the update - gh will tell us if already up to date
+            status_indicator=" | ${YELLOW}OUTDATED${NC}"
             should_update=true
             ;;
         CLEAN|HAS_HOOKS|UNSTABLE)
-            log_success "  Already up to date"
-            return 1
+            # Up to date, no indicator needed
             ;;
         DIRTY)
-            skip_reason="Has merge conflicts - manual resolution required"
+            status_indicator=" | ${RED}CONFLICTS${NC}"
             ;;
         UNKNOWN)
-            # Try anyway - GitHub might still be computing
+            status_indicator=" | ${YELLOW}UNKNOWN${NC}"
             should_update=true
             ;;
         *)
-            skip_reason="Unexpected status: ${merge_state}"
+            status_indicator=" | ${RED}${merge_state}${NC}"
             ;;
     esac
 
-    if [[ -n "$skip_reason" ]]; then
-        log_warn "  ${skip_reason}"
-        return 2
-    fi
+    echo -e "  Status: ${YELLOW}${merge_state}${NC} | Checks: ${check_display}${status_indicator}${draft_indicator}"
+    echo ""
 
-    if [[ "$should_update" == true ]]; then
-        if [[ "$DO_UPDATE" == false ]]; then
-            log_warn "  Behind ${base_ref} (use --update to rebase)"
-            return 2
-        fi
-
-        log_info "  Rebasing on ${base_ref}..."
+    # Handle update if requested
+    if [[ "$should_update" == true && "$DO_UPDATE" == true ]]; then
+        echo -e "  ${BLUE}ℹ${NC} Rebasing..."
         local result
         if result=$(update_pr "$repo" "$number" 2>&1); then
-            # Check if it was actually updated or already up to date
             if [[ "$result" == *"already up to date"* ]] || [[ "$result" == *"Already up to date"* ]]; then
-                log_success "  Already up to date"
+                echo -e "  ${GREEN}✓${NC} Already up to date"
                 return 1
             else
-                log_success "  Updated successfully"
+                echo -e "  ${GREEN}✓${NC} Updated successfully"
                 return 0
             fi
         else
-            log_error "  Failed to update: $result"
+            echo -e "  ${RED}✗${NC} Failed to update: $result"
             return 3
         fi
     fi
+
+    # Return codes for non-update mode
+    case "$merge_state" in
+        CLEAN|HAS_HOOKS|UNSTABLE) return 1 ;;  # up-to-date
+        DIRTY) return 2 ;;  # conflicts
+        *) return 2 ;;  # behind/other
+    esac
 }
 
 main() {
@@ -346,46 +338,39 @@ main() {
 
     echo -e "Found ${BOLD}${pr_count}${NC} open PR(s)"
 
-    # Counters
-    local updated=0 up_to_date=0 skipped=0 failed=0
+    # Group PRs by repo and process
+    local repos
+    repos=$(echo "$prs_json" | jq -r '[.[].repo] | unique | .[]')
 
-    # Read PRs into array to avoid subshell counter issues
-    local pr_entries=()
-    while IFS= read -r pr; do
-        pr_entries+=("$pr")
-    done < <(echo "$prs_json" | jq -c '.[]')
+    local had_failures=false
 
-    # Process each PR
-    for pr in "${pr_entries[@]}"; do
-        local repo number title url
-        repo=$(echo "$pr" | jq -r '.repo')
-        number=$(echo "$pr" | jq -r '.number')
-        title=$(echo "$pr" | jq -r '.title')
-        url=$(echo "$pr" | jq -r '.url')
+    while IFS= read -r repo; do
+        [[ -z "$repo" ]] && continue
 
-        local result=0
-        process_pr "$repo" "$number" "$title" "$url" || result=$?
+        echo ""
+        echo -e "${BOLD}Repo: ${YELLOW}${repo}${NC}"
 
-        case $result in
-            0) ((updated++)) ;;
-            1) ((up_to_date++)) ;;
-            2) ((skipped++)) ;;
-            3) ((failed++)) ;;
-        esac
-    done
+        # Get PRs for this repo
+        local repo_prs
+        repo_prs=$(echo "$prs_json" | jq -c --arg repo "$repo" '[.[] | select(.repo == $repo)] | .[]')
 
-    # Summary
-    echo ""
-    echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -e "${BOLD}Summary${NC}"
-    echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    [[ $updated -gt 0 ]] && echo -e "  ${GREEN}✓ Updated:${NC}        $updated"
-    [[ $up_to_date -gt 0 ]] && echo -e "  ${GREEN}✓ Up to date:${NC}     $up_to_date"
-    [[ $skipped -gt 0 ]] && echo -e "  ${YELLOW}⚠ Skipped:${NC}        $skipped"
-    [[ $failed -gt 0 ]] && echo -e "  ${RED}✗ Failed:${NC}         $failed"
+        while IFS= read -r pr; do
+            [[ -z "$pr" ]] && continue
+
+            local number title url
+            number=$(echo "$pr" | jq -r '.number')
+            title=$(echo "$pr" | jq -r '.title')
+            url=$(echo "$pr" | jq -r '.url')
+
+            local result=0
+            process_pr "$repo" "$number" "$title" "$url" || result=$?
+
+            [[ $result -eq 3 ]] && had_failures=true
+        done <<< "$repo_prs"
+    done <<< "$repos"
 
     # Exit with error if any failures
-    [[ $failed -gt 0 ]] && exit 1
+    [[ "$had_failures" == true ]] && exit 1
     exit 0
 }
 
