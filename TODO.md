@@ -21,8 +21,6 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
     3. Which VS Code settings files should be tracked? Just `settings.json` and `keybindings.json`? Also `snippets/`, `tasks.json`, `launch.json`? Should machine-specific settings be excluded?
     4. Should this script be integrated into the main run/setup.sh workflow or remain manual?
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
-- [ ] Fix the sudo check - i actually want to just do it once for setup
-- [ ] Add default opinionated configs for all linters
 - [ ] Get mcp logic set up for gemini, codex
 
 ## Icebox
@@ -35,3 +33,4 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 - [ ] Is there a way to audit which vscode extensions i actually use?
 - [ ] Fucking fix vscode's tab completion!!!
 - [ ] Can we add extension syncing to vscode & cursor?
+- [ ] How do I set up manual set up in a clean way?  Each app could have a manual_setep.md file.  Can I transclude it into readme?
