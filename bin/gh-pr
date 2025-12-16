@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-# gh-pr-update - Update all your open PRs by rebasing on their base branch
+# gh-pr - Manage your GitHub pull requests
 #
-# Finds open PRs authored by you, checks if they're behind their base branch,
-# and updates them using GitHub's rebase functionality.
+# Shows status of all your open PRs across repositories.
+# Optionally updates them by rebasing on their base branch.
 
 # Colors
 RED='\033[0;31m'
@@ -16,35 +16,33 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Options
-DRY_RUN=true  # Safe default: show what would happen
-INTERACTIVE=false
+DO_UPDATE=false
 INCLUDE_DRAFTS=false
 REPO=""
 ORG=""
 
 show_help() {
     cat <<EOF
-Usage: gh-pr-update [OPTIONS]
+Usage: gh-pr [OPTIONS]
 
-Find all your open PRs on GitHub and rebase them with their base branch if needed.
+Show status of all your open PRs on GitHub. Optionally rebase them with their base branch.
 
 Options:
-    --update            Actually perform the rebase (dry-run by default)
+    --update            Rebase PRs that are behind their base branch
     --repo OWNER/REPO   Limit to specific repository
     --org ORG           Limit to an organization or user (e.g., galileo-inc, racurry)
-    --include-drafts    Include draft PRs (skipped by default)
-    --interactive       Confirm each PR before updating
+    --include-drafts    Include draft PRs (excluded by default)
     -h, --help          Show this help message
 
 Examples:
-    gh-pr-update                        # Show what would be updated (dry-run)
-    gh-pr-update --update               # Actually rebase PRs
-    gh-pr-update --org galileo-inc      # Only PRs in galileo-inc repos
-    gh-pr-update --repo cli/cli         # Only PRs in cli/cli repo
-    gh-pr-update --interactive --update # Confirm each before updating
+    gh-pr                           # Show status of all your open PRs
+    gh-pr --update                  # Rebase PRs that are behind
+    gh-pr --org galileo-inc         # Only PRs in galileo-inc repos
+    gh-pr --repo cli/cli            # Only PRs in cli/cli repo
+    gh-pr --update --include-drafts # Update including draft PRs
 
 Merge State Reference:
-    BEHIND      PR branch is behind base - will be updated
+    BEHIND      PR branch is behind base - can be updated with --update
     CLEAN       Already up to date with base
     DIRTY       Has merge conflicts - requires manual resolution
     BLOCKED     Blocked by branch protection rules
@@ -89,24 +87,34 @@ check_requirements() {
 get_open_prs() {
     local prs_json
 
+    # Build query args array - terms must be separate arguments, not quoted together
+    local query_args=()
+    [[ "$INCLUDE_DRAFTS" == false ]] && query_args+=(draft:false)
+
     if [[ -n "$REPO" ]]; then
         # Single repo - use gh pr list (more efficient, better fields)
+        local draft_arg=()
+        [[ "$INCLUDE_DRAFTS" == false ]] && draft_arg=(--draft false)
+
         prs_json=$(gh pr list --author @me --state open --repo "$REPO" \
+            "${draft_arg[@]}" \
             --json number,title,url,baseRefName,headRefName 2>/dev/null) || prs_json="[]"
 
         # Add repo field for consistent processing
         echo "$prs_json" | jq --arg repo "$REPO" '[.[] | . + {repo: $repo}]'
     elif [[ -n "$ORG" ]]; then
         # Filter by org/user - use gh search with org: qualifier
+        query_args+=("org:${ORG}")
+
         prs_json=$(gh search prs --author @me --state open --limit 100 \
-            "org:${ORG}" --json number,title,url,repository 2>/dev/null) || prs_json="[]"
+            "${query_args[@]}" --json number,title,url,repository 2>/dev/null) || prs_json="[]"
 
         # Restructure to extract repo name
         echo "$prs_json" | jq '[.[] | {number, title, url, repo: .repository.nameWithOwner}]'
     else
         # All repos - use gh search prs
         prs_json=$(gh search prs --author @me --state open --limit 100 \
-            --json number,title,url,repository 2>/dev/null) || prs_json="[]"
+            "${query_args[@]}" --json number,title,url,repository 2>/dev/null) || prs_json="[]"
 
         # Restructure to extract repo name
         echo "$prs_json" | jq '[.[] | {number, title, url, repo: .repository.nameWithOwner}]'
@@ -118,7 +126,34 @@ get_pr_status() {
     local number=$2
 
     gh pr view "$number" --repo "$repo" \
-        --json mergeStateStatus,baseRefName,headRefName,isDraft 2>/dev/null || echo "{}"
+        --json mergeStateStatus,baseRefName,headRefName,isDraft,statusCheckRollup 2>/dev/null || echo "{}"
+}
+
+# Summarize check status from statusCheckRollup array
+summarize_checks() {
+    local status_json=$1
+    local checks
+    checks=$(echo "$status_json" | jq -r '.statusCheckRollup // []')
+
+    local total passing failing pending
+    total=$(echo "$checks" | jq 'length')
+
+    if [[ "$total" -eq 0 ]]; then
+        echo "none"
+        return
+    fi
+
+    passing=$(echo "$checks" | jq '[.[] | select(.conclusion == "SUCCESS" or .state == "SUCCESS")] | length')
+    failing=$(echo "$checks" | jq '[.[] | select(.conclusion == "FAILURE" or .state == "FAILURE" or .conclusion == "ERROR" or .state == "ERROR")] | length')
+    pending=$(echo "$checks" | jq '[.[] | select(.state == "PENDING" or .conclusion == null or .conclusion == "")] | length')
+
+    if [[ "$failing" -gt 0 ]]; then
+        echo "failing:${failing}/${total}"
+    elif [[ "$pending" -gt 0 ]]; then
+        echo "pending:${pending}/${total}"
+    else
+        echo "passing:${total}/${total}"
+    fi
 }
 
 update_pr() {
@@ -126,13 +161,6 @@ update_pr() {
     local number=$2
 
     gh pr update-branch "$number" --repo "$repo" --rebase 2>&1
-}
-
-confirm() {
-    local prompt=$1
-    local response
-    read -r -p "$prompt [y/N] " response
-    [[ "$response" =~ ^[Yy]$ ]]
 }
 
 # Process a single PR and return status code:
@@ -157,21 +185,33 @@ process_pr() {
         return 3
     fi
 
-    local merge_state base_ref is_draft
+    local merge_state base_ref is_draft check_summary
     merge_state=$(echo "$status_json" | jq -r '.mergeStateStatus // "UNKNOWN"')
     base_ref=$(echo "$status_json" | jq -r '.baseRefName // "unknown"')
     is_draft=$(echo "$status_json" | jq -r '.isDraft // false')
+    check_summary=$(summarize_checks "$status_json")
 
     local draft_indicator=""
     [[ "$is_draft" == "true" ]] && draft_indicator=" ${YELLOW}[DRAFT]${NC}"
 
-    echo -e "  Base: ${YELLOW}${base_ref}${NC} | Status: ${YELLOW}${merge_state}${NC}${draft_indicator}"
+    # Format check status with color
+    local check_display
+    case "${check_summary%%:*}" in
+        failing)
+            check_display="${RED}${check_summary#*:} failing${NC}"
+            ;;
+        pending)
+            check_display="${YELLOW}${check_summary#*:} pending${NC}"
+            ;;
+        passing)
+            check_display="${GREEN}${check_summary#*:} passing${NC}"
+            ;;
+        none)
+            check_display="${BLUE}no checks${NC}"
+            ;;
+    esac
 
-    # Skip drafts unless --include-drafts is set
-    if [[ "$is_draft" == "true" && "$INCLUDE_DRAFTS" == false ]]; then
-        log_info "  Skipping draft PR (use --include-drafts to include)"
-        return 2
-    fi
+    echo -e "  Base: ${YELLOW}${base_ref}${NC} | Status: ${YELLOW}${merge_state}${NC} | Checks: ${check_display}${draft_indicator}"
 
     # Determine if we should attempt update
     # BEHIND = definitely needs update
@@ -212,16 +252,9 @@ process_pr() {
     fi
 
     if [[ "$should_update" == true ]]; then
-        if [[ "$DRY_RUN" == true ]]; then
-            log_warn "  Would attempt rebase on ${base_ref}"
+        if [[ "$DO_UPDATE" == false ]]; then
+            log_warn "  Behind ${base_ref} (use --update to rebase)"
             return 2
-        fi
-
-        if [[ "$INTERACTIVE" == true ]]; then
-            if ! confirm "  Update this PR?"; then
-                log_info "  Skipped by user"
-                return 2
-            fi
         fi
 
         log_info "  Rebasing on ${base_ref}..."
@@ -251,11 +284,7 @@ main() {
                 exit 0
                 ;;
             --update)
-                DRY_RUN=false
-                shift
-                ;;
-            --interactive)
-                INTERACTIVE=true
+                DO_UPDATE=true
                 shift
                 ;;
             --include-drafts)
@@ -316,10 +345,6 @@ main() {
     fi
 
     echo -e "Found ${BOLD}${pr_count}${NC} open PR(s)"
-
-    if [[ "$DRY_RUN" == true ]]; then
-        echo -e "${YELLOW}${BOLD}DRY RUN${NC} - no changes will be made"
-    fi
 
     # Counters
     local updated=0 up_to_date=0 skipped=0 failed=0
