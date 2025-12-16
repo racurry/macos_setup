@@ -1,0 +1,367 @@
+#!/bin/bash
+set -euo pipefail
+
+# gh-pr-update - Update all your open PRs by rebasing on their base branch
+#
+# Finds open PRs authored by you, checks if they're behind their base branch,
+# and updates them using GitHub's rebase functionality.
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Options
+DRY_RUN=true  # Safe default: show what would happen
+INTERACTIVE=false
+INCLUDE_DRAFTS=false
+REPO=""
+ORG=""
+
+show_help() {
+    cat <<EOF
+Usage: gh-pr-update [OPTIONS]
+
+Find all your open PRs on GitHub and rebase them with their base branch if needed.
+
+Options:
+    --update            Actually perform the rebase (dry-run by default)
+    --repo OWNER/REPO   Limit to specific repository
+    --org ORG           Limit to an organization or user (e.g., galileo-inc, racurry)
+    --include-drafts    Include draft PRs (skipped by default)
+    --interactive       Confirm each PR before updating
+    -h, --help          Show this help message
+
+Examples:
+    gh-pr-update                        # Show what would be updated (dry-run)
+    gh-pr-update --update               # Actually rebase PRs
+    gh-pr-update --org galileo-inc      # Only PRs in galileo-inc repos
+    gh-pr-update --repo cli/cli         # Only PRs in cli/cli repo
+    gh-pr-update --interactive --update # Confirm each before updating
+
+Merge State Reference:
+    BEHIND      PR branch is behind base - will be updated
+    CLEAN       Already up to date with base
+    DIRTY       Has merge conflicts - requires manual resolution
+    BLOCKED     Blocked by branch protection rules
+    UNKNOWN     GitHub still computing status
+
+Requirements:
+    - gh CLI installed and authenticated
+    - jq installed for JSON parsing
+EOF
+}
+
+log_info() { echo -e "${BLUE}ℹ${NC} $*"; }
+log_success() { echo -e "${GREEN}✓${NC} $*"; }
+log_warn() { echo -e "${YELLOW}⚠${NC} $*"; }
+log_error() { echo -e "${RED}✗${NC} $*"; }
+
+check_requirements() {
+    local missing=()
+
+    if ! command -v gh &> /dev/null; then
+        missing+=("gh CLI (https://cli.github.com/)")
+    fi
+
+    if ! command -v jq &> /dev/null; then
+        missing+=("jq (brew install jq)")
+    fi
+
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        log_error "Missing required tools:"
+        for tool in "${missing[@]}"; do
+            echo "  - $tool"
+        done
+        exit 1
+    fi
+
+    if ! gh auth status &> /dev/null 2>&1; then
+        log_error "gh CLI is not authenticated. Run: gh auth login"
+        exit 1
+    fi
+}
+
+get_open_prs() {
+    local prs_json
+
+    if [[ -n "$REPO" ]]; then
+        # Single repo - use gh pr list (more efficient, better fields)
+        prs_json=$(gh pr list --author @me --state open --repo "$REPO" \
+            --json number,title,url,baseRefName,headRefName 2>/dev/null) || prs_json="[]"
+
+        # Add repo field for consistent processing
+        echo "$prs_json" | jq --arg repo "$REPO" '[.[] | . + {repo: $repo}]'
+    elif [[ -n "$ORG" ]]; then
+        # Filter by org/user - use gh search with org: qualifier
+        prs_json=$(gh search prs --author @me --state open --limit 100 \
+            "org:${ORG}" --json number,title,url,repository 2>/dev/null) || prs_json="[]"
+
+        # Restructure to extract repo name
+        echo "$prs_json" | jq '[.[] | {number, title, url, repo: .repository.nameWithOwner}]'
+    else
+        # All repos - use gh search prs
+        prs_json=$(gh search prs --author @me --state open --limit 100 \
+            --json number,title,url,repository 2>/dev/null) || prs_json="[]"
+
+        # Restructure to extract repo name
+        echo "$prs_json" | jq '[.[] | {number, title, url, repo: .repository.nameWithOwner}]'
+    fi
+}
+
+get_pr_status() {
+    local repo=$1
+    local number=$2
+
+    gh pr view "$number" --repo "$repo" \
+        --json mergeStateStatus,baseRefName,headRefName,isDraft 2>/dev/null || echo "{}"
+}
+
+update_pr() {
+    local repo=$1
+    local number=$2
+
+    gh pr update-branch "$number" --repo "$repo" --rebase 2>&1
+}
+
+confirm() {
+    local prompt=$1
+    local response
+    read -r -p "$prompt [y/N] " response
+    [[ "$response" =~ ^[Yy]$ ]]
+}
+
+# Process a single PR and return status code:
+# 0 = updated, 1 = up-to-date, 2 = skipped, 3 = failed
+process_pr() {
+    local repo=$1
+    local number=$2
+    local title=$3
+    local url=$4
+
+    echo ""
+    echo -e "${CYAN}${BOLD}PR #${number}${NC} - ${title}"
+    echo -e "  ${BLUE}${url}${NC}"
+    echo -e "  Repo: ${YELLOW}${repo}${NC}"
+
+    # Get PR status
+    local status_json
+    status_json=$(get_pr_status "$repo" "$number")
+
+    if [[ -z "$status_json" || "$status_json" == "{}" ]]; then
+        log_error "  Could not fetch PR status"
+        return 3
+    fi
+
+    local merge_state base_ref is_draft
+    merge_state=$(echo "$status_json" | jq -r '.mergeStateStatus // "UNKNOWN"')
+    base_ref=$(echo "$status_json" | jq -r '.baseRefName // "unknown"')
+    is_draft=$(echo "$status_json" | jq -r '.isDraft // false')
+
+    local draft_indicator=""
+    [[ "$is_draft" == "true" ]] && draft_indicator=" ${YELLOW}[DRAFT]${NC}"
+
+    echo -e "  Base: ${YELLOW}${base_ref}${NC} | Status: ${YELLOW}${merge_state}${NC}${draft_indicator}"
+
+    # Skip drafts unless --include-drafts is set
+    if [[ "$is_draft" == "true" && "$INCLUDE_DRAFTS" == false ]]; then
+        log_info "  Skipping draft PR (use --include-drafts to include)"
+        return 2
+    fi
+
+    # Determine if we should attempt update
+    # BEHIND = definitely needs update
+    # BLOCKED = might need update (branch protection doesn't tell us if behind)
+    # CLEAN = already up to date
+    # DIRTY = has conflicts, can't auto-update
+    local should_update=false
+    local skip_reason=""
+
+    case "$merge_state" in
+        BEHIND)
+            should_update=true
+            ;;
+        BLOCKED)
+            # BLOCKED means can't merge due to branch protection, but may still be behind
+            # Attempt the update - gh will tell us if already up to date
+            should_update=true
+            ;;
+        CLEAN|HAS_HOOKS|UNSTABLE)
+            log_success "  Already up to date"
+            return 1
+            ;;
+        DIRTY)
+            skip_reason="Has merge conflicts - manual resolution required"
+            ;;
+        UNKNOWN)
+            # Try anyway - GitHub might still be computing
+            should_update=true
+            ;;
+        *)
+            skip_reason="Unexpected status: ${merge_state}"
+            ;;
+    esac
+
+    if [[ -n "$skip_reason" ]]; then
+        log_warn "  ${skip_reason}"
+        return 2
+    fi
+
+    if [[ "$should_update" == true ]]; then
+        if [[ "$DRY_RUN" == true ]]; then
+            log_warn "  Would attempt rebase on ${base_ref}"
+            return 2
+        fi
+
+        if [[ "$INTERACTIVE" == true ]]; then
+            if ! confirm "  Update this PR?"; then
+                log_info "  Skipped by user"
+                return 2
+            fi
+        fi
+
+        log_info "  Rebasing on ${base_ref}..."
+        local result
+        if result=$(update_pr "$repo" "$number" 2>&1); then
+            # Check if it was actually updated or already up to date
+            if [[ "$result" == *"already up to date"* ]] || [[ "$result" == *"Already up to date"* ]]; then
+                log_success "  Already up to date"
+                return 1
+            else
+                log_success "  Updated successfully"
+                return 0
+            fi
+        else
+            log_error "  Failed to update: $result"
+            return 3
+        fi
+    fi
+}
+
+main() {
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help|help)
+                show_help
+                exit 0
+                ;;
+            --update)
+                DRY_RUN=false
+                shift
+                ;;
+            --interactive)
+                INTERACTIVE=true
+                shift
+                ;;
+            --include-drafts)
+                INCLUDE_DRAFTS=true
+                shift
+                ;;
+            --repo)
+                if [[ -z "${2:-}" ]]; then
+                    log_error "--repo requires an argument (OWNER/REPO)"
+                    exit 1
+                fi
+                REPO="$2"
+                shift 2
+                ;;
+            --org)
+                if [[ -z "${2:-}" ]]; then
+                    log_error "--org requires an argument (ORG)"
+                    exit 1
+                fi
+                ORG="$2"
+                shift 2
+                ;;
+            *)
+                log_error "Unknown option: $1"
+                echo ""
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+
+    # Validate mutually exclusive options
+    if [[ -n "$REPO" && -n "$ORG" ]]; then
+        log_error "--repo and --org are mutually exclusive"
+        exit 1
+    fi
+
+    check_requirements
+
+    echo -e "${BOLD}Finding your open PRs...${NC}"
+    if [[ -n "$REPO" ]]; then
+        echo -e "  Filtering to repo: ${CYAN}${REPO}${NC}"
+    elif [[ -n "$ORG" ]]; then
+        echo -e "  Filtering to org: ${CYAN}${ORG}${NC}"
+    else
+        echo -e "  Searching all repositories"
+    fi
+
+    local prs_json
+    prs_json=$(get_open_prs)
+
+    local pr_count
+    pr_count=$(echo "$prs_json" | jq 'length')
+
+    if [[ "$pr_count" -eq 0 ]]; then
+        log_info "No open PRs found"
+        exit 0
+    fi
+
+    echo -e "Found ${BOLD}${pr_count}${NC} open PR(s)"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        echo -e "${YELLOW}${BOLD}DRY RUN${NC} - no changes will be made"
+    fi
+
+    # Counters
+    local updated=0 up_to_date=0 skipped=0 failed=0
+
+    # Read PRs into array to avoid subshell counter issues
+    local pr_entries=()
+    while IFS= read -r pr; do
+        pr_entries+=("$pr")
+    done < <(echo "$prs_json" | jq -c '.[]')
+
+    # Process each PR
+    for pr in "${pr_entries[@]}"; do
+        local repo number title url
+        repo=$(echo "$pr" | jq -r '.repo')
+        number=$(echo "$pr" | jq -r '.number')
+        title=$(echo "$pr" | jq -r '.title')
+        url=$(echo "$pr" | jq -r '.url')
+
+        local result=0
+        process_pr "$repo" "$number" "$title" "$url" || result=$?
+
+        case $result in
+            0) ((updated++)) ;;
+            1) ((up_to_date++)) ;;
+            2) ((skipped++)) ;;
+            3) ((failed++)) ;;
+        esac
+    done
+
+    # Summary
+    echo ""
+    echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BOLD}Summary${NC}"
+    echo -e "${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    [[ $updated -gt 0 ]] && echo -e "  ${GREEN}✓ Updated:${NC}        $updated"
+    [[ $up_to_date -gt 0 ]] && echo -e "  ${GREEN}✓ Up to date:${NC}     $up_to_date"
+    [[ $skipped -gt 0 ]] && echo -e "  ${YELLOW}⚠ Skipped:${NC}        $skipped"
+    [[ $failed -gt 0 ]] && echo -e "  ${RED}✗ Failed:${NC}         $failed"
+
+    # Exit with error if any failures
+    [[ $failed -gt 0 ]] && exit 1
+    exit 0
+}
+
+main "$@"
