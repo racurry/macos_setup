@@ -50,17 +50,14 @@ DEFAULT_STYLE = "powerline"
 #     "total_lines_removed": 1             # Lines removed this session
 #   },
 #
-#   # --- UNDOCUMENTED FIELDS (discovered via schema logging) -----------------
-#   # These fields are not in official docs but appear in actual hook data.
-#   # Use --log to discover new fields as Claude Code evolves.
-#
 #   "context_window": {
-#     "total_input_tokens": 32501,         # Input tokens used
-#     "total_output_tokens": 34054,        # Output tokens used
-#     "context_window_size": 200000        # Max context window size
-#   },
-#
-#   "exceeds_200k_tokens": false           # Context exhaustion warning
+#     "current_usage": {                     # Added in v2.0.70
+#       "input_tokens": 32501,               # Input tokens used
+#       "cache_creation_input_tokens": 0,    # Cache creation tokens
+#       "cache_read_input_tokens": 15000     # Cache read tokens
+#     },
+#     "context_window_size": 200000          # Max context window size
+#   }
 # }
 #
 # Note: "hook_event_name": "Status" appears in docs but not in actual data.
@@ -276,8 +273,9 @@ def get_context_usage(data: dict) -> ContextInfo | None:
     """
     Extract context window usage from status hook data.
 
-    Uses the undocumented 'context_window' field which provides direct token
-    counts - no need to parse the transcript file! Discovered via schema logging.
+    Uses the official 'current_usage' field (added in v2.0.70) which provides
+    accurate token breakdown:
+        input_tokens + cache_creation_input_tokens + cache_read_input_tokens
 
     Args:
         data: The full status hook JSON data dict
@@ -289,8 +287,16 @@ def get_context_usage(data: dict) -> ContextInfo | None:
     if not ctx:
         return None
 
-    tokens = ctx.get("total_input_tokens", 0)
-    max_tokens = ctx.get("context_window_size", 200_000)  # Fallback if missing
+    current_usage = ctx.get("current_usage")
+    if not current_usage:
+        return None
+
+    tokens = (
+        current_usage.get("input_tokens", 0)
+        + current_usage.get("cache_creation_input_tokens", 0)
+        + current_usage.get("cache_read_input_tokens", 0)
+    )
+    max_tokens = ctx.get("context_window_size", 200_000)
 
     if tokens and max_tokens:
         return ContextInfo(tokens=tokens, percentage=(tokens / max_tokens) * 100)
