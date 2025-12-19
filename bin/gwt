@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
-# gwt - Git Worktree helper
-# Creates worktrees with predictable naming: ../<repo>__<branch>
+# gwt - Git clone helper (reference clones for isolation)
+# Creates isolated clones with predictable naming: ../<repo>__<branch>
+#
+# Uses --reference clones to share git objects (disk efficient) while avoiding
+# the lock contention issues that plague git worktrees with multiple editors.
 #
 # Usage:
-#   gwt <branch-name>           Create worktree with new branch, open in VS Code
-#   gwt -e <branch-name>        Create from existing branch (no -b flag)
-#   gwt list                    List all worktrees
-#   gwt remove <branch-name>    Remove worktree by branch name
+#   gwt <branch-name>           Create clone with new branch, open in VS Code
+#   gwt -e <branch-name>        Create clone with existing branch
+#   gwt list                    List all clones matching pattern
+#   gwt remove <branch-name>    Remove clone by branch name
 #
 # Examples:
 #   gwt clean-direnv            Creates ../frontend-monorepo__clean-direnv
-#   gwt -e main                 Creates worktree from existing main branch
+#   gwt -e main                 Creates clone tracking existing main branch
 #
-# After creating a worktree, copies gitignored .env* files and .claude/ directory
+# After creating a clone, copies gitignored .env* files and .claude/ directory
 
 set -euo pipefail
 
-# Copy gitignored environment files to new worktree
+# Copy gitignored environment files to new clone
 copy_gitignored_files() {
     local dest="$1"
     local src_root
@@ -50,47 +53,161 @@ copy_gitignored_files() {
     done < <(find "$src_root" -type d -name ".env" 2>/dev/null | grep -v "node_modules" || true)
 
     if [[ $copied -gt 0 ]]; then
-        echo "Copied $copied gitignored file(s)/directory(s) to worktree"
+        echo "Copied $copied gitignored file(s)/directory(s) to clone"
     fi
 }
 
 main() {
     local repo_name existing_branch=false
+    local src_root
 
-    # Get repo name from current directory or git remote
-    repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
-    if [[ -z "$repo_name" ]]; then
+    # Get repo root and name
+    src_root=$(git rev-parse --show-toplevel 2>/dev/null)
+    if [[ -z "$src_root" ]]; then
         echo "Error: Not in a git repository" >&2
         exit 1
     fi
+    repo_name=$(basename "$src_root")
+    local parent_dir
+    parent_dir=$(dirname "$src_root")
+
+    # Get the default branch
+    local default_branch
+    default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | cut -f4 -d/)
+    if [[ -z "$default_branch" ]]; then
+        default_branch="main"
+    fi
 
     # Handle subcommands
-    case "$1" in
+    case "${1:-}" in
     list | ls)
-        git worktree list
-        exit $?
+        echo "Reference clones for $repo_name:"
+        local found=0
+        for dir in "$parent_dir/${repo_name}__"*; do
+            if [[ -d "$dir" ]]; then
+                local branch
+                branch=$(git -C "$dir" branch --show-current 2>/dev/null || echo "unknown")
+                echo "  $(basename "$dir")  [$branch]"
+                ((found++)) || true
+            fi
+        done
+        if [[ $found -eq 0 ]]; then
+            echo "  (none)"
+        fi
+        exit 0
         ;;
     remove | rm)
         if [[ -z "${2:-}" ]]; then
             echo "Usage: gwt remove <branch-name>" >&2
             exit 1
         fi
-        local wt_path="../${repo_name}__${2}"
-        git worktree remove "$wt_path"
-        exit $?
+        local clone_path="$parent_dir/${repo_name}__${2}"
+        if [[ ! -d "$clone_path" ]]; then
+            echo "Error: Clone not found: $clone_path" >&2
+            exit 1
+        fi
+        rm -rf "$clone_path"
+        echo "Removed $clone_path"
+        exit 0
+        ;;
+    cleanup | clean)
+        echo "Cleaning up stale clones for $repo_name..."
+        local cleaned=0
+        local skipped=0
+
+        for dir in "$parent_dir/${repo_name}__"*; do
+            [[ -d "$dir" ]] || continue
+
+            local clone_name
+            clone_name=$(basename "$dir")
+
+            local clone_branch
+            clone_branch=$(git -C "$dir" branch --show-current 2>/dev/null)
+            if [[ -z "$clone_branch" ]]; then
+                echo "  Skipping $clone_name - could not determine branch"
+                ((skipped++)) || true
+                continue
+            fi
+
+            # Skip if branch is the default branch (e.g., gwt -e main)
+            if [[ "$clone_branch" == "$default_branch" ]]; then
+                continue
+            fi
+
+            # Safety: skip if uncommitted changes
+            if ! git -C "$dir" diff --quiet 2>/dev/null || ! git -C "$dir" diff --cached --quiet 2>/dev/null; then
+                echo "  Skipping $clone_name - has uncommitted changes"
+                ((skipped++)) || true
+                continue
+            fi
+
+            # Fetch latest default branch to check merge status
+            git -C "$dir" fetch origin "$default_branch" --quiet 2>/dev/null || true
+
+            local should_delete=false
+            local reason=""
+
+            # Check if remote branch is gone
+            if ! git -C "$dir" ls-remote --exit-code --heads origin "$clone_branch" &>/dev/null; then
+                # Remote gone - only delete if work is merged
+                if git -C "$dir" merge-base --is-ancestor HEAD "origin/$default_branch" 2>/dev/null; then
+                    should_delete=true
+                    reason="merged, remote branch deleted"
+                else
+                    echo "  Skipping $clone_name - remote gone but has unmerged commits"
+                    ((skipped++)) || true
+                    continue
+                fi
+            fi
+
+            # Check if merged even if remote still exists
+            if [[ "$should_delete" != true ]]; then
+                if git -C "$dir" merge-base --is-ancestor HEAD "origin/$default_branch" 2>/dev/null; then
+                    should_delete=true
+                    reason="merged into $default_branch"
+                fi
+            fi
+
+            if [[ "$should_delete" == true ]]; then
+                echo "  Removing $clone_name ($reason)"
+                rm -rf "$dir"
+                ((cleaned++)) || true
+            fi
+        done
+
+        if [[ $cleaned -eq 0 && $skipped -eq 0 ]]; then
+            echo "  No stale clones found"
+        else
+            [[ $cleaned -gt 0 ]] && echo "Cleaned up $cleaned clone(s)"
+            [[ $skipped -gt 0 ]] && echo "Skipped $skipped clone(s) with uncommitted/unmerged work"
+        fi
+        exit 0
+        ;;
+    reup)
+        # Full sync: checkout default, pull, cleanup branches, cleanup clones
+        echo "Syncing $repo_name..."
+        git checkout "$default_branch"
+        git pull --rebase
+        git cleanup 2>/dev/null || true  # Uses git alias if available
+        exec "$0" cleanup  # Run gwt cleanup
         ;;
     -e | --existing)
         existing_branch=true
         shift
         ;;
     -h | --help | help)
-        echo "gwt - Git Worktree helper"
+        echo "gwt - Git clone helper (reference clones for isolation)"
         echo ""
         echo "Usage:"
-        echo "  gwt <branch-name>           Create worktree with new branch, open in VS Code"
-        echo "  gwt -e <branch-name>        Create from existing branch (no -b flag)"
-        echo "  gwt list                    List all worktrees"
-        echo "  gwt remove <branch-name>    Remove worktree by branch name"
+        echo "  gwt <branch-name>           Create clone with new branch, open in VS Code"
+        echo "  gwt -e <branch-name>        Create clone with existing branch"
+        echo "  gwt list                    List all clones"
+        echo "  gwt remove <branch-name>    Remove clone by branch name"
+        echo "  gwt cleanup                 Remove clones whose branches are merged/gone"
+        echo "  gwt reup                    Full sync: checkout default, pull, cleanup all"
+        echo ""
+        echo "Uses --reference clones for disk efficiency while avoiding worktree lock issues."
+        echo "Note: You'll need to 'git fetch' separately in each clone."
         exit 0
         ;;
     esac
@@ -104,16 +221,32 @@ main() {
         exit 1
     fi
 
-    local wt_path="../${repo_name}__${branch}"
+    local clone_path="$parent_dir/${repo_name}__${branch}"
 
-    if [[ "$existing_branch" == true ]]; then
-        git worktree add "$wt_path" "$branch"
-    else
-        git worktree add "$wt_path" -b "$branch"
+    if [[ -d "$clone_path" ]]; then
+        echo "Error: Clone already exists: $clone_path" >&2
+        exit 1
     fi
 
-    copy_gitignored_files "$wt_path"
-    code "$wt_path"
+    # Get the remote URL (prefer origin, fall back to first remote)
+    local remote_url
+    remote_url=$(git remote get-url origin 2>/dev/null || git remote get-url "$(git remote | head -1)" 2>/dev/null)
+    if [[ -z "$remote_url" ]]; then
+        echo "Error: No git remote found" >&2
+        exit 1
+    fi
+
+    echo "Creating reference clone at $clone_path..."
+
+    if [[ "$existing_branch" == true ]]; then
+        git clone --reference "$src_root" --branch "$branch" "$remote_url" "$clone_path"
+    else
+        git clone --reference "$src_root" "$remote_url" "$clone_path"
+        git -C "$clone_path" checkout -b "$branch"
+    fi
+
+    copy_gitignored_files "$clone_path"
+    code "$clone_path"
 }
 
 main "$@"
