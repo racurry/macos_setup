@@ -91,4 +91,3 @@ mas "Rapidmg", id: 6451349778
 mas "The Unarchiver", id: 425424353
 mas "Things", id: 904280696
 
-# Apps requiring sudo for upgrades are in sudo.Brewfile
