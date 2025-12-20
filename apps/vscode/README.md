@@ -26,7 +26,7 @@ To add an extension:
 
 Complete these steps after installation:
 
-1. **Enable Settings Sync** - Open Command Palette > "Settings Sync: Turn On" > Sign in with GitHub or Microsoft
+1. **Enable Settings Sync** - Open Command Palette > "Settings Sync: Turn On" > Sign in with GitHub (not MS!)
 2. **Wait for sync** - Extensions, settings, keybindings, and snippets will sync automatically
 
 ## Syncing Preferences

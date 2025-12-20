@@ -22,6 +22,7 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
     4. Should this script be integrated into the main run/setup.sh workflow or remain manual?
     5. Should VS Code settings have work/personal variants (using SETUP_MODE)?
 - [ ] Get mcp logic set up for gemini, codex
+- [ ] https://github.com/dandavison/delta
 
 ## Icebox
 
@@ -34,3 +35,4 @@ For any todo in `Ready to work`,  For every todo, use a sub-agent.  Each agent s
 - [ ] Fucking fix vscode's tab completion!!!
 - [ ] Can we add extension syncing to vscode & cursor?
 - [ ] How do I set up manual set up in a clean way?  Each app could have a manual_setep.md file.  Can I transclude it into readme?
+- [ ] https://github.com/catppuccin/bat
