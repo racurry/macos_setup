@@ -1,22 +1,44 @@
 # VSCode extensions
+# Note: Some extensions auto-install dependencies (e.g., ms-python.python installs pylance, debugpy)
+
+# AI assistants
 vscode "anthropic.claude-code"
-vscode "batisteo.vscode-django"
-vscode "dbaeumer.vscode-eslint"
-vscode "esbenp.prettier-vscode"
-vscode "formulahendry.auto-rename-tag"
-vscode "gamunu.vscode-yarn"
-vscode "github.copilot-chat"
 vscode "github.copilot"
-vscode "github.vscode-github-actions"
-vscode "jetmartin.bats"
-vscode "llvm-vs-code-extensions.lldb-dap"
-vscode "mechatroner.rainbow-csv"
-vscode "charliermarsh.ruff"
-vscode "mikestead.dotenv"
-vscode "ms-python.python"
+vscode "github.copilot-chat"
+vscode "google.gemini-cli-vscode-ide-companion"
+vscode "google.geminicodeassist"
 vscode "openai.chatgpt"
-vscode "swiftlang.swift-vscode"
-vscode "teabyii.ayu"
-vscode "tomoki1207.pdf"
+
+# Languages & frameworks
+vscode "batisteo.vscode-django"
+vscode "idleberg.applescript"
+vscode "jetmartin.bats"
+vscode "ms-python.python"
+vscode "redhat.vscode-yaml"
+vscode "tamasfe.even-better-toml"
+
+# Linting & formatting
+vscode "bittorala.mdformat"
+vscode "charliermarsh.ruff"
+vscode "dbaeumer.vscode-eslint"
+vscode "editorconfig.editorconfig"
+vscode "esbenp.prettier-vscode"
+vscode "foxundermoon.shell-format"
+vscode "timonwong.shellcheck"
+
+# Git & GitHub
+vscode "github.vscode-github-actions"
 vscode "waderyan.gitblame"
-vscode "wmaurer.change-case"
+
+# Docker
+vscode "ms-azuretools.vscode-docker"
+
+# Theme & icons
+vscode "catppuccin.catppuccin-vsc"
+vscode "catppuccin.catppuccin-vsc-icons"
+
+# Utilities
+vscode "formulahendry.auto-rename-tag"
+vscode "mechatroner.rainbow-csv"
+vscode "tomoki1207.pdf"
+vscode "usernamehw.errorlens"
