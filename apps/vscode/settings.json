@@ -1,0 +1,39 @@
+{
+  "[markdown]": {
+    "editor.defaultFormatter": "bittorala.mdformat"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "claudeCode.preferredLocation": "sidebar",
+  "editor.accessibilitySupport": "off",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true,
+  "editor.tabCompletion": "on",
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmPasteNative": false,
+  "git.blame.editorDecoration.enabled": true,
+  "git.openRepositoryInParentFolders": "always",
+  "github.copilot.enable": {
+    "*": true,
+    "markdown": true,
+    "plaintext": false,
+    "scminput": false
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "prettier.configPath": "~/.prettierrc.json5",
+  "prettier.ignorePath": "~/.prettierignore",
+  "prettier.printWidth": 999,
+  "python.defaultInterpreterPath": "/opt/homebrew/bin/python3",
+  "security.workspace.trust.untrustedFiles": "open",
+  "workbench.iconTheme": "catppuccin-latte",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "workbench.startupEditor": "none",
+  "window.newWindowProfile": "Default",
+  "github.copilot.nextEditSuggestions.enabled": true
+}

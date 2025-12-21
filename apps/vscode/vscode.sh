@@ -14,23 +14,78 @@ Usage: $0 [COMMAND]
 Visual Studio Code setup and backup.
 
 VSCode installation and extensions are managed in apps/brew/Brewfile.
-Preferences sync via VSCode's built-in Settings Sync (sign in with GitHub/Microsoft).
+Settings and keybindings are symlinked from this repo.
 
 Commands:
-    setup       Install VSCode and extensions via Homebrew
+    setup       Install extensions and link settings/keybindings
     backup      Backup settings, keybindings, snippets, and extensions list
     help        Show this help message (also: -h, --help)
 EOF
 }
 
+do_link_settings() {
+    print_heading "Linking VS Code settings"
+
+    mkdir -p "${VSCODE_USER_DIR}"
+
+    # Link settings.json
+    local settings_src="${SCRIPT_DIR}/settings.json"
+    local settings_dest="${VSCODE_USER_DIR}/settings.json"
+    if [[ -f "${settings_src}" ]]; then
+        link_file "${settings_src}" "${settings_dest}" "vscode"
+    else
+        log_warn "No settings.json found in repo"
+    fi
+
+    # Link keybindings.json
+    local keybindings_src="${SCRIPT_DIR}/keybindings.json"
+    local keybindings_dest="${VSCODE_USER_DIR}/keybindings.json"
+    if [[ -f "${keybindings_src}" ]]; then
+        link_file "${keybindings_src}" "${keybindings_dest}" "vscode"
+    else
+        log_warn "No keybindings.json found in repo"
+    fi
+
+    log_success "VS Code settings linked"
+}
+
+do_link_snippets() {
+    print_heading "Linking VS Code snippets"
+
+    local snippets_src="${SCRIPT_DIR}/snippets"
+    local snippets_dest="${VSCODE_USER_DIR}/snippets"
+
+    if [[ ! -d "${snippets_src}" ]]; then
+        log_warn "No snippets directory found in repo"
+        return 0
+    fi
+
+    mkdir -p "${snippets_dest}"
+
+    # Link each snippet file
+    for snippet_file in "${snippets_src}"/*.json "${snippets_src}"/*.code-snippets; do
+        [[ -f "${snippet_file}" ]] || continue
+        local filename
+        filename="$(basename "${snippet_file}")"
+        link_file "${snippet_file}" "${snippets_dest}/${filename}" "vscode"
+    done
+
+    log_success "VS Code snippets linked"
+}
+
 do_setup() {
     print_heading "Setting up Visual Studio Code"
+
+    # Link settings and keybindings from repo
+    do_link_settings
+
+    # Link snippets from repo
+    do_link_snippets
 
     # Install extensions from local Brewfile
     log_info "Installing VSCode extensions..."
     brew bundle --file="${SCRIPT_DIR}/Brewfile"
 
-    log_info "Enable Settings Sync in VSCode to sync preferences across machines"
     log_success "VSCode setup complete"
 }
 

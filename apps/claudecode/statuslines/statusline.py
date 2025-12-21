@@ -292,9 +292,7 @@ def get_context_usage(data: dict) -> ContextInfo | None:
         return None
 
     tokens = (
-        current_usage.get("input_tokens", 0)
-        + current_usage.get("cache_creation_input_tokens", 0)
-        + current_usage.get("cache_read_input_tokens", 0)
+        current_usage.get("input_tokens", 0) + current_usage.get("cache_creation_input_tokens", 0) + current_usage.get("cache_read_input_tokens", 0)
     )
     max_tokens = ctx.get("context_window_size", 200_000)
 
@@ -400,9 +398,7 @@ STYLES: dict[str, Style] = {
 }
 
 
-def format_status(
-    git: GitInfo | None, model: str, ctx: ContextInfo | None, style_name: str
-) -> str:
+def format_status(git: GitInfo | None, model: str, ctx: ContextInfo | None, style_name: str) -> str:
     """Format status line using the specified style."""
     style = STYLES[style_name]
     parts = []

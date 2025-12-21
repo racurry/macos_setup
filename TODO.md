@@ -16,6 +16,7 @@ bullets asking the clarifying questions.
 - [ ] Review VS Code sync settings - configure what syncs vs stays machine-specific (paths like openscad shouldn't sync)
 - [ ] Get mcp logic set up for gemini, codex
 - [ ] https://github.com/dandavison/delta
+- [ ] I added a markdown config to .editorconfig - how do we make sure it isn't only part of shfmt?
 
 ## Icebox
 
