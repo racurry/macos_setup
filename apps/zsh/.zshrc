@@ -1,23 +1,4 @@
 # ============================================================================
-# OH-MY-ZSH CONFIGURATION
-# ============================================================================
-
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-
-# Configuration must be set before sourcing oh-my-zsh
-ZSH_THEME=""
-HYPHEN_INSENSITIVE="true"
-COMPLETION_WAITING_DOTS="true"
-plugins=()
-
-if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
-  source "$ZSH/oh-my-zsh.sh"
-else
-  echo "Warning: Oh My Zsh is not installed at $ZSH. Prompting will be minimal."
-fi
-
-# ============================================================================
 # PACKAGE MANAGERS & TOOL SETUP
 # ============================================================================
 
@@ -159,7 +140,6 @@ typeset -U PATH
 # Shell convenience
 alias rezsh="source ~/.zshrc"
 alias zshcfg='code -nw "$(readlink ~/.zshrc 2>/dev/null || echo ~/.zshrc)"'
-alias omzcfg="code -nw ~/.oh-my-zsh"
 
 # Motherbox repo shortcut (derived from zshrc symlink location)
 alias motherbox='cd "$(dirname "$(readlink ~/.zshrc)")"/../..'

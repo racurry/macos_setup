@@ -128,7 +128,6 @@ run_app_setup brew
 
 print_heading "Shell Settings"
 run_app_setup zsh
-run_app_setup ohmyzsh
 
 print_heading "macOS Settings"
 run_app_setup macos
