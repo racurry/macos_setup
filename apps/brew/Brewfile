@@ -43,6 +43,11 @@ cask "flux-app"
 cask "google-drive"
 cask "hazel"
 cask "iterm2"
+cask "kitty"
+
+# Fonts
+cask "font-fira-code-nerd-font"
+cask "font-fira-mono-nerd-font"
 # cask "jordanbaird-ice"  # Disabled: using beta for Tahoe crash fix (see apps/ice/README.md)
 cask "karabiner-elements"
 cask "keyboard-maestro"

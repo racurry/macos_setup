@@ -5,3 +5,8 @@
 item = "Aaron's github ssh key"
 vault = "Private"
 account = "my.1password.com"
+
+[[ssh-keys]]
+item = "Personal Local Homelab SSH Keys"
+vault = "Private"
+account = "my.1password.com"

@@ -165,9 +165,6 @@ alias dirs='dirs -v'
 # Say the magic word
 alias please='sudo $(fc -ln -1)'
 
-# Cleanup
-alias mdlint='markdownlint-cli2 --config ~/.markdownlint-cli2.jsonc'
-
 # Claude helpers
 alias cld='claude'
 alias cldup='npm update -g @anthropic-ai/claude-code'
@@ -175,6 +172,9 @@ alias clddanger='claude --allow-dangerously-skip-permissions'
 alias cldc='claude --continue'
 alias cldr='claude --resume'
 alias cldp='claude --print'
+
+# Doin things
+alias c='clear'
 
 # ============================================================================
 # GIT SHORTHANDS

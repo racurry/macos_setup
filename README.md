@@ -34,7 +34,8 @@ Tests are distributed throughout the repository, co-located with the code they t
 
 ## Resources
 
-Things that can help manage or tweak macOS settings
+Stuff that helps
 
 - <http://www.bresink.com/osx/TinkerTool.html>
 - <https://formulae.brew.sh/>
+- https://www.nerdfonts.com/

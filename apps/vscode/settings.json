@@ -35,5 +35,6 @@
   "workbench.secondarySideBar.defaultVisibility": "hidden",
   "workbench.startupEditor": "none",
   "window.newWindowProfile": "Default",
-  "github.copilot.nextEditSuggestions.enabled": true
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "redhat.telemetry.enabled": false
 }

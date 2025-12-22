@@ -29,3 +29,4 @@ bullets asking the clarifying questions.
 - [ ] Add extension syncing to Cursor (VS Code done via Brewfile)
 - [ ] How do I set up manual set up in a clean way? Each app could have a manual_setep.md file. Can I transclude it into readme?
 - [ ] https://github.com/catppuccin/bat
+- [ ] What is my arc replacement?
